@@ -78,14 +78,14 @@ int main( int argc, char **argv ) {
 		//input
 		while ( SDL_PollEvent( &events ) ) {
 			if ( ( events.type == SDL_QUIT ) || ( events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_ESCAPE ) ) {
-				SetNextState( STATE_EXIT );
+				CBaseGameState::SetNextState( STATE_EXIT );
 			}
 		}
 		currentGameState->Input();
 
 		//logic
 		currentGameState->Logic();
-		ChangeState();
+		CBaseGameState::ChangeState();
 
 		//rendering
 		SDL_RenderClear( renderer );

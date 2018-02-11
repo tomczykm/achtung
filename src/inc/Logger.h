@@ -15,4 +15,3 @@ private:
 	std::ofstream file;
 
 };
-

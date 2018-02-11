@@ -1,19 +1,20 @@
 #include <SDL.h>
+#include <SDL_image.h>
 
 #include "inc/Global.h"
 #include "inc/StateTest.h"
 
-SDL_Window		    *window = nullptr;
-SDL_Event		    events;
-SDL_Renderer		*renderer = nullptr;
+SDL_Window        *window = nullptr;
+SDL_Event         events;
+SDL_Renderer      *renderer = nullptr;
 
-CLogger 		    *logger = nullptr;
+CLogger           *logger = nullptr;
 CSettingsHandler	*settings = nullptr;
 
 
 CBaseGameState		*currentGameState = nullptr;
 EGameState		    stateID = STATE_NULL,
-                    nextState = STATE_NULL;
+                  nextState = STATE_NULL;
 
 bool Init();
 void Cleanup();
@@ -48,6 +49,12 @@ bool Init() {
 
 	renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
 	SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
+
+  int imgFlags = IMG_INIT_PNG;
+  if( !( IMG_Init( imgFlags ) & imgFlags ) ) {
+    logger->Error( "FATAL: Failed to initialize SDL_Image. IMG_Error: " + std::string( IMG_GetError() ) );
+    return false;
+  }
 
 	logger->Out( "Creating test game state" );
 	currentGameState = new CStateTest();

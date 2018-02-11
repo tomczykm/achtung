@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include <SDL_image.h>
 #include <string>
 #include <sstream>
 #include <cstdlib>
@@ -16,12 +17,13 @@
 
 extern SDL_Window		    *window;
 extern CLogger			    *logger;
-extern CSettingsHandler		*settings;
+extern CSettingsHandler	*settings;
 extern SDL_Event		    events;
+extern SDL_Renderer     *renderer;
 
 extern CBaseGameState		*currentGameState;
 extern EGameState		    stateID,
-                            nextState;
+                        nextState;
 
 /**
 	From BaseGameState.cpp
@@ -37,8 +39,7 @@ extern void     ChangeState();
 template < typename T >
 std::string ToString( const T& n )
 {
-    std::ostringstream stm ;
-    stm << n ;
-    return stm.str() ;
+    std::ostringstream stm;
+    stm << n;
+    return stm.str();
 }
-

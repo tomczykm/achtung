@@ -3,8 +3,8 @@
 
 CTexture::CTexture( std::string filename ):
   t( nullptr ),
-  w( 0 ),
-  h( 0 )
+  mw( 0 ),
+  mh( 0 )
 {
   if( !filename.empty() ) {
     LoadFromFile( filename );
@@ -15,8 +15,8 @@ CTexture::~CTexture() {
   if( t != nullptr ) {
     SDL_DestroyTexture( t );
     t = nullptr;
-    w = 0;
-    h = 0;
+    mw = 0;
+    mh = 0;
   }
 }
 
@@ -39,8 +39,8 @@ bool CTexture::LoadFromFile( std::string filename ) {
     return false;
   }
 
-  w = loadedSurface->w;
-  h = loadedSurface->h;
+  mw = loadedSurface->w;
+  mh = loadedSurface->h;
   SDL_FreeSurface( loadedSurface );
 
   t = newTexture;
@@ -48,6 +48,15 @@ bool CTexture::LoadFromFile( std::string filename ) {
 }
 
 void CTexture::Render( int x, int y ) const {
-  SDL_Rect rq = { x, y, w, h };
+  SDL_Rect rq = { x, y, mw, mh };
   SDL_RenderCopy( renderer, t, nullptr, &rq );
+}
+
+void CTexture::Render( int x, int y, int w, int h, double angle, SDL_Point *center, SDL_Rect *clip ) const {
+  SDL_Rect rq = { x, y, w, h };
+  if( clip != nullptr ) {
+    rq.w = clip->w;
+    rq.h = clip->h;
+  }
+  SDL_RenderCopyEx( renderer, t, clip, &rq, angle, center, SDL_FLIP_NONE );
 }

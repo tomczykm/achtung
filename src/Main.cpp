@@ -48,7 +48,7 @@ bool Init() {
 	logger->Out( "SDL_CreateWindow() OK" );
 
 	renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
-	SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
+	SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0xFF );
 
   int imgFlags = IMG_INIT_PNG;
   if( !( IMG_Init( imgFlags ) & imgFlags ) ) {

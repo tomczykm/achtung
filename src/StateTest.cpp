@@ -11,7 +11,6 @@ CStateTest::CStateTest():
   players.push_back( CPlayerThing( "player" ) );
   for( auto it = players.begin() ; it != players.end() ; it++ ) {
     it->NewRoundSetup( 100, 600, 100, 600 );
-    it->DoRoga( bx+wt, bx+wt );
   }
   logger->Out( "Szerokość pola to " + ToString( bw ) + "px" );
 }

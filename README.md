@@ -1,4 +1,4 @@
-#achtung
+# achtung
 
 A C++ rewrite of [this game](https://en.wikipedia.org/wiki/Achtung,_die_Kurve!).
 

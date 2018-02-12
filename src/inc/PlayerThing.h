@@ -14,14 +14,12 @@ public:
 
   SDL_Rect GetRenderRect() const;
   int GetRadius() const { return radius; }
-
-  void DoRoga( int x, int y );
 private:
   std::string name;
 
-  double xPos, yPos;
+  float xPos, yPos;
   int direction; //in degrees
-  double vel; //pixels per seconds - depends on the size of the playfield
+  int vel; //pixels per seconds - depends on the size of the playfield
 
   int radius; //for thickness buffs
   int score;

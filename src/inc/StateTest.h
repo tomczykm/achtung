@@ -34,5 +34,6 @@ private:
 
 	std::vector <CPlayerThing> players;
 
+	//for calculating per-pixel movement speed
 	Uint32 timer;
 };

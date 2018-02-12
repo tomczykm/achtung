@@ -4,11 +4,11 @@
 
 class CStateSettings: public CBaseGameState {
 public:
-	CStateSettings	();
-	~CStateSettings	();
+	CStateSettings ();
+	~CStateSettings ();
 
-	void		Input();
-	void		Logic();
-	void		Render();
+	void Input();
+	void Logic();
+	void Render();
 private:
 };

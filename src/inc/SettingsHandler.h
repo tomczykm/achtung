@@ -37,22 +37,19 @@ inline e_ResAspectRatio GetResAspectRatio( e_Resolution res );
 
 class CSettingsHandler {
 public:
-	CSettingsHandler	( const std::string &filename = "settings.dat" );
-	~CSettingsHandler	();
+  CSettingsHandler ( const std::string &filename = "settings.dat" );
+  ~CSettingsHandler	();
 
-    int                 GetResW() const;
-    int                 GetResH() const;
-    bool                GetFullscreen() const { return mFullscreen; }
-	e_Resolution        GetRes() const { return mResolution; }
+  int GetResW() const;
+  int GetResH() const;
+  bool GetFullscreen() const { return mFullscreen; }
+	e_Resolution GetRes() const { return mResolution; }
 private:
 	//pomocnicze skladowe
-	std::fstream		mFile;
-	std::string         mFilename;
+	std::fstream mFile;
+	std::string mFilename;
+
 	//faktyczne ustawienia
-
-	e_Resolution        mResolution,
-                        mNewRes;
-
-    bool                mFullscreen;
+	e_Resolution mResolution, mNewRes;
+  bool mFullscreen;
 };
-

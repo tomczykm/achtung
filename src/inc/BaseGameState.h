@@ -9,11 +9,11 @@ enum EGameState {
 
 class CBaseGameState {
 public:
-	virtual void 	Logic() = 0;
-	virtual void 	Render() = 0;
-	virtual void 	Input() = 0;
+	virtual void Logic() = 0;
+	virtual void Render() = 0;
+	virtual void Input() = 0;
 
-	virtual 			~CBaseGameState() {}
-	static void 	SetNextState( EGameState newState );
-	static void 	ChangeState();
+	virtual ~CBaseGameState() {}
+	static void SetNextState( EGameState newState );
+	static void ChangeState();
 };

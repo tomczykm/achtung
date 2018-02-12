@@ -4,17 +4,16 @@
 #include "inc/Global.h"
 #include "inc/StateTest.h"
 
-SDL_Window        *window = nullptr;
-SDL_Event         events;
-SDL_Renderer      *renderer = nullptr;
+SDL_Window *window = nullptr;
+SDL_Event events;
+SDL_Renderer *renderer = nullptr;
 
-CLogger           *logger = nullptr;
-CSettingsHandler	*settings = nullptr;
+CLogger *logger = nullptr;
+CSettingsHandler *settings = nullptr;
 
 
-CBaseGameState		*currentGameState = nullptr;
-EGameState		    stateID = STATE_NULL,
-                  nextState = STATE_NULL;
+CBaseGameState *currentGameState = nullptr;
+EGameState stateID = STATE_NULL, nextState = STATE_NULL;
 
 bool Init();
 void Cleanup();
@@ -56,10 +55,10 @@ bool Init() {
     return false;
   }
 
+	std::srand( std::time( nullptr ) );
+
 	logger->Out( "Creating test game state" );
 	currentGameState = new CStateTest();
-
-	srand( time( nullptr ) );
 
 	logger->Out( "Initialization complete!" );
 	return true;

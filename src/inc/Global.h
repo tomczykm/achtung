@@ -15,26 +15,27 @@
 	From Main.cpp
 **/
 
-extern SDL_Window		    *window;
-extern CLogger			    *logger;
+extern SDL_Window *window;
+extern CLogger *logger;
 extern CSettingsHandler	*settings;
-extern SDL_Event		    events;
-extern SDL_Renderer     *renderer;
+extern SDL_Event events;
+extern SDL_Renderer *renderer;
 
-extern CBaseGameState		*currentGameState;
-extern EGameState		    stateID,
-                        nextState;
+extern CBaseGameState *currentGameState;
+extern EGameState stateID, nextState;
 
 /**
 	From BaseGameState.cpp
 **/
 
-extern void     SetNextState( EGameState newState );
-extern void     ChangeState();
+extern void SetNextState( EGameState newState );
+extern void ChangeState();
 
 /**
     Z Global.cpp
 **/
+
+extern int RandomInt( int min, int max );
 
 template < typename T >
 std::string ToString( const T& n )

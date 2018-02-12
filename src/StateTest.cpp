@@ -1,12 +1,19 @@
 #include "inc/StateTest.h"
-#include "inc/Global.h"
 
 CStateTest::CStateTest():
-  tex( "dot.png" ),
-  tex2( "wall.png" ),
-  radius( 12 )
+  playerTex( "dot.png" ),
+  wallTex( "wall.png" ),
+  wt( 4 ),
+  bx( 0.05 * settings->GetResH() ),
+  bw( 0.9 * settings->GetResH() ),
+  timer( SDL_GetTicks() )
 {
-
+  players.push_back( CPlayerThing( "player" ) );
+  for( auto it = players.begin() ; it != players.end() ; it++ ) {
+    it->NewRoundSetup( 100, 600, 100, 600 );
+    it->DoRoga( bx+wt, bx+wt );
+  }
+  logger->Out( "Szerokość pola to " + ToString( bw ) + "px" );
 }
 
 CStateTest::~CStateTest() {
@@ -14,39 +21,39 @@ CStateTest::~CStateTest() {
 }
 
 void CStateTest::Input() {
-
+  for( auto it = players.begin() ; it != players.end() ; it++ ) {
+    it->Input();
+  }
 }
 
 void CStateTest::Logic() {
-
+  for( auto it = players.begin() ; it != players.end() ; it++ ) {
+    it->Logic( ( SDL_GetTicks() - timer ) / 1000.f );
+  }
+  timer = SDL_GetTicks();
 }
 
 void CStateTest::Render() {
-  int wt = 4; //wall thickness
-  int x = 0.05 * settings->GetResH();
-  int y = x;
-  int w = 0.9 * settings->GetResH();
-  int h = w;
-
   //drawing outer walls
   SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0x00, 0xFF );
   SDL_Rect rect;
   //top
-  rect = { x, y, w, wt };
+  rect = { bx, bx, bw, wt };
   SDL_RenderFillRect( renderer, &rect );
   //bottom
-  rect = { x, y+h-wt, w, wt };
+  rect = { bx, bx+bw-wt, bw, wt };
   SDL_RenderFillRect( renderer, &rect );
   //left
-  rect = { x, y, wt, h };
+  rect = { bx, bx, wt, bw };
   SDL_RenderFillRect( renderer, &rect );
   //right
-  rect = { x+w-wt, y, wt, h };
+  rect = { bx+bw-wt, bx, wt, bw };
   SDL_RenderFillRect( renderer, &rect );
   SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0xFF );
 
-  tex.Render( 100, 100, radius, radius );
-  tex2.Render( 120, 100, radius*1.5, radius, 60 );
-  tex2.Render( 130, 100, radius*1.5, radius, 90 );
-  tex2.Render( 140, 100, radius*1.5, radius, 180 );
+  //draw players
+  for( auto it = players.begin() ; it != players.end() ; it++ ) {
+    SDL_Rect rec = it->GetRenderRect();
+    playerTex.Render( rec.x, rec.y, rec.w, rec.h );
+  }
 }

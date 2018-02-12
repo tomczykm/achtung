@@ -3,7 +3,6 @@ project( "achtung" )
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
 
-
 set( SOURCE
 
 src/BaseGameState.cpp
@@ -11,6 +10,7 @@ src/CTexture.cpp
 src/Global.cpp
 src/Logger.cpp
 src/Main.cpp
+src/PlayerThing.cpp
 src/SettingsHandler.cpp
 src/StateSettings.cpp
 src/StateTest.cpp

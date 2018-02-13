@@ -5,7 +5,7 @@
 
 class CPlayerThing {
 public:
-  CPlayerThing( std::string n );
+  CPlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right );
   ~CPlayerThing();
 
   void Input();

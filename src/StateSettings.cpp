@@ -12,6 +12,10 @@ void CStateSettings::Input() {
 
 }
 
+void CStateSettings::PolledInput() {
+  
+}
+
 void CStateSettings::Logic() {
 
 }

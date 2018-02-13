@@ -3,15 +3,17 @@
 
 #include <cmath>
 
-CPlayerThing::CPlayerThing( std::string n ):
+CPlayerThing::CPlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right ):
   name( n ),
   xPos( 0 ),
   yPos( 0 ),
   direction( 0.0 ),
-  vel( 50 ),
+  vel( 150 ),
   radius( 10 ),
   score( 0 ),
-  dead( false )
+  dead( false ),
+  leftKey( left ),
+  rightKey( right )
 {}
 
 CPlayerThing::~CPlayerThing() {
@@ -19,7 +21,13 @@ CPlayerThing::~CPlayerThing() {
 }
 
 void CPlayerThing::Input() {
-
+  const Uint8 *keyStates = SDL_GetKeyboardState( nullptr );
+	if( keyStates[ leftKey ] ) {
+		if( !keyStates[ rightKey ] )
+		  direction += 3;
+	} else if ( keyStates[ rightKey ] ) {
+		direction -= 3;
+	}
 }
 
 void CPlayerThing::Logic( float timeStep ) {

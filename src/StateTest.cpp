@@ -8,7 +8,7 @@ CStateTest::CStateTest():
   bw( 0.9 * settings->GetResH() ),
   timer( SDL_GetTicks() )
 {
-  players.push_back( CPlayerThing( "player" ) );
+  players.push_back( CPlayerThing( "player", SDL_SCANCODE_Q, SDL_SCANCODE_W ) );
   for( auto it = players.begin() ; it != players.end() ; it++ ) {
     it->NewRoundSetup( 100, 600, 100, 600 );
   }
@@ -23,6 +23,10 @@ void CStateTest::Input() {
   for( auto it = players.begin() ; it != players.end() ; it++ ) {
     it->Input();
   }
+}
+
+void CStateTest::PolledInput() {
+
 }
 
 void CStateTest::Logic() {

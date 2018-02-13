@@ -83,9 +83,10 @@ int main( int argc, char **argv ) {
 	while( stateID != STATE_EXIT ) {
 		//input
 		while ( SDL_PollEvent( &events ) ) {
-			if ( ( events.type == SDL_QUIT ) || ( events.type == SDL_KEYDOWN && events.key.keysym.sym == SDLK_ESCAPE ) ) {
+			if ( ( events.type == SDL_QUIT ) ) {
 				CBaseGameState::SetNextState( STATE_EXIT );
 			}
+			currentGameState->PolledInput();
 		}
 		currentGameState->Input();
 

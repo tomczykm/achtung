@@ -10,5 +10,6 @@ public:
 	void Input();
 	void Logic();
 	void Render();
+	void PolledInput();
 private:
 };

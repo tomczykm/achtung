@@ -2,22 +2,28 @@
 
 #include <string>
 #include <SDL.h>
+#include <vector>
 
-class CPlayerThing {
+#include "Thing.h"
+#include "TrailThing.h"
+
+class CPlayerThing: public CThing {
 public:
   CPlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right );
   ~CPlayerThing();
 
   void Input();
-  void Logic( float timeStep );
+  void Move( float timeStep );
+
   void NewRoundSetup( int xmin, int xmax, int ymin, int ymax );
+  void CreateTrail( std::vector <CTrailThing> *trails ) const;
 
   SDL_Rect GetRenderRect() const;
   int GetRadius() const { return radius; }
 private:
   std::string name;
 
-  float xPos, yPos;
+  //float xPos, yPos;
   int direction; //in degrees
   int vel; //pixels per seconds - depends on the size of the playfield
 

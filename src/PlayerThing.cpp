@@ -4,9 +4,8 @@
 #include <cmath>
 
 CPlayerThing::CPlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right ):
+  CThing( 0, 0 ),
   name( n ),
-  xPos( 0 ),
-  yPos( 0 ),
   direction( 0.0 ),
   vel( 150 ),
   radius( 10 ),
@@ -21,6 +20,8 @@ CPlayerThing::~CPlayerThing() {
 }
 
 void CPlayerThing::Input() {
+  //The pointer returned is a pointer to an internal SDL array.
+  //It will be valid for the whole lifetime of the application and should not be freed by the caller.
   const Uint8 *keyStates = SDL_GetKeyboardState( nullptr );
 	if( keyStates[ leftKey ] ) {
 		if( !keyStates[ rightKey ] )
@@ -30,7 +31,7 @@ void CPlayerThing::Input() {
 	}
 }
 
-void CPlayerThing::Logic( float timeStep ) {
+void CPlayerThing::Move( float timeStep ) {
   xPos += timeStep * vel * sin( (M_PI/180)*direction );
 	yPos += timeStep * vel * cos( (M_PI/180)*direction );
 }
@@ -42,6 +43,10 @@ void CPlayerThing::NewRoundSetup( int xmin, int xmax, int ymin, int ymax ) {
   yPos = RandomInt( ymin, ymax );
   direction = std::rand();
   logger->Out( "Direction: " + ToString( direction ) );
+}
+
+void CPlayerThing::CreateTrail( std::vector <CTrailThing> *trails ) const {
+  trails->push_back( CTrailThing( xPos, yPos, direction, radius ) );
 }
 
 SDL_Rect CPlayerThing::GetRenderRect() const {

@@ -2,7 +2,7 @@
 
 CStateTest::CStateTest():
   playerTex( "dot.png" ),
-  wallTex( "wall.png" ),
+  trailTex( "wall.png" ),
   wt( 4 ),
   bx( 0.05 * settings->GetResH() ),
   bw( 0.9 * settings->GetResH() ),
@@ -26,17 +26,41 @@ void CStateTest::Input() {
 }
 
 void CStateTest::PolledInput() {
-
+  if( events.type == SDL_KEYDOWN ) {
+		switch( events.key.keysym.sym ) {
+		case SDLK_SPACE:
+      SDL_Rect rec = trails.begin()->GetRenderRect();
+      logger->Out( "rec x: " + ToString( rec.w ) );
+    }
+  }
 }
 
 void CStateTest::Logic() {
   for( auto it = players.begin() ; it != players.end() ; it++ ) {
-    it->Logic( ( SDL_GetTicks() - timer ) / 1000.f );
+    //move players
+    it->Move( ( SDL_GetTicks() - timer ) / 1000.f );
+
+    //create trails
+    it->CreateTrail( &trails );
+
+    //handle collisions
   }
   timer = SDL_GetTicks();
 }
 
 void CStateTest::Render() {
+  //draw trails
+  for( auto it = trails.begin() ; it != trails.end() ; it++ ) {
+    SDL_Rect rec = it->GetRenderRect();
+    trailTex.Render( rec.x, rec.y, rec.w, rec.h, static_cast< double >( it->GetAngle() ) );
+  }
+
+  //draw players
+  for( auto it = players.begin() ; it != players.end() ; it++ ) {
+    SDL_Rect rec = it->GetRenderRect();
+    playerTex.Render( rec.x, rec.y, rec.w, rec.h );
+  }
+
   //drawing outer walls
   SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0x00, 0xFF );
   SDL_Rect rect;
@@ -53,10 +77,4 @@ void CStateTest::Render() {
   rect = { bx+bw-wt, bx, wt, bw };
   SDL_RenderFillRect( renderer, &rect );
   SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0xFF );
-
-  //draw players
-  for( auto it = players.begin() ; it != players.end() ; it++ ) {
-    SDL_Rect rec = it->GetRenderRect();
-    playerTex.Render( rec.x, rec.y, rec.w, rec.h );
-  }
 }

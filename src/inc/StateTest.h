@@ -27,13 +27,14 @@ public:
 	void PolledInput();
 private:
 	CTexture playerTex;
-	CTexture wallTex;
+	CTexture trailTex;
 
 	//dimensions for border
 	//cannot be static const as they use SettingsHandler::GetResH() to initialize
 	const int wt, bx, bw;
 
 	std::vector <CPlayerThing> players;
+	std::vector <CTrailThing> trails;
 
 	//for calculating per-pixel movement speed
 	Uint32 timer;

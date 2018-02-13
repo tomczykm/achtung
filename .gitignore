@@ -1,2 +1,3 @@
 build/
-*.swp
+bin/*
+!bin/*.png

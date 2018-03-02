@@ -22,13 +22,13 @@ extern SDL_Event events;
 extern SDL_Renderer *renderer;
 
 extern CBaseGameState *currentGameState;
-extern EGameState stateID, nextState;
+extern GameState stateID, nextState;
 
 /**
 	From BaseGameState.cpp
 **/
 
-extern void SetNextState( EGameState newState );
+extern void SetNextState( GameState newState );
 extern void ChangeState();
 
 /**

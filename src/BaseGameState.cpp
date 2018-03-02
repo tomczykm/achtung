@@ -5,33 +5,33 @@
 
 #include <cstdlib>
 
-void CBaseGameState::SetNextState( EGameState newState ) {
-	if ( nextState != STATE_EXIT ) {
+void CBaseGameState::SetNextState( GameState newState ) {
+	if ( nextState != GameState::quit ) {
 		nextState = newState;
 	}
 }
 
 void CBaseGameState::ChangeState() {
-	if ( nextState != STATE_NULL ) {
-		if ( nextState != STATE_EXIT ) {
+	if ( nextState != GameState::null ) {
+		if ( nextState != GameState::quit ) {
 			logger->Out( "Changing current game state..." );
 			delete currentGameState;
 		}
 		switch( nextState ) {
-		case STATE_TEST:
+		case GameState::test:
 			currentGameState = new CStateTest();
 			break;
-		case STATE_SETTINGS:
+		case GameState::settings:
 			currentGameState = new CStateSettings();
-		case STATE_EXIT:
+		case GameState::quit:
 			logger->Out( "Quitting the game" );
 			break;
-    case STATE_NULL:
+    case GameState::null:
 		default:
 			logger->Error( "FATAL: Attempt to enter undefined gamestate." );
 			exit( -1 );
 		}
 		stateID = nextState;
-		nextState = STATE_NULL;
+		nextState = GameState::null;
 	}
 }

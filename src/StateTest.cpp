@@ -6,7 +6,8 @@ CStateTest::CStateTest():
   wt( 4 ),
   bx( 0.05 * settings->GetResH() ),
   bw( 0.9 * settings->GetResH() ),
-  timer( SDL_GetTicks() )
+  timer( SDL_GetTicks() ),
+  status( GameplayStatus::roundBegin )
 {
   players.push_back( CPlayerThing( "player", SDL_SCANCODE_Q, SDL_SCANCODE_W ) );
   for( auto it = players.begin() ; it != players.end() ; it++ ) {

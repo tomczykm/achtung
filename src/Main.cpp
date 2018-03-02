@@ -13,7 +13,7 @@ CSettingsHandler *settings = nullptr;
 
 
 CBaseGameState *currentGameState = nullptr;
-EGameState stateID = STATE_NULL, nextState = STATE_NULL;
+GameState stateID = GameState::null, nextState = GameState::null;
 
 bool Init();
 void Cleanup();
@@ -80,11 +80,11 @@ int main( int argc, char **argv ) {
 	}
 
 	logger->Out( "Starting main loop..." );
-	while( stateID != STATE_EXIT ) {
+	while( stateID != GameState::quit ) {
 		//input
 		while ( SDL_PollEvent( &events ) ) {
 			if ( ( events.type == SDL_QUIT ) ) {
-				CBaseGameState::SetNextState( STATE_EXIT );
+				CBaseGameState::SetNextState( GameState::quit );
 			}
 			currentGameState->PolledInput();
 		}

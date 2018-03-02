@@ -1,10 +1,10 @@
 #pragma once
 
-enum EGameState {
-	STATE_NULL,
-	STATE_TEST,
-	STATE_SETTINGS,
-	STATE_EXIT
+enum class GameState {
+	null,
+	test,
+	settings,
+	quit
 };
 
 class CBaseGameState {
@@ -15,6 +15,6 @@ public:
 	virtual void PolledInput() = 0;
 
 	virtual ~CBaseGameState() {}
-	static void SetNextState( EGameState newState );
+	static void SetNextState( GameState newState );
 	static void ChangeState();
 };

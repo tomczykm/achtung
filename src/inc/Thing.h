@@ -9,7 +9,7 @@ public:
 
   virtual SDL_Rect GetRenderRect() const;
 protected:
-  float xPos, yPos;
+  double xPos, yPos;
 private:
 
 };

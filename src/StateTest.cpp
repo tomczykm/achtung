@@ -30,7 +30,7 @@ void CStateTest::PolledInput() {
   if( events.type == SDL_KEYDOWN ) {
 		switch( events.key.keysym.sym ) {
 		case SDLK_SPACE:
-      SDL_Rect rec = trails.begin()->GetRenderRect();
+      SDL_Rect rec = trails.cbegin()->GetRenderRect();
       logger->Out( "rec x: " + ToString( rec.w ) );
     }
   }
@@ -51,13 +51,13 @@ void CStateTest::Logic() {
 
 void CStateTest::Render() {
   //draw trails
-  for( auto it = trails.begin() ; it != trails.end() ; it++ ) {
+  for( auto it = trails.cbegin() ; it != trails.cend() ; it++ ) {
     SDL_Rect rec = it->GetRenderRect();
     trailTex.Render( rec.x, rec.y, rec.w, rec.h, static_cast< double >( it->GetAngle() ) );
   }
 
   //draw players
-  for( auto it = players.begin() ; it != players.end() ; it++ ) {
+  for( auto it = players.cbegin() ; it != players.cend() ; it++ ) {
     SDL_Rect rec = it->GetRenderRect();
     playerTex.Render( rec.x, rec.y, rec.w, rec.h );
   }

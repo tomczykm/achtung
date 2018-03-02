@@ -6,6 +6,7 @@
 #include "PlayerThing.h"
 
 #include <vector>
+#include <deque>
 
 enum class GameplayStatus {
 	null = 0,
@@ -34,7 +35,7 @@ private:
 	const int wt, bx, bw;
 
 	std::vector <CPlayerThing> players;
-	std::vector <CTrailThing> trails;
+	std::deque <CTrailThing> trails;
 
 	//for calculating per-pixel movement speed
 	Uint32 timer;

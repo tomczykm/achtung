@@ -23,6 +23,7 @@ void CBaseGameState::ChangeState() {
 			break;
 		case GameState::settings:
 			currentGameState = new CStateSettings();
+			break;
 		case GameState::quit:
 			logger->Out( "Quitting the game" );
 			break;

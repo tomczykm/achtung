@@ -3,10 +3,14 @@
 
 #include <cmath>
 
+const float CPlayerThing::TURN_DEG = 240;
+
 CPlayerThing::CPlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right ):
   CThing( 0, 0 ),
   name( n ),
   direction( 0.0 ),
+  turnR( false ),
+  turnL( false ),
   vel( 150 ),
   radius( 10 ),
   score( 0 ),
@@ -22,16 +26,15 @@ CPlayerThing::~CPlayerThing() {
 void CPlayerThing::Input() {
   //The pointer returned is a pointer to an internal SDL array.
   //It will be valid for the whole lifetime of the application and should not be freed by the caller.
-  const Uint8 *keyStates = SDL_GetKeyboardState( nullptr );
-	if( keyStates[ leftKey ] ) {
-		if( !keyStates[ rightKey ] )
-		  direction += 3;
-	} else if ( keyStates[ rightKey ] ) {
-		direction -= 3;
-	}
+  const auto keyStates = SDL_GetKeyboardState( nullptr );
+  turnL = keyStates[ leftKey ] && !keyStates[ rightKey ];
+  turnR = keyStates[ rightKey ];
 }
 
 void CPlayerThing::Move( float timeStep ) {
+  if( turnL ) direction += timeStep * TURN_DEG;
+  else if( turnR ) direction -= timeStep * TURN_DEG;
+
   xPos += timeStep * vel * sin( (M_PI/180)*direction );
 	yPos += timeStep * vel * cos( (M_PI/180)*direction );
 }

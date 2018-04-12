@@ -37,8 +37,8 @@ private:
 	std::vector <CPlayerThing> players;
 	std::deque <CTrailThing> trails;
 
-	//for calculating per-pixel movement speed
-	Uint32 timer;
+	//for calculating per-pixel movement speed and turn angles
+	Uint32 	moveTimer;
 
 	GameplayStatus status;
 };

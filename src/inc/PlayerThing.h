@@ -23,8 +23,10 @@ public:
 private:
   std::string name;
 
-  //float xPos, yPos;
-  int direction; //in degrees
+  double direction; //in degrees
+  bool turnR, turnL;
+
+  static const float TURN_DEG;
   int vel; //pixels per seconds - depends on the size of the playfield
 
   int radius; //for thickness buffs

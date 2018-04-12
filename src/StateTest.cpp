@@ -6,7 +6,7 @@ CStateTest::CStateTest():
   wt( 4 ),
   bx( 0.05 * settings->GetResH() ),
   bw( 0.9 * settings->GetResH() ),
-  timer( SDL_GetTicks() ),
+  moveTimer( SDL_GetTicks() ),
   status( GameplayStatus::roundBegin )
 {
   players.push_back( CPlayerThing( "player", SDL_SCANCODE_Q, SDL_SCANCODE_W ) );
@@ -39,14 +39,14 @@ void CStateTest::PolledInput() {
 void CStateTest::Logic() {
   for( auto it = players.begin() ; it != players.end() ; it++ ) {
     //move players
-    it->Move( ( SDL_GetTicks() - timer ) / 1000.f );
+    it->Move( ( SDL_GetTicks() - moveTimer ) / 1000.f );
 
     //create trails
     it->CreateTrail( &trails );
 
     //handle collisions
   }
-  timer = SDL_GetTicks();
+  moveTimer = SDL_GetTicks();
 }
 
 void CStateTest::Render() {

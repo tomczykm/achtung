@@ -16,7 +16,7 @@ public:
   void Move( float timeStep );
 
   void NewRoundSetup( int xmin, int xmax, int ymin, int ymax );
-  void CreateTrail( std::deque <CTrailThing> *trails ) const;
+  void CreateTrail( std::deque <CTrailThing> &trails ) const;
 
   SDL_Rect GetRenderRect() const;
   int GetRadius() const { return radius; }

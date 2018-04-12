@@ -4,22 +4,22 @@
 #include "inc/Global.h"
 #include "inc/StateTest.h"
 
+//these SDL objects need to be raw pointers.
 SDL_Window *window = nullptr;
 SDL_Event events;
 SDL_Renderer *renderer = nullptr;
 
-CLogger *logger = nullptr;
-CSettingsHandler *settings = nullptr;
+std::unique_ptr< CLogger > logger;
+std::unique_ptr< CSettingsHandler > settings;
 
-
-CBaseGameState *currentGameState = nullptr;
+std::unique_ptr< CBaseGameState > currentGameState;
 GameState stateID = GameState::null, nextState = GameState::null;
 
 bool Init();
 void Cleanup();
 
 bool Init() {
-	logger = new CLogger();
+	logger = std::make_unique< CLogger >();
 	logger->Out( "Starting initialization" );
 	if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 ) {
 		logger->Error( "FATAL: Failed to init SDL video. SDL_Error: " + std::string( SDL_GetError() ) );
@@ -35,7 +35,7 @@ bool Init() {
 		logger->Out( "WARNING: VSync is OFF!" );
 	}
 
-	settings = new CSettingsHandler();
+	settings = std::make_unique< CSettingsHandler >();
 
 	logger->Out( "Resolution: " + ToString( settings->GetResW() ) + "x" + ToString( settings->GetResH() ) );
 
@@ -58,7 +58,7 @@ bool Init() {
 	std::srand( std::time( nullptr ) );
 
 	logger->Out( "Creating test game state" );
-	currentGameState = new CStateTest();
+	currentGameState.reset( new CStateTest() );
 
 	logger->Out( "Initialization complete!" );
 	return true;
@@ -69,8 +69,6 @@ void Cleanup() {
 	SDL_DestroyRenderer( renderer );
 	SDL_DestroyWindow( window );
 	SDL_Quit();
-	delete settings;
-	delete logger;
 }
 
 int main( int argc, char **argv ) {

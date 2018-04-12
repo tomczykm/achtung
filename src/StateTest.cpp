@@ -42,7 +42,7 @@ void CStateTest::Logic() {
     it->Move( ( SDL_GetTicks() - moveTimer ) / 1000.f );
 
     //create trails
-    it->CreateTrail( &trails );
+    it->CreateTrail( trails );
 
     //handle collisions
   }

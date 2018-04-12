@@ -48,8 +48,8 @@ void CPlayerThing::NewRoundSetup( int xmin, int xmax, int ymin, int ymax ) {
   logger->Out( "Direction: " + ToString( direction ) );
 }
 
-void CPlayerThing::CreateTrail( std::deque <CTrailThing> *trails ) const {
-  trails->push_front( CTrailThing( xPos, yPos, direction, radius ) );
+void CPlayerThing::CreateTrail( std::deque <CTrailThing> &trails ) const {
+  trails.push_front( CTrailThing( xPos, yPos, direction, radius ) );
 }
 
 SDL_Rect CPlayerThing::GetRenderRect() const {

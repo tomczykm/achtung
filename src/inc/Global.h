@@ -6,6 +6,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <ctime>
+#include <memory>
 
 #include "Logger.h"
 #include "SettingsHandler.h"
@@ -16,12 +17,13 @@
 **/
 
 extern SDL_Window *window;
-extern CLogger *logger;
-extern CSettingsHandler	*settings;
 extern SDL_Event events;
 extern SDL_Renderer *renderer;
 
-extern CBaseGameState *currentGameState;
+extern std::unique_ptr< CLogger > logger;
+extern std::unique_ptr< CSettingsHandler > settings;
+
+extern std::unique_ptr< CBaseGameState > currentGameState;
 extern GameState stateID, nextState;
 
 /**

@@ -15,14 +15,13 @@ void CBaseGameState::ChangeState() {
 	if ( nextState != GameState::null ) {
 		if ( nextState != GameState::quit ) {
 			logger->Out( "Changing current game state..." );
-			delete currentGameState;
 		}
 		switch( nextState ) {
 		case GameState::test:
-			currentGameState = new CStateTest();
+			currentGameState.reset( new CStateTest() );
 			break;
 		case GameState::settings:
-			currentGameState = new CStateSettings();
+			currentGameState.reset( new CStateSettings() );
 			break;
 		case GameState::quit:
 			logger->Out( "Quitting the game" );

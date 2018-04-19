@@ -1,25 +1,25 @@
 #include "inc/StateSettings.h"
 
-CStateSettings::CStateSettings() {
+StateSettings::StateSettings() {
 
 }
 
-CStateSettings::~CStateSettings() {
+StateSettings::~StateSettings() {
 
 }
 
-void CStateSettings::Input() {
+void StateSettings::Input() {
 
 }
 
-void CStateSettings::PolledInput() {
-  
-}
-
-void CStateSettings::Logic() {
+void StateSettings::PolledInput() {
 
 }
 
-void CStateSettings::Render() {
+void StateSettings::Logic() {
+
+}
+
+void StateSettings::Render() {
 
 }

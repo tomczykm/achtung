@@ -9,17 +9,17 @@ SDL_Window *window = nullptr;
 SDL_Event events;
 SDL_Renderer *renderer = nullptr;
 
-std::unique_ptr< CLogger > logger;
-std::unique_ptr< CSettingsHandler > settings;
+std::unique_ptr< Logger > logger;
+std::unique_ptr< SettingsHandler > settings;
 
-std::unique_ptr< CBaseGameState > currentGameState;
+std::unique_ptr< BaseGameState > currentGameState;
 GameState stateID = GameState::null, nextState = GameState::null;
 
 bool Init();
 void Cleanup();
 
 bool Init() {
-	logger = std::make_unique< CLogger >();
+	logger = std::make_unique< Logger >();
 	logger->Out( "Starting initialization" );
 	if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 ) {
 		logger->Error( "FATAL: Failed to init SDL video. SDL_Error: " + std::string( SDL_GetError() ) );
@@ -35,7 +35,7 @@ bool Init() {
 		logger->Out( "WARNING: VSync is OFF!" );
 	}
 
-	settings = std::make_unique< CSettingsHandler >();
+	settings = std::make_unique< SettingsHandler >();
 
 	logger->Out( "Resolution: " + ToString( settings->GetResW() ) + "x" + ToString( settings->GetResH() ) );
 
@@ -58,7 +58,7 @@ bool Init() {
 	std::srand( std::time( nullptr ) );
 
 	logger->Out( "Creating test game state" );
-	currentGameState.reset( new CStateTest() );
+	currentGameState.reset( new StateTest() );
 
 	logger->Out( "Initialization complete!" );
 	return true;
@@ -82,7 +82,7 @@ int main( int argc, char **argv ) {
 		//input
 		while ( SDL_PollEvent( &events ) ) {
 			if ( ( events.type == SDL_QUIT ) ) {
-				CBaseGameState::SetNextState( GameState::quit );
+				BaseGameState::SetNextState( GameState::quit );
 			}
 			currentGameState->PolledInput();
 		}
@@ -90,7 +90,7 @@ int main( int argc, char **argv ) {
 
 		//logic
 		currentGameState->Logic();
-		CBaseGameState::ChangeState();
+		BaseGameState::ChangeState();
 
 		//rendering
 		SDL_RenderClear( renderer );

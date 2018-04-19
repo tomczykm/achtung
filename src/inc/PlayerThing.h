@@ -7,32 +7,32 @@
 #include "Thing.h"
 #include "TrailThing.h"
 
-class CPlayerThing: public CThing {
+class PlayerThing: public Thing {
 public:
-  CPlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right );
-  ~CPlayerThing();
+  PlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right );
+  ~PlayerThing();
 
   void Input();
   void Move( float timeStep );
 
   void NewRoundSetup( int xmin, int xmax, int ymin, int ymax );
-  void CreateTrail( std::deque <CTrailThing> &trails ) const;
+  void CreateTrail( std::deque <TrailThing> &trails ) const;
 
   SDL_Rect GetRenderRect() const;
-  int GetRadius() const { return radius; }
+  int GetRadius() const { return radius_; }
 private:
-  std::string name;
+  std::string name_;
 
-  double direction; //in degrees
-  bool turnR, turnL;
+  double direction_; //in degrees
+  bool turnR_, turnL_;
 
   static const float TURN_DEG;
-  int vel; //pixels per seconds - depends on the size of the playfield
+  int vel_; //pixels per seconds - depends on the size of the playfield
 
-  int radius; //for thickness buffs
-  int score;
+  int radius_; //for thickness buffs
+  int score_;
 
-  bool dead;
+  bool dead_;
 
-  SDL_Scancode leftKey, rightKey;
+  SDL_Scancode leftKey_, rightKey_;
 };

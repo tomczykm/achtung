@@ -1,27 +1,27 @@
-#include "inc/CTexture.h"
+#include "inc/Texture.h"
 #include "inc/Global.h"
 
-CTexture::CTexture( std::string filename ):
-  t( nullptr ),
-  mw( 0 ),
-  mh( 0 )
+Texture::Texture( std::string filename ):
+  t_( nullptr ),
+  mw_( 0 ),
+  mh_( 0 )
 {
   if( !filename.empty() ) {
     LoadFromFile( filename );
   }
 }
 
-CTexture::~CTexture() {
-  if( t != nullptr ) {
-    SDL_DestroyTexture( t );
-    t = nullptr;
-    mw = 0;
-    mh = 0;
+Texture::~Texture() {
+  if( t_ != nullptr ) {
+    SDL_DestroyTexture( t_ );
+    t_ = nullptr;
+    mw_ = 0;
+    mh_ = 0;
   }
 }
 
-bool CTexture::LoadFromFile( std::string filename ) {
-  this->~CTexture();
+bool Texture::LoadFromFile( std::string filename ) {
+  this->~Texture();
 
   SDL_Texture *newTexture = nullptr;
   SDL_Surface *loadedSurface = IMG_Load( filename.c_str() );
@@ -39,24 +39,24 @@ bool CTexture::LoadFromFile( std::string filename ) {
     return false;
   }
 
-  mw = loadedSurface->w;
-  mh = loadedSurface->h;
+  mw_ = loadedSurface->w;
+  mh_ = loadedSurface->h;
   SDL_FreeSurface( loadedSurface );
 
-  t = newTexture;
-  return t != nullptr;
+  t_ = newTexture;
+  return t_ != nullptr;
 }
 
-void CTexture::Render( int x, int y ) const {
-  SDL_Rect rq = { x, y, mw, mh };
-  SDL_RenderCopy( renderer, t, nullptr, &rq );
+void Texture::Render( int x, int y ) const {
+  SDL_Rect rq = { x, y, mw_, mh_ };
+  SDL_RenderCopy( renderer, t_, nullptr, &rq );
 }
 
-void CTexture::Render( int x, int y, int w, int h, double angle, SDL_Point *center, SDL_Rect *clip ) const {
+void Texture::Render( int x, int y, int w, int h, double angle, SDL_Point *center, SDL_Rect *clip ) const {
   SDL_Rect rq = { x, y, w, h };
   if( clip != nullptr ) {
     rq.w = clip->w;
     rq.h = clip->h;
   }
-  SDL_RenderCopyEx( renderer, t, clip, &rq, angle, center, SDL_FLIP_NONE );
+  SDL_RenderCopyEx( renderer, t_, clip, &rq, angle, center, SDL_FLIP_NONE );
 }

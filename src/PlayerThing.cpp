@@ -3,56 +3,56 @@
 
 #include <cmath>
 
-const float CPlayerThing::TURN_DEG = 240;
+const float PlayerThing::TURN_DEG = 160;
 
-CPlayerThing::CPlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right ):
-  CThing( 0, 0 ),
-  name( n ),
-  direction( 0.0 ),
-  turnR( false ),
-  turnL( false ),
-  vel( 150 ),
-  radius( 10 ),
-  score( 0 ),
-  dead( false ),
-  leftKey( left ),
-  rightKey( right )
+PlayerThing::PlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right ):
+  Thing( 0, 0 ),
+  name_( n ),
+  direction_( 0.0 ),
+  turnR_( false ),
+  turnL_( false ),
+  vel_( 100 ),
+  radius_( 10 ),
+  score_( 0 ),
+  dead_( false ),
+  leftKey_( left ),
+  rightKey_( right )
 {}
 
-CPlayerThing::~CPlayerThing() {
+PlayerThing::~PlayerThing() {
 
 }
 
-void CPlayerThing::Input() {
+void PlayerThing::Input() {
   //The pointer returned is a pointer to an internal SDL array.
   //It will be valid for the whole lifetime of the application and should not be freed by the caller.
   const auto keyStates = SDL_GetKeyboardState( nullptr );
-  turnL = keyStates[ leftKey ] && !keyStates[ rightKey ];
-  turnR = keyStates[ rightKey ];
+  turnL_ = keyStates[ leftKey_ ] && !keyStates[ rightKey_ ];
+  turnR_ = keyStates[ rightKey_ ];
 }
 
-void CPlayerThing::Move( float timeStep ) {
-  if( turnL ) direction += timeStep * TURN_DEG;
-  else if( turnR ) direction -= timeStep * TURN_DEG;
+void PlayerThing::Move( float timeStep ) {
+  if( turnL_ ) direction_ += timeStep * TURN_DEG;
+  else if( turnR_ ) direction_ -= timeStep * TURN_DEG;
 
-  xPos += timeStep * vel * sin( (M_PI/180)*direction );
-	yPos += timeStep * vel * cos( (M_PI/180)*direction );
+  xPos_ += timeStep * vel_ * sin( (M_PI/180)*direction_ );
+	yPos_ += timeStep * vel_ * cos( (M_PI/180)*direction_ );
 }
 
 //places a player randomly on the playfield and moves them four steps
-void CPlayerThing::NewRoundSetup( int xmin, int xmax, int ymin, int ymax ) {
-  dead = false;
-  xPos = RandomInt( xmin, xmax );
-  yPos = RandomInt( ymin, ymax );
-  direction = std::rand();
-  logger->Out( "Direction: " + ToString( direction ) );
+void PlayerThing::NewRoundSetup( int xmin, int xmax, int ymin, int ymax ) {
+  dead_ = false;
+  xPos_ = RandomInt( xmin, xmax );
+  yPos_ = RandomInt( ymin, ymax );
+  direction_ = std::rand();
+  logger->Out( "Direction: " + ToString( direction_ ) );
 }
 
-void CPlayerThing::CreateTrail( std::deque <CTrailThing> &trails ) const {
-  trails.push_front( CTrailThing( xPos, yPos, direction, radius ) );
+void PlayerThing::CreateTrail( std::deque <TrailThing> &trails ) const {
+  trails.emplace_front( xPos_, yPos_, direction_, radius_ );
 }
 
-SDL_Rect CPlayerThing::GetRenderRect() const {
-  SDL_Rect r = { static_cast< int >( xPos ), static_cast< int >( yPos ), radius, radius };
+SDL_Rect PlayerThing::GetRenderRect() const {
+  SDL_Rect r = { static_cast< int >( xPos_ ), static_cast< int >( yPos_ ), radius_, radius_ };
   return r;
 }

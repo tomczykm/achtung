@@ -2,10 +2,10 @@
 
 #include "BaseGameState.h"
 
-class CStateSettings: public CBaseGameState {
+class StateSettings: public BaseGameState {
 public:
-	CStateSettings ();
-	~CStateSettings ();
+	StateSettings ();
+	~StateSettings ();
 
 	void Input();
 	void Logic();

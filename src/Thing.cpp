@@ -1,14 +1,14 @@
 #include "inc/Thing.h"
 
-CThing::CThing( float x, float y ):
-  xPos( x ),
-  yPos( y )
+Thing::Thing( float x, float y ):
+  xPos_( x ),
+  yPos_( y )
 {
 
 }
 
-SDL_Rect CThing::GetRenderRect() const {
+SDL_Rect Thing::GetRenderRect() const {
   //when w and h are 0, the texture rendered is not to be scaled
-  SDL_Rect rec = { static_cast< int >( xPos ), static_cast< int >( yPos ), 0, 0 };
+  SDL_Rect rec = { static_cast< int >( xPos_ ), static_cast< int >( yPos_ ), 0, 0 };
   return rec;
 }

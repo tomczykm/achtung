@@ -2,13 +2,13 @@
 
 #include "Thing.h"
 
-class CTrailThing: public CThing {
+class TrailThing: public Thing {
 public:
-  CTrailThing( float x, float y, int ang, int rad );
+  TrailThing( float x, float y, int ang, int rad );
   SDL_Rect GetRenderRect() const;
 
-  int GetAngle() const { return angle; }
+  double GetAngle() const { return angle_; }
 private:
-  int angle;
-  int radius;
+  double angle_;
+  int radius_;
 };

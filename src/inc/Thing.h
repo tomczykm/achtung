@@ -2,14 +2,14 @@
 
 #include <SDL.h>
 
-class CThing {
+class Thing {
 public:
-  CThing( float xPos, float yPos );
-  virtual ~CThing(){}
+  Thing( float xPos, float yPos );
+  virtual ~Thing(){}
 
   virtual SDL_Rect GetRenderRect() const;
 protected:
-  double xPos, yPos;
+  double xPos_, yPos_;
 private:
 
 };

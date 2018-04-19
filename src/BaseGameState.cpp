@@ -5,23 +5,23 @@
 
 #include <cstdlib>
 
-void CBaseGameState::SetNextState( GameState newState ) {
+void BaseGameState::SetNextState( GameState newState ) {
 	if ( nextState != GameState::quit ) {
 		nextState = newState;
 	}
 }
 
-void CBaseGameState::ChangeState() {
+void BaseGameState::ChangeState() {
 	if ( nextState != GameState::null ) {
 		if ( nextState != GameState::quit ) {
 			logger->Out( "Changing current game state..." );
 		}
 		switch( nextState ) {
 		case GameState::test:
-			currentGameState.reset( new CStateTest() );
+			currentGameState.reset( new StateTest() );
 			break;
 		case GameState::settings:
-			currentGameState.reset( new CStateSettings() );
+			currentGameState.reset( new StateSettings() );
 			break;
 		case GameState::quit:
 			logger->Out( "Quitting the game" );

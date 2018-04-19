@@ -20,10 +20,10 @@ extern SDL_Window *window;
 extern SDL_Event events;
 extern SDL_Renderer *renderer;
 
-extern std::unique_ptr< CLogger > logger;
-extern std::unique_ptr< CSettingsHandler > settings;
+extern std::unique_ptr< Logger > logger;
+extern std::unique_ptr< SettingsHandler > settings;
 
-extern std::unique_ptr< CBaseGameState > currentGameState;
+extern std::unique_ptr< BaseGameState > currentGameState;
 extern GameState stateID, nextState;
 
 /**

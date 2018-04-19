@@ -4,13 +4,13 @@
 #include <fstream>
 #include <iostream>
 
-class CLogger {
+class Logger {
 public:
-	CLogger( const std::string &filename = "event.log" );
-	~CLogger();
+	Logger( const std::string &filename = "event.log" );
+	~Logger();
 
 	void Out( const std::string &o );
 	void Error( const std::string &o );
 private:
-	std::ofstream file;
+	std::ofstream file_;
 };

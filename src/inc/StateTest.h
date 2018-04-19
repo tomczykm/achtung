@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BaseGameState.h"
-#include "CTexture.h"
+#include "Texture.h"
 #include "Global.h"
 #include "PlayerThing.h"
 
@@ -17,28 +17,28 @@ enum class GameplayStatus {
 	gameEnd //when a player has reached the score goal and is declared a winner; move to another gamestate (TODO)
 };
 
-class CStateTest: public CBaseGameState {
+class StateTest: public BaseGameState {
 public:
-	CStateTest ();
-	~CStateTest ();
+	StateTest ();
+	~StateTest ();
 
 	void Input();
 	void Logic();
 	void Render();
 	void PolledInput();
 private:
-	CTexture playerTex;
-	CTexture trailTex;
+	Texture playerTex_;
+	Texture trailTex_;
 
 	//dimensions for border
 	//cannot be static const as they use SettingsHandler::GetResH() to initialize
-	const int wt, bx, bw;
+	const int wt_, bx_, bw_;
 
-	std::vector <CPlayerThing> players;
-	std::deque <CTrailThing> trails;
+	std::vector <PlayerThing> players_;
+	std::deque <TrailThing> trails_;
 
 	//for calculating per-pixel movement speed and turn angles
-	Uint32 	moveTimer;
+	Uint32 moveTimer_;
 
-	GameplayStatus status;
+	GameplayStatus status_;
 };

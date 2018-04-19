@@ -7,7 +7,7 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin )
 set( SOURCE
 
 src/BaseGameState.cpp
-src/CTexture.cpp
+src/Texture.cpp
 src/Global.cpp
 src/Logger.cpp
 src/Main.cpp

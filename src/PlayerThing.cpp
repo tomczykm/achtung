@@ -12,7 +12,7 @@ PlayerThing::PlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right )
   turnR_( false ),
   turnL_( false ),
   vel_( 100 ),
-  radius_( 10 ),
+  radius_( 7 ),
   score_( 0 ),
   dead_( false ),
   leftKey_( left ),
@@ -32,11 +32,14 @@ void PlayerThing::Input() {
 }
 
 void PlayerThing::Move( float timeStep ) {
-  if( turnL_ ) direction_ += timeStep * TURN_DEG;
-  else if( turnR_ ) direction_ -= timeStep * TURN_DEG;
+  if( turnL_ ) direction_ -= timeStep * TURN_DEG;
+  else if( turnR_ ) direction_ += timeStep * TURN_DEG;
 
-  xPos_ += timeStep * vel_ * sin( (M_PI/180)*direction_ );
-	yPos_ += timeStep * vel_ * cos( (M_PI/180)*direction_ );
+  if( direction_ < 0 ) direction_ += 360;
+  else if( direction_ >= 360 ) direction_ -= 360;
+
+  xPos_ += timeStep * vel_ * sin( -(M_PI/180)*direction_ );
+	yPos_ += timeStep * vel_ * cos( -(M_PI/180)*direction_ );
 }
 
 //places a player randomly on the playfield and moves them four steps
@@ -44,7 +47,7 @@ void PlayerThing::NewRoundSetup( int xmin, int xmax, int ymin, int ymax ) {
   dead_ = false;
   xPos_ = RandomInt( xmin, xmax );
   yPos_ = RandomInt( ymin, ymax );
-  direction_ = std::rand();
+  direction_ = std::rand()%360;
   logger->Out( "Direction: " + ToString( direction_ ) );
 }
 

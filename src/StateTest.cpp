@@ -30,8 +30,8 @@ void StateTest::PolledInput() {
   if( events.type == SDL_KEYDOWN ) {
 		switch( events.key.keysym.sym ) {
 		case SDLK_SPACE:
-      SDL_Rect rec = trails_.cbegin()->GetRenderRect();
-      logger->Out( "rec x: " + ToString( rec.w ) );
+      //space for shitty debugging
+      ;
     }
   }
 }

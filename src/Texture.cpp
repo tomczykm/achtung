@@ -1,5 +1,5 @@
-#include "inc/Texture.h"
-#include "inc/Global.h"
+#include "Texture.h"
+#include "Global.h"
 
 Texture::Texture( std::string filename ):
   t_( nullptr ),

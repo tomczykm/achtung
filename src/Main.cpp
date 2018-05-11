@@ -1,8 +1,8 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-#include "inc/Global.h"
-#include "inc/StateTest.h"
+#include "Global.h"
+#include "StateTest.h"
 
 //these SDL objects need to be raw pointers.
 SDL_Window *window = nullptr;
@@ -20,7 +20,7 @@ void Cleanup();
 
 bool Init() {
 	logger = std::make_unique< Logger >();
-	logger->Out( "Starting initialization" );
+	logger->Out( "Starting initialization..." );
 	if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 ) {
 		logger->Error( "FATAL: Failed to init SDL video. SDL_Error: " + std::string( SDL_GetError() ) );
 		return false;
@@ -36,8 +36,6 @@ bool Init() {
 	}
 
 	settings = std::make_unique< SettingsHandler >();
-
-	logger->Out( "Resolution: " + ToString( settings->GetResW() ) + "x" + ToString( settings->GetResH() ) );
 
 	window = SDL_CreateWindow( "Achtung Reloaded", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, settings->GetResW(), settings->GetResH(), SDL_WINDOW_SHOWN | ( settings->GetFullscreen() ? SDL_WINDOW_FULLSCREEN : 0 ) );
 	if( window == nullptr ) {

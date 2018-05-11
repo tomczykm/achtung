@@ -1,4 +1,4 @@
-#include "inc/StateSettings.h"
+#include "StateSettings.h"
 
 StateSettings::StateSettings() {
 

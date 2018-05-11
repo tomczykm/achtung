@@ -1,4 +1,4 @@
-#include "inc/Thing.h"
+#include "Thing.h"
 
 Thing::Thing( float x, float y ):
   xPos_( x ),

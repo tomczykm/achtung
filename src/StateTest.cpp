@@ -1,4 +1,4 @@
-#include "inc/StateTest.h"
+#include "StateTest.h"
 
 StateTest::StateTest():
   playerTex_( "dot.png" ),
@@ -13,7 +13,6 @@ StateTest::StateTest():
   for( auto &p: players_ ) {
     p.NewRoundSetup( 100, 600, 100, 600 );
   }
-  logger->Out( "Szerokość pola to " + ToString( bw_ ) + "px" );
 }
 
 StateTest::~StateTest() {

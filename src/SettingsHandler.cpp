@@ -1,5 +1,5 @@
-#include "inc/SettingsHandler.h"
-#include "inc/Global.h"
+#include "SettingsHandler.h"
+#include "Global.h"
 
 /**
 
@@ -31,7 +31,6 @@ SettingsHandler::SettingsHandler( const std::string &fname ):
         file_.read( reinterpret_cast< char* >( &resolution_ ), sizeof( Resolution ) );
         file_.read( reinterpret_cast< char* >( &fullscreen_ ), sizeof( bool ) );
         file_.close();
-        logger->Out( "Done" );
 	} else {
 	    logger->Error( "ERROR: Failed to read settings - reverting to defaults" );
         //brak pliku/inny blad otwarcia
@@ -48,7 +47,6 @@ SettingsHandler::~SettingsHandler() {
         file_.write( reinterpret_cast< char* >( &resolution_ ), sizeof( Resolution ) );
         file_.write( reinterpret_cast< char* >( &fullscreen_ ), sizeof( bool ) );
         file_.close();
-        logger->Out( "Done." );
     } else {
         logger->Error( "ERROR: Failed to save settings." );
     }

@@ -1,5 +1,5 @@
-#include "inc/PlayerThing.h"
-#include "inc/Global.h"
+#include "PlayerThing.h"
+#include "Global.h"
 
 #include <cmath>
 
@@ -48,7 +48,6 @@ void PlayerThing::NewRoundSetup( int xmin, int xmax, int ymin, int ymax ) {
   xPos_ = RandomInt( xmin, xmax );
   yPos_ = RandomInt( ymin, ymax );
   direction_ = std::rand()%360;
-  logger->Out( "Direction: " + ToString( direction_ ) );
 }
 
 void PlayerThing::CreateTrail( std::deque <TrailThing> &trails ) const {

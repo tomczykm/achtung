@@ -1,7 +1,7 @@
-#include "inc/BaseGameState.h"
-#include "inc/Global.h"
-#include "inc/StateTest.h"
-#include "inc/StateSettings.h"
+#include "BaseGameState.h"
+#include "Global.h"
+#include "StateTest.h"
+#include "StateSettings.h"
 
 #include <cstdlib>
 

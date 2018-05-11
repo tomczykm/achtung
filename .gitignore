@@ -1,2 +1,4 @@
 bin/*
 !bin/*.png
+
+src/inc/CMakeDefine.h

@@ -8,13 +8,18 @@
 #include <ctime>
 #include <memory>
 
+#include "CMakeDefine.h"
 #include "Logger.h"
 #include "SettingsHandler.h"
 #include "BaseGameState.h"
 
 /**
-	From Main.cpp
+  From Global.cpp
 **/
+
+extern int RandomInt( int min, int max );
+
+extern const std::string projectName;
 
 extern SDL_Window *window;
 extern SDL_Event events;
@@ -32,17 +37,3 @@ extern GameState stateID, nextState;
 
 extern void SetNextState( GameState newState );
 extern void ChangeState();
-
-/**
-    Z Global.cpp
-**/
-
-extern int RandomInt( int min, int max );
-
-template < typename T >
-std::string ToString( const T& n )
-{
-    std::ostringstream stm;
-    stm << n;
-    return stm.str();
-}

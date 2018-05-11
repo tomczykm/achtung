@@ -1,5 +1,8 @@
 cmake_minimum_required( VERSION 3.0 )
 
+add_subdirectory( inc/ )
+include_directories( inc/ )
+
 set( SOURCE
   BaseGameState.cpp
   Texture.cpp
@@ -13,8 +16,6 @@ set( SOURCE
   Thing.cpp
   TrailThing.cpp
 )
-
-include_directories( inc/ )
 
 add_executable( ${PROJECT_NAME} ${SOURCE} )
 target_link_libraries( ${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} )

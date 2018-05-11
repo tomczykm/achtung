@@ -4,17 +4,6 @@
 #include "Global.h"
 #include "StateTest.h"
 
-//these SDL objects need to be raw pointers.
-SDL_Window *window = nullptr;
-SDL_Event events;
-SDL_Renderer *renderer = nullptr;
-
-std::unique_ptr< Logger > logger;
-std::unique_ptr< SettingsHandler > settings;
-
-std::unique_ptr< BaseGameState > currentGameState;
-GameState stateID = GameState::null, nextState = GameState::null;
-
 bool Init();
 void Cleanup();
 
@@ -37,7 +26,7 @@ bool Init() {
 
 	settings = std::make_unique< SettingsHandler >();
 
-	window = SDL_CreateWindow( "Achtung Reloaded", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, settings->GetResW(), settings->GetResH(), SDL_WINDOW_SHOWN | ( settings->GetFullscreen() ? SDL_WINDOW_FULLSCREEN : 0 ) );
+	window = SDL_CreateWindow( projectName.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, settings->GetResW(), settings->GetResH(), SDL_WINDOW_SHOWN | ( settings->GetFullscreen() ? SDL_WINDOW_FULLSCREEN : 0 ) );
 	if( window == nullptr ) {
 		logger->Error( "FATAL: Failed to create a window. SDL_Error: " + std::string( SDL_GetError() ) );
 		return false;

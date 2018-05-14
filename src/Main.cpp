@@ -2,7 +2,7 @@
 #include <SDL_image.h>
 
 #include "Global.h"
-#include "StateTest.h"
+#include "StateGame.h"
 
 bool Init();
 void Cleanup();
@@ -45,7 +45,7 @@ bool Init() {
 	std::srand( std::time( nullptr ) );
 
 	logger->Out( "Creating test game state" );
-	currentGameState.reset( new StateTest() );
+	currentGameState.reset( new StateGame() );
 
 	logger->Out( "Initialization complete!" );
 	return true;

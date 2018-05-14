@@ -7,7 +7,7 @@
 using namespace std::chrono;
 
 const float PlayerThing::TURN_DEG( 160 );
-const milliseconds PlayerThing::GAP_TIME( 190 ); //in ms
+const milliseconds PlayerThing::GAP_TIME( 170 ); //in ms
 
 PlayerThing::PlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right ):
   Thing( 0, 0 ),
@@ -57,7 +57,7 @@ void PlayerThing::NewRoundSetup( int xmin, int xmax, int ymin, int ymax ) {
   xPos_ = RandomInt( xmin, xmax );
   yPos_ = RandomInt( ymin, ymax );
   direction_ = std::rand()%360;
-  
+
   //todo: move the player
 
   gap_ = true;
@@ -76,9 +76,12 @@ SDL_Rect PlayerThing::GetRenderRect() const {
 
 void PlayerThing::GapSwitch() {
   gap_ = !gap_;
-  if( gap_ ) {
+  if( gap_ )
     switch_time_ = steady_clock::now() + GAP_TIME;
-  } else {
-    switch_time_ = steady_clock::now() + milliseconds( RandomInt( 3500, 6500 ) );
-  }
+  else
+    switch_time_ = steady_clock::now() + milliseconds( RandomInt( 1800, 3900 ) );
+}
+
+bool PlayerThing::CheckCollision( const TrailThing &o ) const {
+  return false;
 }

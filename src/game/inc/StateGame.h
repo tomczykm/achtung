@@ -17,10 +17,10 @@ enum class GameplayStatus {
 	gameEnd //when a player has reached the score goal and is declared a winner; move to another gamestate (TODO)
 };
 
-class StateTest: public BaseGameState {
+class StateGame: public BaseGameState {
 public:
-	StateTest ();
-	~StateTest ();
+	StateGame();
+	~StateGame();
 
 	void Input();
 	void Logic();

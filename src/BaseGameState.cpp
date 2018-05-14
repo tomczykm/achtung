@@ -1,6 +1,6 @@
 #include "BaseGameState.h"
 #include "Global.h"
-#include "StateTest.h"
+#include "StateGame.h"
 #include "StateSettings.h"
 
 #include <cstdlib>
@@ -18,7 +18,7 @@ void BaseGameState::ChangeState() {
 		}
 		switch( nextState ) {
 		case GameState::test:
-			currentGameState.reset( new StateTest() );
+			currentGameState.reset( new StateGame() );
 			break;
 		case GameState::settings:
 			currentGameState.reset( new StateSettings() );

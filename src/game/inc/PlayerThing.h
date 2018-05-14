@@ -24,6 +24,12 @@ public:
 
   SDL_Rect GetRenderRect() const;
   int GetRadius() const { return radius_; }
+
+  bool CheckCollision( const TrailThing &o ) const;
+
+  void Die() { dead_ = true; }
+  bool IsDead() const { return dead_; }
+  bool IsGap() const { return gap_; }
 private:
   std::string name_;
 

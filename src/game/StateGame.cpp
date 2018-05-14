@@ -1,6 +1,8 @@
-#include "StateTest.h"
+#include "StateGame.h"
 
-StateTest::StateTest():
+#include <algorithm>
+
+StateGame::StateGame():
   playerTex_( "dot.png" ),
   trailTex_( "wall.png" ),
   wt_( 4 ),
@@ -15,17 +17,17 @@ StateTest::StateTest():
   }
 }
 
-StateTest::~StateTest() {
+StateGame::~StateGame() {
 
 }
 
-void StateTest::Input() {
+void StateGame::Input() {
   for( auto &p: players_ ) {
     p.Input();
   }
 }
 
-void StateTest::PolledInput() {
+void StateGame::PolledInput() {
   if( events.type == SDL_KEYDOWN ) {
 		switch( events.key.keysym.sym ) {
 		case SDLK_SPACE:
@@ -35,20 +37,25 @@ void StateTest::PolledInput() {
   }
 }
 
-void StateTest::Logic() {
-  for( auto &p: players_ ) {
-    //move players
-    p.Move( ( SDL_GetTicks() - moveTimer_ ) / 1000.f );
+void StateGame::Logic() {
+  auto endAlive = std::partition( players_.begin(), players_.end(),
+    []( const PlayerThing &p ) { return !p.IsDead(); } );
 
-    //create trails
-    p.CreateTrail( trails_ );
+  for( auto it = players_.begin() ; it != endAlive ; it++ ) {
+    it->Move( ( SDL_GetTicks() - moveTimer_ ) / 1000.f );
+    it->CreateTrail( trails_ );
 
-    //handle collisions
+    for( const auto& t: trails_ ) {
+      if( it->CheckCollision( t ) && !it->IsGap() ) {
+        it->Die();
+        logger->Out( "Collsion!" );
+      }
+    }
   }
   moveTimer_ = SDL_GetTicks();
 }
 
-void StateTest::Render() {
+void StateGame::Render() {
   //draw trails
   for( auto &t: trails_ ) {
     SDL_Rect rec = t.GetRenderRect();

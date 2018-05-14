@@ -1,11 +1,15 @@
 #pragma once
 
 #include <string>
-#include <SDL.h>
 #include <deque>
+#include <chrono>
+
+#include <SDL.h>
 
 #include "Thing.h"
 #include "TrailThing.h"
+
+using namespace std::chrono;
 
 class PlayerThing: public Thing {
 public:
@@ -29,10 +33,16 @@ private:
   static const float TURN_DEG;
   int vel_; //pixels per seconds - depends on the size of the playfield
 
-  int radius_; //for thickness buffs
+  int radius_; //for thickness powerups
   int score_;
 
   bool dead_;
 
   SDL_Scancode leftKey_, rightKey_;
+
+  //gap logic
+  static const milliseconds GAP_TIME;
+  bool gap_;
+  steady_clock::time_point switch_time_;
+  void GapSwitch();
 };

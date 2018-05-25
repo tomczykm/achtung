@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "Global.h"
+#include "Collisions.h"
 
 using namespace std::chrono;
 
@@ -83,5 +84,6 @@ void PlayerThing::GapSwitch() {
 }
 
 bool PlayerThing::CheckCollision( const TrailThing &o ) const {
-  return false;
+  col::Circle c = { xPos_, yPos_, radius_ };
+  return col::CheckCollision( c, o.GetRenderRect(), o.GetAngle() );
 }

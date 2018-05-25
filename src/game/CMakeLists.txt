@@ -1,5 +1,3 @@
-cmake_minimum_required( VERSION 3.0 )
-
 set( LIB_GAME_SOURCE
   PlayerThing.cpp
   StateGame.cpp
@@ -9,3 +7,4 @@ set( LIB_GAME_SOURCE
 )
 
 add_library( libGame OBJECT ${LIB_GAME_SOURCE} )
+add_library( libCollisions OBJECT Collisions.cpp )

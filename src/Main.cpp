@@ -3,6 +3,7 @@
 
 #include "Global.h"
 #include "StateGame.h"
+#include "StateSandbox.h"
 
 bool Init();
 void Cleanup();
@@ -44,8 +45,8 @@ bool Init() {
 
 	std::srand( std::time( nullptr ) );
 
-	logger->Out( "Creating test game state" );
-	currentGameState.reset( new StateGame() );
+	logger->Out( "Creating gamestate" );
+	currentGameState.reset( new StateSandbox() );
 
 	logger->Out( "Initialization complete!" );
 	return true;

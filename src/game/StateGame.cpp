@@ -48,7 +48,6 @@ void StateGame::Logic() {
     for( const auto& t: trails_ ) {
       if( it->CheckCollision( t ) && !it->IsGap() ) {
         it->Die();
-        logger->Out( "Collsion!" );
       }
     }
   }
@@ -58,13 +57,13 @@ void StateGame::Logic() {
 void StateGame::Render() {
   //draw trails
   for( auto &t: trails_ ) {
-    SDL_Rect rec = t.GetRenderRect();
+    auto rec = t.GetRenderRect();
     trailTex_.Render( rec.x, rec.y, rec.w, rec.h, t.GetAngle() );
   }
 
   //draw players
   for( auto &p: players_ ) {
-    SDL_Rect rec = p.GetRenderRect();
+    auto rec = p.GetRenderRect();
     playerTex_.Render( rec.x, rec.y, rec.w, rec.h );
   }
 

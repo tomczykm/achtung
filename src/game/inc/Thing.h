@@ -4,7 +4,7 @@
 
 class Thing {
 public:
-  Thing( float xPos, float yPos );
+  Thing( double xPos, double yPos );
   virtual ~Thing(){}
 
   virtual SDL_Rect GetRenderRect() const;

@@ -1,6 +1,6 @@
 #include "Thing.h"
 
-Thing::Thing( float x, float y ):
+Thing::Thing( double x, double y ):
   xPos_( x ),
   yPos_( y )
 {

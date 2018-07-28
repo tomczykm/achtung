@@ -17,7 +17,7 @@ public:
   ~PlayerThing();
 
   void Input();
-  void Move( float timeStep );
+  void Move( double timeStep );
 
   void NewRoundSetup( int xmin, int xmax, int ymin, int ymax );
   void CreateTrail( std::deque <TrailThing> &trails ) const;
@@ -36,7 +36,7 @@ private:
   double direction_; //in degrees
   bool turnR_, turnL_;
 
-  static const float TURN_DEG;
+  static const double TURN_DEG;
   int vel_; //pixels per seconds - depends on the size of the playfield
 
   int radius_; //for thickness powerups

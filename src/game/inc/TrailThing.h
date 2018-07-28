@@ -4,7 +4,7 @@
 
 class TrailThing: public Thing {
 public:
-  TrailThing( float x, float y, int ang, int rad );
+  TrailThing( double x, double y, int ang, int rad );
   SDL_Rect GetRenderRect() const;
 
   double GetAngle() const { return angle_; }

@@ -7,7 +7,7 @@
 
 using namespace std::chrono;
 
-const float PlayerThing::TURN_DEG( 160 );
+const double PlayerThing::TURN_DEG( 160 );
 const milliseconds PlayerThing::GAP_TIME( 170 ); //in ms
 
 PlayerThing::PlayerThing( std::string n, SDL_Scancode left, SDL_Scancode right ):
@@ -38,7 +38,7 @@ void PlayerThing::Input() {
   turnR_ = keyStates[ rightKey_ ];
 }
 
-void PlayerThing::Move( float timeStep ) {
+void PlayerThing::Move( double timeStep ) {
   if( turnL_ ) direction_ -= timeStep * TURN_DEG;
   else if( turnR_ ) direction_ += timeStep * TURN_DEG;
   if( direction_ < 0 ) direction_ += 360;
@@ -71,7 +71,7 @@ void PlayerThing::CreateTrail( std::deque <TrailThing> &trails ) const {
 }
 
 SDL_Rect PlayerThing::GetRenderRect() const {
-  SDL_Rect r = { static_cast< int >( xPos_ ), static_cast< int >( yPos_ ), radius_, radius_ };
+  SDL_Rect r = { static_cast< int >( xPos_-radius_/2 ), static_cast< int >( yPos_-radius_/2 ), radius_, radius_ };
   return r;
 }
 

@@ -33,23 +33,23 @@ enum class Resolution {
     r_1600_1280
 };
 
-inline AspRatio GetAspRatio( Resolution res );
+inline AspRatio GetAspRatio(Resolution res);
 
 class SettingsHandler {
 public:
-  SettingsHandler ( const std::string &filename = "settings.dat" );
-  ~SettingsHandler	();
+    SettingsHandler (const std::string &filename = "settings.dat");
+    ~SettingsHandler  ();
 
-  int GetResW() const;
-  int GetResH() const;
-  bool GetFullscreen() const { return fullscreen_; }
-	Resolution GetRes() const { return resolution_; }
+    int getResW() const;
+    int getResH() const;
+    bool getFullscreen() const { return fullscreen_; }
+    Resolution getRes() const { return resolution_; }
 private:
-	//pomocnicze skladowe
-	std::fstream file_;
-	std::string filename_;
+    //pomocnicze skladowe
+    std::fstream file_;
+    std::string filename_;
 
-	//faktyczne ustawienia
-	Resolution resolution_, newRes_;
+    //faktyczne ustawienia
+    Resolution resolution_, newRes_;
   bool fullscreen_;
 };

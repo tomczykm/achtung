@@ -8,18 +8,18 @@ StateSettings::~StateSettings() {
 
 }
 
-void StateSettings::Input() {
+void StateSettings::input() {
 
 }
 
-void StateSettings::PolledInput() {
+void StateSettings::polledInput() {
 
 }
 
-void StateSettings::Logic() {
+void StateSettings::logic() {
 
 }
 
-void StateSettings::Render() {
+void StateSettings::render() {
 
 }

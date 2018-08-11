@@ -6,11 +6,11 @@
 
 class Logger {
 public:
-	Logger( const std::string &filename = "event.log" );
-	~Logger();
+    Logger(const std::string &filename = "event.log");
+    ~Logger();
 
-	void Out( const std::string &o );
-	void Error( const std::string &o );
+    void out(const std::string &o);
+    void error(const std::string &o);
 private:
-	std::ofstream file_;
+    std::ofstream file_;
 };

@@ -1,59 +1,46 @@
 #include "SettingsHandler.h"
 #include "Global.h"
 
-/**
-
-Globalne
-
-**/
-
-inline AspRatio GetAspectRatio( Resolution res ) {
-    if( res == Resolution::null ) return AspRatio::null;
-    else if( res < Resolution::r_1280_720 ) return AspRatio::r_43;
-    else if( res < Resolution::r_1280_768 ) return AspRatio::r_169;
-    else if( res < Resolution::r_1280_1024 ) return AspRatio::r_1610;
+inline AspRatio GetAspectRatio(Resolution res) {
+    if (res == Resolution::null) return AspRatio::null;
+    else if (res < Resolution::r_1280_720) return AspRatio::r_43;
+    else if (res < Resolution::r_1280_768) return AspRatio::r_169;
+    else if (res < Resolution::r_1280_1024) return AspRatio::r_1610;
     else return AspRatio::r_54;
 }
-/**
 
-Klasowe
-
-**/
-
-SettingsHandler::SettingsHandler( const std::string &fname ):
-    filename_( fname ),
-    resolution_( Resolution::null ),
-    fullscreen_( false )
+SettingsHandler::SettingsHandler(const std::string &fname):
+    filename_(fname),
+    resolution_(Resolution::null),
+    fullscreen_(false)
 {
-    logger->Out( "Reading settings..." );
-	file_.open( filename_.c_str(), std::ios::in | std::ios::binary );
-	if( file_ ) {
-        file_.read( reinterpret_cast< char* >( &resolution_ ), sizeof( Resolution ) );
-        file_.read( reinterpret_cast< char* >( &fullscreen_ ), sizeof( bool ) );
+    logger->out("Reading settings...");
+	file_.open(filename_.c_str(), std::ios::in | std::ios::binary);
+	if (file_) {
+        file_.read(reinterpret_cast<char*>(&resolution_), sizeof(Resolution));
+        file_.read(reinterpret_cast<char*>(&fullscreen_), sizeof(bool));
         file_.close();
 	} else {
-	    logger->Error( "ERROR: Failed to read settings - reverting to defaults" );
-        //brak pliku/inny blad otwarcia
-        //bierzemy domyslne ustawienia
+	    logger->out("Warning: Failed to read settings - reverting to defaults");
         resolution_ = Resolution::r_1280_768;
         fullscreen_ = false;
 	}
 }
 
 SettingsHandler::~SettingsHandler() {
-    logger->Out( "Saving settings..." );
-    file_.open( filename_.c_str(), std::ios::out | std::ios::trunc | std::ios::binary );
-    if( file_ ) {
-        file_.write( reinterpret_cast< char* >( &resolution_ ), sizeof( Resolution ) );
-        file_.write( reinterpret_cast< char* >( &fullscreen_ ), sizeof( bool ) );
+    logger->out("Saving settings...");
+    file_.open(filename_.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+    if (file_) {
+        file_.write(reinterpret_cast<char*>(&resolution_ ), sizeof( Resolution));
+        file_.write(reinterpret_cast<char*>(&fullscreen_ ), sizeof( bool));
         file_.close();
     } else {
-        logger->Error( "ERROR: Failed to save settings." );
+        logger->error("ERROR: Failed to save settings.");
     }
 }
 
-int SettingsHandler::GetResW() const {
-    switch( resolution_ ) {
+int SettingsHandler::getResW() const {
+    switch (resolution_) {
     case Resolution::r_1024_768:
         return 1024;
     case Resolution::r_1280_1024:
@@ -82,8 +69,8 @@ int SettingsHandler::GetResW() const {
     }
 }
 
-int SettingsHandler::GetResH() const {
-    switch( resolution_ ) {
+int SettingsHandler::getResH() const {
+    switch (resolution_) {
     case Resolution::r_1024_768:
     case Resolution::r_1360_768:
     case Resolution::r_1280_768:

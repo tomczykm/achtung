@@ -3,17 +3,15 @@
 #include <SDL.h>
 #include <utility>
 
-using Coords = std::pair< double, double >;
+using Coords = std::pair<double, double>;
 
 class Thing {
 public:
-  Thing( double xPos, double yPos );
-  virtual ~Thing(){}
+    Thing(double xPos, double yPos);
+    virtual ~Thing() = default;
 
-  Coords GetPos() const;
-  virtual SDL_Rect GetRenderRect() const;
+    Coords getPos() const;
+    virtual SDL_Rect getRenderRect() const;
 protected:
-  double xPos_, yPos_;
-private:
-
+    double xPos_, yPos_;
 };

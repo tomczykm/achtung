@@ -4,12 +4,12 @@
 
 class StateSettings: public BaseGameState {
 public:
-	StateSettings ();
-	~StateSettings ();
+    StateSettings ();
+    ~StateSettings ();
 
-	void Input();
-	void Logic();
-	void Render();
-	void PolledInput();
+    void input() override;
+    void logic() override;
+    void render() override;
+    void polledInput() override;
 private:
 };

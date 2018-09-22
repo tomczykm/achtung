@@ -1,13 +1,16 @@
-#include "StateGame.h"
+#include "Game/StateGame.hpp"
 
 #include <algorithm>
 
-StateGame::StateGame():
-    playerTex_("dot.png"),
-    trailTex_("wall.png"),
+#include "Global.hpp"
+
+StateGame::StateGame(Application& app):
+    app_(app),
+    playerTex_(app.renderer(), "dot.png"),
+    trailTex_(app.renderer(), "wall.png"),
     wt_(4),
-    bx_(0.05 * settings->getResH()),
-    bw_(0.9 * settings->getResH()),
+    bx_(0.05 * app_.settings().getResH()),
+    bw_(0.9 * app_.settings().getResH()),
     moveTimer_(SDL_GetTicks()),
     status_(GameplayStatus::roundBegin)
 {
@@ -15,6 +18,7 @@ StateGame::StateGame():
     for (auto &p: players_) {
         p.newRoundSetup(100, 600, 100, 600);
     }
+    lastAlive_ = players_.end();
 }
 
 StateGame::~StateGame() {
@@ -28,8 +32,8 @@ void StateGame::input() {
 }
 
 void StateGame::polledInput() {
-    if (events.type == SDL_KEYDOWN) {
-        switch(events.key.keysym.sym) {
+    if (app_.events().type == SDL_KEYDOWN) {
+        switch(app_.events().key.keysym.sym) {
         case SDLK_SPACE:
             //space (hehe) for shitty debugging
             ;
@@ -38,19 +42,25 @@ void StateGame::polledInput() {
 }
 
 void StateGame::logic() {
-    auto endAlive = std::partition(players_.begin(), players_.end(),
-        [](const PlayerThing &p ) { return !p.isDead(); });
+    bool playerDied = false;
 
-    for (auto it = players_.begin() ; it != endAlive ; it++) {
+    for (auto it = players_.begin() ; it != lastAlive_ ; it++) {
         it->move((SDL_GetTicks() - moveTimer_) / 1000.f);
         it->createTrail(trails_);
 
         for (const auto& t: trails_) {
             if (it->checkCollision(t) && !it->isGap()) {
                 it->die();
+                playerDied = true;
             }
         }
     }
+
+    if (playerDied) {
+        lastAlive_ = std::partition(players_.begin(), players_.end(),
+            [](const PlayerThing &p ) { return !p.isDead(); });
+    }
+
     moveTimer_ = SDL_GetTicks();
 }
 
@@ -68,6 +78,7 @@ void StateGame::render() {
     }
 
     //drawing outer walls
+    auto renderer = app_.renderer();
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0x00, 0xFF);
     SDL_Rect rect;
     //top

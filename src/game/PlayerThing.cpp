@@ -1,9 +1,9 @@
-#include "PlayerThing.h"
+#include "Game/PlayerThing.hpp"
 
 #include <cmath>
 
-#include "Global.h"
-#include "Collisions.h"
+#include "Global.hpp"
+#include "Game/Collisions.hpp"
 
 using namespace std::chrono;
 

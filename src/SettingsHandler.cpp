@@ -1,5 +1,5 @@
-#include "SettingsHandler.h"
-#include "Global.h"
+#include "SettingsHandler.hpp"
+#include "Global.hpp"
 
 inline AspRatio GetAspectRatio(Resolution res) {
     if (res == Resolution::null) return AspRatio::null;

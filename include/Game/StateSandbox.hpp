@@ -2,14 +2,15 @@
 
 #include <deque>
 
-#include "BaseGameState.h"
-#include "PlayerThing.h"
-#include "TrailThing.h"
-#include "Texture.h"
+#include "Application.hpp"
+#include "IGameState.hpp"
+#include "Game/PlayerThing.hpp"
+#include "Game/TrailThing.hpp"
+#include "Texture.hpp"
 
-class StateSandbox: public BaseGameState {
+class StateSandbox: public IGameState {
 public:
-    StateSandbox();
+    StateSandbox(Application& app);
     ~StateSandbox();
 
     void input() override;
@@ -17,13 +18,15 @@ public:
     void render() override;
     void polledInput() override;
 private:
+    Application& app_;
+
     Texture playerTex_;
     Texture trailTex_;
 
     PlayerThing player_;
     std::deque <TrailThing> trails_;
 
-  bool move_;
+    bool move_;
 
     //for calculating per-pixel movement speed and turn angles
     Uint32 moveTimer_;

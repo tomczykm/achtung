@@ -5,7 +5,7 @@
 
 class Texture {
 public:
-    Texture(std::string filename = std::string());
+    Texture(SDL_Renderer *renderer, std::string filename);
     ~Texture();
 
     bool loadFromFile(std::string filename);
@@ -15,6 +15,7 @@ public:
     int getW() const { return mw_; }
     int getH() const { return mh_; }
 private:
+    SDL_Renderer *renderer_;
     SDL_Texture *t_;
     int mw_, mh_;
 };

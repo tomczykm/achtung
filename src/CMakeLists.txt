@@ -1,8 +1,7 @@
-add_subdirectory(inc/)
-add_subdirectory(game/)
+add_subdirectory(Game/)
 
 set(CORE_SOURCE
-    BaseGameState.cpp
+    Application.cpp
     Texture.cpp
     Global.cpp
     Logger.cpp

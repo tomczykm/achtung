@@ -1,7 +1,10 @@
-#include "Texture.h"
-#include "Global.h"
+#include <SDL_image.h>
 
-Texture::Texture(std::string filename):
+#include "Texture.hpp"
+#include "Global.hpp"
+
+Texture::Texture(SDL_Renderer *renderer, std::string filename = std::string()):
+    renderer_(renderer),
     t_(nullptr),
     mw_(0),
     mh_(0)
@@ -32,7 +35,7 @@ bool Texture::loadFromFile(std::string filename) {
     }
 
     SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
-    newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+    newTexture = SDL_CreateTextureFromSurface(renderer_, loadedSurface);
 
     if (!newTexture) {
         logger->error("Error creating texture from \"" + filename + "\"! SDL_Error: " + std::string(SDL_GetError()));
@@ -49,7 +52,7 @@ bool Texture::loadFromFile(std::string filename) {
 
 void Texture::render(int x, int y) const {
     SDL_Rect rq = {x, y, mw_, mh_};
-    SDL_RenderCopy(renderer, t_, nullptr, &rq);
+    SDL_RenderCopy(renderer_, t_, nullptr, &rq);
 }
 
 void Texture::render(int x, int y, int w, int h, double angle, SDL_Point *center, SDL_Rect *clip) const {
@@ -58,5 +61,5 @@ void Texture::render(int x, int y, int w, int h, double angle, SDL_Point *center
         rq.w = clip->w;
         rq.h = clip->h;
     }
-    SDL_RenderCopyEx(renderer, t_, clip, &rq, angle, center, SDL_FLIP_NONE);
+    SDL_RenderCopyEx(renderer_, t_, clip, &rq, angle, center, SDL_FLIP_NONE);
 }

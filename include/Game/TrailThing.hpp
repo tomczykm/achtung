@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Thing.h"
+#include "Game/Thing.hpp"
 
 class TrailThing : public Thing {
 public:

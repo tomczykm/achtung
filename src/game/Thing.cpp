@@ -1,4 +1,4 @@
-#include "Thing.h"
+#include "Game/Thing.hpp"
 
 Thing::Thing(double x, double y):
     xPos_(x),

@@ -6,8 +6,8 @@
 
 #include <SDL.h>
 
-#include "Thing.h"
-#include "TrailThing.h"
+#include "Game/Thing.hpp"
+#include "Game/TrailThing.hpp"
 
 using namespace std::chrono;
 

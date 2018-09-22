@@ -1,4 +1,4 @@
-#include "Collisions.h"
+#include "Game/Collisions.hpp"
 
 namespace col {
 

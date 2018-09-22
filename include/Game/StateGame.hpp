@@ -1,9 +1,9 @@
 #pragma once
 
-#include "BaseGameState.h"
-#include "Texture.h"
-#include "Global.h"
-#include "PlayerThing.h"
+#include "Application.hpp"
+#include "IGameState.hpp"
+#include "Texture.hpp"
+#include "Game/PlayerThing.hpp"
 
 #include <vector>
 #include <deque>
@@ -17,9 +17,9 @@ enum class GameplayStatus {
     gameEnd //when a player has reached the score goal and is declared a winner; move to another gamestate (TODO)
 };
 
-class StateGame: public BaseGameState {
+class StateGame: public IGameState {
 public:
-    StateGame();
+    StateGame(Application& app);
     ~StateGame();
 
     void input() override;
@@ -27,6 +27,8 @@ public:
     void render() override;
     void polledInput() override;
 private:
+    Application& app_;
+
     Texture playerTex_;
     Texture trailTex_;
 
@@ -35,6 +37,8 @@ private:
     const int wt_, bx_, bw_;
 
     std::vector <PlayerThing> players_;
+    std::vector <PlayerThing>::iterator lastAlive_;
+
     std::deque <TrailThing> trails_;
 
     //for calculating per-pixel movement speed and turn angles

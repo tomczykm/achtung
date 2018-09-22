@@ -1,6 +1,8 @@
-#include "StateSettings.h"
+#include "StateSettings.hpp"
 
-StateSettings::StateSettings() {
+StateSettings::StateSettings(Application &app):
+    app_(app)
+{
 
 }
 

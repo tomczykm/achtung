@@ -1,9 +1,10 @@
-#include "StateSandbox.h"
-#include "Global.h"
+#include "Game/StateSandbox.hpp"
+#include "Global.hpp"
 
-StateSandbox::StateSandbox():
-    playerTex_("dot.png"),
-    trailTex_("wall.png"),
+StateSandbox::StateSandbox(Application &app):
+    app_(app),
+    playerTex_(app.renderer(), "dot.png"),
+    trailTex_(app.renderer(), "wall.png"),
     player_("player", SDL_SCANCODE_Q, SDL_SCANCODE_W),
     move_(false),
     moveTimer_(SDL_GetTicks())
@@ -20,6 +21,7 @@ void StateSandbox::input() {
 }
 
 void StateSandbox::polledInput() {
+    auto events = app_.events();
     if (events.type == SDL_KEYDOWN) {
         switch(events.key.keysym.sym) {
         case SDLK_SPACE:

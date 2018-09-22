@@ -1,4 +1,3 @@
-bin/*
-!bin/*.png
+build/*
 
-src/inc/CMakeDefine.h
+include/CMakeDefine.hpp

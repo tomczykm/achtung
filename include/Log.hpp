@@ -16,6 +16,7 @@ public:
         template<typename T>
         LogLevel& operator<<(const T& t) {
             log_.buffer_ << t;
+            return *this;
         }
 
         Logger& log_;

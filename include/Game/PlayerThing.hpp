@@ -6,12 +6,11 @@
 
 #include <SDL.h>
 
-#include "Game/Thing.hpp"
 #include "Game/TrailThing.hpp"
 
 using namespace std::chrono;
 
-class PlayerThing : public Thing {
+class PlayerThing {
 public:
     PlayerThing(std::string n, SDL_Scancode left, SDL_Scancode right);
     ~PlayerThing();
@@ -32,6 +31,8 @@ public:
     bool isGap() const { return gap_; }
 private:
     std::string name_;
+
+    double xPos_, yPos_;
 
     double direction_; //in degrees
     bool turnR_, turnL_;

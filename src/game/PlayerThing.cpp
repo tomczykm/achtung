@@ -3,7 +3,6 @@
 #include <cmath>
 
 #include "Global.hpp"
-#include "Game/Collisions.hpp"
 
 using namespace std::chrono;
 
@@ -11,8 +10,9 @@ const double PlayerThing::TURN_DEG(160);
 const milliseconds PlayerThing::GAP_TIME(170);
 
 PlayerThing::PlayerThing(std::string n, SDL_Scancode left, SDL_Scancode right):
-    Thing(0, 0),
     name_(n),
+    xPos_(0),
+    yPos_(0),
     direction_(0.0),
     turnR_(false),
     turnL_(false),
@@ -72,19 +72,15 @@ void PlayerThing::createTrail(std::deque <TrailThing> &trails) const {
 }
 
 SDL_Rect PlayerThing::getRenderRect() const {
-    SDL_Rect r = {static_cast<int>(xPos_-radius_/2), static_cast<int>(yPos_-radius_/2),
+    return {static_cast<int>(xPos_-radius_/2), static_cast<int>(yPos_-radius_/2),
         radius_, radius_};
-    return r;
 }
 
 void PlayerThing::gapSwitch() {
     gap_ = !gap_;
-    // if (gap_) switch_time_ = steady_clock::now() + GAP_TIME;
-    // else switch_time_ = steady_clock::now() + milliseconds(RandomInt( 1800, 3900 ));
     switch_time_ = steady_clock::now() + (gap_ ? GAP_TIME : milliseconds(randomInt( 1800, 3900 )));
 }
 
 bool PlayerThing::checkCollision(const TrailThing &o) const {
-    col::Circle c = {xPos_, yPos_, radius_};
-    return col::checkCollision(c, o.getRenderRect(), o.getAngle());
+    return false;
 }

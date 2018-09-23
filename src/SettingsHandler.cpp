@@ -14,13 +14,13 @@ SettingsHandler::SettingsHandler(const std::string &fname):
     resolution_(Resolution::null),
     fullscreen_(false)
 {
-	file_.open(filename_.c_str(), std::ios::in | std::ios::binary);
-	if (file_) {
+    file_.open(filename_.c_str(), std::ios::in | std::ios::binary);
+    if (file_) {
         file_.read(reinterpret_cast<char*>(&resolution_), sizeof(Resolution));
         file_.read(reinterpret_cast<char*>(&fullscreen_), sizeof(bool));
         file_.close();
-	} else {
-	    log_ << warning << "Failed to read settings - reverting to defaults";
+    } else {
+        log_ << warning << "Failed to read settings - reverting to defaults";
         resolution_ = Resolution::r_1280_768;
         fullscreen_ = false;
 	}
@@ -29,8 +29,8 @@ SettingsHandler::SettingsHandler(const std::string &fname):
 SettingsHandler::~SettingsHandler() {
     file_.open(filename_.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
     if (file_) {
-        file_.write(reinterpret_cast<char*>(&resolution_ ), sizeof( Resolution));
-        file_.write(reinterpret_cast<char*>(&fullscreen_ ), sizeof( bool));
+        file_.write(reinterpret_cast<char*>(&resolution_), sizeof(Resolution));
+        file_.write(reinterpret_cast<char*>(&fullscreen_), sizeof(bool));
         file_.close();
     } else {
         log_ << error << "Failed to save settings.";

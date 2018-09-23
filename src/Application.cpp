@@ -3,7 +3,7 @@
 #include <SDL_image.h>
 
 #include "Application.hpp"
-#include "Global.hpp"
+#include "Log.hpp"
 
 #include "Game/StateGame.hpp"
 #include "Game/StateSandbox.hpp"
@@ -19,26 +19,24 @@ Application::Application():
 {}
 
 Application::~Application() {
-    logger->out("Cleanup");
+    log_ << info << "Cleanup";
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);
     SDL_Quit();
 }
 
 bool Application::init() {
-    logger = std::make_unique<Logger>();
-    logger->out("Starting initialization...");
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-        logger->error("FATAL: Failed to init SDL video. SDL_Error: " + std::string(SDL_GetError()));
+        log_ << error << "Failed to init SDL video. SDL_Error: " << SDL_GetError();
         return false;
     }
 
     if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
-        logger->out("WARNING: Linear filtering is OFF!");
+        log_ << warning << "Linear filtering is off";
     }
 
     if (!SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1")) {
-        logger->out("WARNING: VSync is OFF!");
+        log_ << warning << "VSync is off";
     }
 
     window_ = SDL_CreateWindow(projectName_.c_str(), SDL_WINDOWPOS_UNDEFINED,
@@ -46,7 +44,7 @@ bool Application::init() {
         SDL_WINDOW_SHOWN | (settings_.getFullscreen() ? SDL_WINDOW_FULLSCREEN : 0));
 
     if (window_ == nullptr) {
-        logger->error("FATAL: Failed to create a window. SDL_Error: " + std::string(SDL_GetError()));
+        log_ << error << "Failed to create a window. SDL_Error: " << SDL_GetError();
         return false;
     }
 
@@ -55,21 +53,19 @@ bool Application::init() {
 
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags)) {
-        logger->error("FATAL: Failed to initialize SDL_Image. IMG_Error: " + std::string(IMG_GetError()));
+        log_ << error << "Failed to initialize SDL_Image. IMG_Error: " << IMG_GetError();
         return false;
     }
 
     std::srand(std::time(nullptr));
 
-    logger->out("Creating gamestate");
-    gameState_.reset(new StateSandbox(*this));
+    gameState_ = std::make_unique<StateSandbox>(*this);
 
-    logger->out("Initialization complete!");
+    log_ << info << "Initialization complete";
     return true;
 }
 
 int Application::run() {
-    logger->out("Starting main loop...");
     while (!quit_) {
         while (SDL_PollEvent(&events_)) {
             if ((events_.type == SDL_QUIT)) {

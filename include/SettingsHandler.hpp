@@ -45,11 +45,9 @@ public:
     bool getFullscreen() const { return fullscreen_; }
     Resolution getRes() const { return resolution_; }
 private:
-    //pomocnicze skladowe
     std::fstream file_;
     std::string filename_;
 
-    //faktyczne ustawienia
     Resolution resolution_, newRes_;
-  bool fullscreen_;
+    bool fullscreen_;
 };

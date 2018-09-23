@@ -26,8 +26,8 @@ StateGame::~StateGame() {
 }
 
 void StateGame::input() {
-    for (auto &p: players_) {
-        p.input();
+    for (auto it = players_.begin() ; it != lastAlive_ ; it++) {
+        it->input();
     }
 }
 
@@ -58,7 +58,7 @@ void StateGame::logic() {
 
     if (playerDied) {
         lastAlive_ = std::partition(players_.begin(), players_.end(),
-            [](const PlayerThing &p ) { return !p.isDead(); });
+            [] (const PlayerThing &p) { return !p.isDead(); });
     }
 
     moveTimer_ = SDL_GetTicks();

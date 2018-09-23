@@ -21,7 +21,7 @@ public:
     template<class State, typename... Ts>
     void enterState(Ts... args) {
         changeState_ = [this, args...] () {
-            gameState_.reset(new State(*this, args...));
+            gameState_ = std::make_unique<State>(*this, args...);
         };
     }
 

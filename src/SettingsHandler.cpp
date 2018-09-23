@@ -1,5 +1,5 @@
 #include "SettingsHandler.hpp"
-#include "Global.hpp"
+#include "Log.hpp"
 
 inline AspRatio GetAspectRatio(Resolution res) {
     if (res == Resolution::null) return AspRatio::null;
@@ -14,28 +14,26 @@ SettingsHandler::SettingsHandler(const std::string &fname):
     resolution_(Resolution::null),
     fullscreen_(false)
 {
-    logger->out("Reading settings...");
 	file_.open(filename_.c_str(), std::ios::in | std::ios::binary);
 	if (file_) {
         file_.read(reinterpret_cast<char*>(&resolution_), sizeof(Resolution));
         file_.read(reinterpret_cast<char*>(&fullscreen_), sizeof(bool));
         file_.close();
 	} else {
-	    logger->out("Warning: Failed to read settings - reverting to defaults");
+	    log_ << warning << "Failed to read settings - reverting to defaults";
         resolution_ = Resolution::r_1280_768;
         fullscreen_ = false;
 	}
 }
 
 SettingsHandler::~SettingsHandler() {
-    logger->out("Saving settings...");
     file_.open(filename_.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
     if (file_) {
         file_.write(reinterpret_cast<char*>(&resolution_ ), sizeof( Resolution));
         file_.write(reinterpret_cast<char*>(&fullscreen_ ), sizeof( bool));
         file_.close();
     } else {
-        logger->error("ERROR: Failed to save settings.");
+        log_ << error << "Failed to save settings.";
     }
 }
 

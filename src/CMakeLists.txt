@@ -4,7 +4,7 @@ set(CORE_SOURCE
     Application.cpp
     Texture.cpp
     Global.cpp
-    Logger.cpp
+    Log.cpp
     Main.cpp
     SettingsHandler.cpp
     StateSettings.cpp

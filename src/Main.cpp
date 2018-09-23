@@ -1,10 +1,10 @@
 #include "Application.hpp"
-#include "Global.hpp"
+#include "Log.hpp"
 
 int main(int argc, char **argv) {
     Application app;
     if (!app.init()) {
-        logger->out("Initialization failed");
+        log_ << error <<"Initialization failed";
         return -1;
     }
 

@@ -1,5 +1,5 @@
 #include "Game/StateSandbox.hpp"
-#include "Global.hpp"
+#include "Log.hpp"
 
 StateSandbox::StateSandbox(Application &app):
     app_(app),
@@ -39,12 +39,12 @@ void StateSandbox::polledInput() {
 
 void StateSandbox::logic() {
     if (move_) {
-        player_.move(( SDL_GetTicks() - moveTimer_ ) / 1000.f);
+        player_.move((SDL_GetTicks() - moveTimer_) / 1000.f);
     }
 
     for (const auto& t: trails_) {
         if (player_.checkCollision( t )) {
-            logger->out("Collsion!");
+            log_ << info << "Collision!";
         }
     }
     moveTimer_ = SDL_GetTicks();

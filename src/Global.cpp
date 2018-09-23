@@ -1,6 +1,6 @@
 #include "Global.hpp"
 
-std::unique_ptr<Logger> logger;
+#include <cstdlib>
 
 int randomInt(int min, int max) {
     if (min >= max) return max;

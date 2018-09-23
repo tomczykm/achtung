@@ -1,7 +1,7 @@
 #include <SDL_image.h>
 
 #include "Texture.hpp"
-#include "Global.hpp"
+#include "Log.hpp"
 
 Texture::Texture(SDL_Renderer *renderer, std::string filename = std::string()):
     renderer_(renderer),
@@ -30,7 +30,7 @@ bool Texture::loadFromFile(std::string filename) {
     SDL_Surface *loadedSurface = IMG_Load(filename.c_str());
 
     if (!loadedSurface) {
-        logger->error("Error loading image \"" + filename + "\"! IMG_Error: " + std::string(IMG_GetError()));
+        log_ << error << "Error loading image \"" << filename << "\". IMG_Error: " << IMG_GetError();
         return false;
     }
 
@@ -38,7 +38,7 @@ bool Texture::loadFromFile(std::string filename) {
     newTexture = SDL_CreateTextureFromSurface(renderer_, loadedSurface);
 
     if (!newTexture) {
-        logger->error("Error creating texture from \"" + filename + "\"! SDL_Error: " + std::string(SDL_GetError()));
+        log_ << error << "Error creating texture from \"" << filename << "\"! SDL_Error: " <<  SDL_GetError();
         return false;
     }
 

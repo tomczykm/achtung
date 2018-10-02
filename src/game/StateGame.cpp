@@ -11,6 +11,7 @@ StateGame::StateGame(Application& app):
     wt_(4),
     bx_(0.05 * app_.settings().getResH()),
     bw_(0.9 * app_.settings().getResH()),
+    world_(b2Vec2(0.f, 0.f)),
     moveTimer_(SDL_GetTicks())
     // status_(GameplayStatus::roundBegin)
 {

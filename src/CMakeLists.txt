@@ -1,4 +1,4 @@
-add_subdirectory(Game/)
+add_subdirectory(game/)
 
 set(APP_CORE_SOURCE
     Application.cpp
@@ -7,7 +7,6 @@ set(APP_CORE_SOURCE
     Log.cpp
     Main.cpp
     SettingsHandler.cpp
-    StateSettings.cpp
 )
 
 add_library(app_core OBJECT ${APP_CORE_SOURCE})

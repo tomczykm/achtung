@@ -7,7 +7,6 @@
 
 #include "Game/StateGame.hpp"
 #include "Game/StateSandbox.hpp"
-#include "StateSettings.hpp"
 
 Application::Application():
     window_(nullptr),
@@ -68,7 +67,7 @@ bool Application::init() {
 int Application::run() {
     while (!quit_) {
         while (SDL_PollEvent(&events_)) {
-            if ((events_.type == SDL_QUIT)) {
+            if (events_.type == SDL_QUIT) {
                 quitGame();
             }
             gameState_->polledInput();

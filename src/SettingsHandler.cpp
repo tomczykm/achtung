@@ -23,7 +23,7 @@ SettingsHandler::SettingsHandler(const std::string &fname):
         log_ << warning << "Failed to read settings - reverting to defaults";
         resolution_ = Resolution::r_1280_768;
         fullscreen_ = false;
-	}
+    }
 }
 
 SettingsHandler::~SettingsHandler() {

@@ -10,11 +10,11 @@
 
 enum class GameplayStatus {
     null = 0,
-    roundBegin, //at the start of each round; move to RUNNING
-    running, //when everybody is furiously trying to kill each other; move to PAUSE, ROUND_END or GAME_END
-    pause, //when a player needs a break; move to RUNNING or quit the game in progress
-    roundEnd, //when there's only one standing; move to ROUND_BEGIN
-    gameEnd //when a player has reached the score goal and is declared a winner; move to another gamestate (TODO)
+    roundBegin, // at the start of each round; move to RUNNING
+    running, // when everybody is furiously trying to kill each other; move to PAUSE, ROUND_END or GAME_END
+    pause, // when a player needs a break; move to RUNNING or quit the game in progress
+    roundEnd, // when there's only one standing; move to ROUND_BEGIN
+    gameEnd // when a player has reached the score goal and is declared a winner; move to another gamestate (TODO)
 };
 
 class StateGame: public IGameState {
@@ -32,8 +32,8 @@ private:
     Texture playerTex_;
     Texture trailTex_;
 
-    //dimensions for border
-    //cannot be static const as they use SettingsHandler::GetResH() to initialize
+    // dimensions for border
+    // cannot be static const as they use SettingsHandler::GetResH() to initialize
     const int wt_, bx_, bw_;
 
     std::vector <PlayerThing> players_;
@@ -41,8 +41,8 @@ private:
 
     std::deque <TrailThing> trails_;
 
-    //for calculating per-pixel movement speed and turn angles
+    // for calculating per-pixel movement speed and turn angles
     Uint32 moveTimer_;
 
-    GameplayStatus status_;
+    // GameplayStatus status_;
 };

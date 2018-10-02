@@ -18,7 +18,7 @@ PlayerThing::PlayerThing(std::string n, SDL_Scancode left, SDL_Scancode right):
     turnL_(false),
     vel_(100),
     radius_(7),
-    score_(0),
+    // score_(0),
     dead_(false),
     leftKey_(left),
     rightKey_(right),
@@ -31,8 +31,6 @@ PlayerThing::~PlayerThing() {
 }
 
 void PlayerThing::input() {
-    // The pointer returned is a pointer to an internal SDL array.
-    // It will be valid for the whole lifetime of the application and should not be freed by the caller.
     const auto keyStates = SDL_GetKeyboardState(nullptr);
     turnL_ = keyStates[ leftKey_ ] && !keyStates[ rightKey_ ];
     turnR_ = keyStates[ rightKey_ ];
@@ -52,15 +50,15 @@ void PlayerThing::move(double timeStep) {
     yPos_ += timeStep * vel_ * cos(-(M_PI/180)*direction_);
 }
 
-//places a player randomly on the playfield and moves them a couple steps
-//so that the player can tell the direction they're going to move
+// places a player randomly on the playfield and moves them a couple steps
+// so that the player can tell the direction they're going to move
 void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax) {
     dead_ = false;
     xPos_ = randomInt(xmin, xmax);
     yPos_ = randomInt(ymin, ymax);
     direction_ = std::rand()%360;
 
-    //todo: move the player
+    // todo: move the player
 
     gap_ = true;
     gapSwitch();

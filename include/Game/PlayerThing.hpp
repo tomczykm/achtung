@@ -34,20 +34,20 @@ private:
 
     double xPos_, yPos_;
 
-    double direction_; //in degrees
+    double direction_; // in degrees
     bool turnR_, turnL_;
 
     static const double TURN_DEG;
-    int vel_; //pixels per seconds - depends on the size of the playfield
+    int vel_; // pixels per seconds - depends on the size of the playfield
 
-    int radius_; //for thickness powerups
-    int score_;
+    int radius_; // for thickness powerups
+    // int score_;
 
     bool dead_;
 
     SDL_Scancode leftKey_, rightKey_;
 
-    //gap logic
+    // gap logic
     static const milliseconds GAP_TIME;
     bool gap_;
     steady_clock::time_point switch_time_;

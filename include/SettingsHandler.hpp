@@ -13,22 +13,22 @@ enum class AspRatio {
 
 enum class Resolution {
     null = 0,
-    //4:3
+    // 4:3
     r_1024_768,
     r_1280_600,
     r_1600_1200,
-    //16:9
+    // 16:9
     r_1280_720,
     r_1360_768,
     r_1600_900,
     r_1920_1080,
-    r_2048_1152, //2K
-    r_4096_2304,  //4K
-    //16:10
+    r_2048_1152, // 2K
+    r_4096_2304,  // 4K
+    // 16:10
     r_1280_768,
     r_1280_800,
     r_1440_900,
-    //5:4
+    // 5:4
     r_1280_1024,
     r_1600_1280
 };
@@ -48,6 +48,7 @@ private:
     std::fstream file_;
     std::string filename_;
 
-    Resolution resolution_, newRes_;
+    Resolution resolution_;
+    // Resolution resolution_, newRes_;
     bool fullscreen_;
 };

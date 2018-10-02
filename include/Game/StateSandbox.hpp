@@ -28,6 +28,6 @@ private:
 
     bool move_;
 
-    //for calculating per-pixel movement speed and turn angles
+    // for calculating per-pixel movement speed and turn angles
     Uint32 moveTimer_;
 };

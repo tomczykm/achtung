@@ -11,8 +11,8 @@ StateGame::StateGame(Application& app):
     wt_(4),
     bx_(0.05 * app_.settings().getResH()),
     bw_(0.9 * app_.settings().getResH()),
-    moveTimer_(SDL_GetTicks()),
-    status_(GameplayStatus::roundBegin)
+    moveTimer_(SDL_GetTicks())
+    // status_(GameplayStatus::roundBegin)
 {
     players_.emplace_back("player", SDL_SCANCODE_Q, SDL_SCANCODE_W);
     for (auto &p: players_) {
@@ -35,7 +35,7 @@ void StateGame::polledInput() {
     if (app_.events().type == SDL_KEYDOWN) {
         switch(app_.events().key.keysym.sym) {
         case SDLK_SPACE:
-            //space (hehe) for shitty debugging
+            // space (hehe) for shitty debugging
             ;
         }
     }
@@ -65,32 +65,32 @@ void StateGame::logic() {
 }
 
 void StateGame::render() {
-    //draw trails
+    // draw trails
     for (auto &t: trails_) {
         auto rec = t.getRenderRect();
         trailTex_.render(rec.x, rec.y, rec.w, rec.h, t.getAngle());
     }
 
-    //draw players
+    // draw players
     for (auto &p: players_) {
         auto rec = p.getRenderRect();
         playerTex_.render(rec.x, rec.y, rec.w, rec.h);
     }
 
-    //drawing outer walls
+    // drawing outer walls
     auto renderer = app_.renderer();
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0x00, 0xFF);
     SDL_Rect rect;
-    //top
+    // top
     rect = { bx_, bx_, bw_, wt_ };
     SDL_RenderFillRect(renderer, &rect);
-    //bottom
+    // bottom
     rect = { bx_, bx_+bw_-wt_, bw_, wt_ };
     SDL_RenderFillRect(renderer, &rect);
-    //left
+    // left
     rect = { bx_, bx_, wt_, bw_ };
     SDL_RenderFillRect(renderer, &rect);
-    //right
+    // right
     rect = { bx_+bw_-wt_, bx_, wt_, bw_ };
     SDL_RenderFillRect(renderer, &rect);
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);

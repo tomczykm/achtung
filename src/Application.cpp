@@ -34,7 +34,7 @@ bool Application::init() {
         SDL_WINDOWPOS_UNDEFINED, settings_.getResW(), settings_.getResH(),
         SDL_WINDOW_SHOWN | (settings_.getFullscreen() ? SDL_WINDOW_FULLSCREEN : 0));
 
-    if (window_ == nullptr) {
+    if (!window_) {
         log_ << error << "Failed to create a window. SDL_Error: " << SDL_GetError();
         return false;
     }
@@ -67,7 +67,7 @@ int Application::run() {
         gameState_->input();
 
         gameState_->logic();
-        if(changeState_ != nullptr) {
+        if (changeState_) {
             changeState_();
             changeState_ = nullptr;
         }

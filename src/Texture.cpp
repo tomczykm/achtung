@@ -3,16 +3,16 @@
 #include "Texture.hpp"
 #include "Log.hpp"
 
-Texture::Texture(SDL_Renderer *renderer, std::string filename = std::string()):
+Texture::Texture(SDL_Renderer *renderer, std::string_view filename = {}):
     renderer_(renderer)
 {
-    if(!filename.empty()) {
+    if (!filename.empty()) {
         loadFromFile(filename);
     }
 }
 
 Texture::~Texture() {
-    if(t_ != nullptr) {
+    if (t_) {
         SDL_DestroyTexture(t_);
         t_ = nullptr;
         mw_ = 0;
@@ -20,11 +20,11 @@ Texture::~Texture() {
     }
 }
 
-bool Texture::loadFromFile(std::string filename) {
+bool Texture::loadFromFile(std::string_view filename) {
     this->~Texture();
 
     SDL_Texture *newTexture = nullptr;
-    SDL_Surface *loadedSurface = IMG_Load(filename.c_str());
+    SDL_Surface *loadedSurface = IMG_Load(filename.data());
 
     if (!loadedSurface) {
         log_ << error << "Error loading image \"" << filename << "\". IMG_Error: " << IMG_GetError();
@@ -54,7 +54,7 @@ void Texture::render(int x, int y) const {
 
 void Texture::render(int x, int y, int w, int h, double angle, SDL_Point *center, SDL_Rect *clip) const {
     SDL_Rect rq = {x, y, w, h};
-    if (clip != nullptr) {
+    if (clip) {
         rq.w = clip->w;
         rq.h = clip->h;
     }

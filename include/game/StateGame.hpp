@@ -19,7 +19,7 @@ enum class GameplayStatus {
 
 class StateGame: public IGameState {
 public:
-    StateGame(Application& app);
+    StateGame(Application&);
 
     void input() override;
     void logic() override;

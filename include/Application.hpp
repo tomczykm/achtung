@@ -16,7 +16,7 @@ public:
     bool init();
     int run();
 
-    template<class State, typename... Ts>
+    template <class State, typename... Ts>
     void enterState(Ts... args) {
         changeState_ = [this, args...] () {
             gameState_ = std::make_unique<State>(*this, args...);
@@ -32,8 +32,8 @@ public:
     SDL_Event& events() { return events_; }
 private:
     SDL_Window *window_ = nullptr;
-    SDL_Event events_;
     SDL_Renderer *renderer_ = nullptr;
+    SDL_Event events_;
 
     SettingsHandler settings_;
 

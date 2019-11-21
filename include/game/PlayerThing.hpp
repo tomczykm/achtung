@@ -19,12 +19,12 @@ public:
     void move(double timeStep);
 
     void newRoundSetup(int xmin, int xmax, int ymin, int ymax);
-    void createTrail(std::deque <TrailThing> &trails) const;
+    void createTrail(std::deque<TrailThing>&) const;
 
     SDL_Rect getRenderRect() const;
     int getRadius() const { return radius_; }
 
-    bool checkCollision(const TrailThing &o) const;
+    bool checkCollision(const TrailThing&) const;
 
     void die() { dead_ = true; }
     bool isDead() const { return dead_; }

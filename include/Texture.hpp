@@ -1,14 +1,14 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 #include <SDL.h>
 
 class Texture {
 public:
-    Texture(SDL_Renderer *renderer, std::string filename);
+    Texture(SDL_Renderer* renderer, std::string_view filename);
     ~Texture();
 
-    bool loadFromFile(std::string filename);
+    bool loadFromFile(std::string_view filename);
     void render(int x, int y) const;
     void render(int x, int y, int w, int h, double angle = 0.0,
         SDL_Point *center = nullptr, SDL_Rect *clip = nullptr) const;

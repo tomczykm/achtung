@@ -37,8 +37,8 @@ inline AspRatio GetAspRatio(Resolution res);
 
 class SettingsHandler {
 public:
-    SettingsHandler (const std::string &filename = "settings.dat");
-    ~SettingsHandler  ();
+    SettingsHandler (std::string_view filename = "settings.dat");
+    ~SettingsHandler();
 
     int getResW() const;
     int getResH() const;

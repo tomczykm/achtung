@@ -9,7 +9,7 @@ inline AspRatio GetAspectRatio(Resolution res) {
     else return AspRatio::r_54;
 }
 
-SettingsHandler::SettingsHandler(const std::string &fname):
+SettingsHandler::SettingsHandler(std::string_view fname):
     filename_(fname)
 {
     std::fstream file{filename_.c_str(), std::ios::in | std::ios::binary};

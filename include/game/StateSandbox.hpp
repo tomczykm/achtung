@@ -10,7 +10,7 @@
 
 class StateSandbox: public IGameState {
 public:
-    StateSandbox(Application& app);
+    StateSandbox(Application&);
 
     void input() override;
     void logic() override;

@@ -8,7 +8,7 @@
 class Logger {
 public:
     struct LogLevel {
-        LogLevel(Logger &log, const std::string &code):
+        LogLevel(Logger& log, const std::string& code):
             log_(log),
             code_(code)
         {}
@@ -26,7 +26,7 @@ public:
     explicit Logger(const std::string &filename = "event.log");
     ~Logger();
 
-    LogLevel& operator<<(LogLevel& level);
+    LogLevel& operator<<(LogLevel&);
 
 private:
     void flush();

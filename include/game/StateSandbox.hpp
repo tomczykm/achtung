@@ -4,8 +4,8 @@
 
 #include "Application.hpp"
 #include "IGameState.hpp"
-#include "Game/PlayerThing.hpp"
-#include "Game/TrailThing.hpp"
+#include "game/PlayerThing.hpp"
+#include "game/TrailThing.hpp"
 #include "Texture.hpp"
 
 class StateSandbox: public IGameState {

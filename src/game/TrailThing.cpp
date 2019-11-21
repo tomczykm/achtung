@@ -1,4 +1,4 @@
-#include "Game/TrailThing.hpp"
+#include "game/TrailThing.hpp"
 
 TrailThing::TrailThing(double x, double y, int ang, int rad):
     xPos_(x),

@@ -1,4 +1,4 @@
-#include "Game/StateSandbox.hpp"
+#include "game/StateSandbox.hpp"
 #include "Log.hpp"
 
 StateSandbox::StateSandbox(Application &app):

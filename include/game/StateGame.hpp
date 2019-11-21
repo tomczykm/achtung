@@ -3,7 +3,7 @@
 #include "Application.hpp"
 #include "IGameState.hpp"
 #include "Texture.hpp"
-#include "Game/PlayerThing.hpp"
+#include "game/PlayerThing.hpp"
 
 #include <vector>
 #include <deque>

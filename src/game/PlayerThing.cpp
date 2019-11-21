@@ -1,4 +1,4 @@
-#include "Game/PlayerThing.hpp"
+#include "game/PlayerThing.hpp"
 
 #include <cmath>
 

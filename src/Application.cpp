@@ -5,8 +5,8 @@
 #include "Application.hpp"
 #include "Log.hpp"
 
-#include "Game/StateGame.hpp"
-#include "Game/StateSandbox.hpp"
+#include "game/StateGame.hpp"
+#include "game/StateSandbox.hpp"
 
 Application::Application():
     window_(nullptr),

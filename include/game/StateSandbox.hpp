@@ -11,7 +11,6 @@
 class StateSandbox: public IGameState {
 public:
     StateSandbox(Application& app);
-    ~StateSandbox();
 
     void input() override;
     void logic() override;
@@ -20,14 +19,14 @@ public:
 private:
     Application& app_;
 
-    Texture playerTex_;
-    Texture trailTex_;
+    Texture playerTex_{app_.renderer(), "dot.png"};
+    Texture trailTex_{app_.renderer(), "wall.png"};
 
-    PlayerThing player_;
+    PlayerThing player_{"player", SDL_SCANCODE_Q, SDL_SCANCODE_W};
     std::deque <TrailThing> trails_;
 
-    bool move_;
+    bool move_ = false;
 
     // for calculating per-pixel movement speed and turn angles
-    Uint32 moveTimer_;
+    std::uint32_t moveTimer_ = SDL_GetTicks();
 };

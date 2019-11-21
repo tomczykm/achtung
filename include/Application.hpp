@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <memory>
 #include <functional>
 
@@ -12,7 +11,6 @@
 
 class Application {
 public:
-    Application();
     ~Application();
 
     bool init();
@@ -33,15 +31,13 @@ public:
     SDL_Renderer* renderer() { return renderer_; }
     SDL_Event& events() { return events_; }
 private:
-    SDL_Window *window_;
+    SDL_Window *window_ = nullptr;
     SDL_Event events_;
-    SDL_Renderer *renderer_;
+    SDL_Renderer *renderer_ = nullptr;
 
     SettingsHandler settings_;
 
     std::unique_ptr<IGameState> gameState_;
     std::function<void()> changeState_;
-    bool quit_;
-
-    const std::string projectName_;
+    bool quit_ = false;
 };

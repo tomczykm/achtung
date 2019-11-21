@@ -4,10 +4,7 @@
 #include "Log.hpp"
 
 Texture::Texture(SDL_Renderer *renderer, std::string filename = std::string()):
-    renderer_(renderer),
-    t_(nullptr),
-    mw_(0),
-    mh_(0)
+    renderer_(renderer)
 {
     if(!filename.empty()) {
         loadFromFile(filename);

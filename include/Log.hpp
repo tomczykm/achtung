@@ -14,8 +14,8 @@ public:
         {}
 
         template<typename T>
-        LogLevel& operator<<(const T& t) {
-            log_.buffer_ << t;
+        LogLevel& operator<<(T&& t) {
+            log_.buffer_ << std::forward<T>(t);
             return *this;
         }
 
@@ -29,11 +29,8 @@ public:
     LogLevel& operator<<(LogLevel& level);
 
 private:
-    void flush() {
-        file_ << buffer_.str() << std::endl;
-        std::cout << buffer_.str() << std::endl;
-        buffer_.str(std::string());
-    }
+    void flush();
+
     std::ofstream file_;
     std::stringstream buffer_;
 };

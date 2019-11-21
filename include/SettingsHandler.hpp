@@ -45,10 +45,9 @@ public:
     bool getFullscreen() const { return fullscreen_; }
     Resolution getRes() const { return resolution_; }
 private:
-    std::fstream file_;
     std::string filename_;
 
-    Resolution resolution_;
+    Resolution resolution_ = Resolution::null;
     // Resolution resolution_, newRes_;
-    bool fullscreen_;
+    bool fullscreen_ = false;
 };

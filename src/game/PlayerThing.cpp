@@ -4,31 +4,11 @@
 
 #include "Global.hpp"
 
-using namespace std::chrono;
-
-const double PlayerThing::TURN_DEG(160);
-const milliseconds PlayerThing::GAP_TIME(170);
-
-PlayerThing::PlayerThing(std::string n, SDL_Scancode left, SDL_Scancode right):
+PlayerThing::PlayerThing(std::string_view n, SDL_Scancode left, SDL_Scancode right):
     name_(n),
-    xPos_(0),
-    yPos_(0),
-    direction_(0.0),
-    turnR_(false),
-    turnL_(false),
-    vel_(100),
-    radius_(7),
-    // score_(0),
-    dead_(false),
     leftKey_(left),
-    rightKey_(right),
-    gap_(false),
-    switch_time_()
+    rightKey_(right)
 {}
-
-PlayerThing::~PlayerThing() {
-
-}
 
 void PlayerThing::input() {
     const auto keyStates = SDL_GetKeyboardState(nullptr);
@@ -43,8 +23,9 @@ void PlayerThing::move(double timeStep) {
     if (direction_ < 0) direction_ += 360;
     else if (direction_ >= 360) direction_ -= 360;
 
-    if (steady_clock::now() >= switch_time_)
+    if (chrono::steady_clock::now() >= switchTime_) {
         gapSwitch();
+    }
 
     xPos_ += timeStep * vel_ * sin(-(M_PI/180)*direction_);
     yPos_ += timeStep * vel_ * cos(-(M_PI/180)*direction_);
@@ -65,8 +46,9 @@ void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax) {
 }
 
 void PlayerThing::createTrail(std::deque <TrailThing> &trails) const {
-    if (!gap_)
+    if (!gap_) {
         trails.emplace_front(xPos_, yPos_, direction_, radius_);
+    }
 }
 
 SDL_Rect PlayerThing::getRenderRect() const {
@@ -76,7 +58,7 @@ SDL_Rect PlayerThing::getRenderRect() const {
 
 void PlayerThing::gapSwitch() {
     gap_ = !gap_;
-    switch_time_ = steady_clock::now() + (gap_ ? GAP_TIME : milliseconds(randomInt( 1800, 3900 )));
+    switchTime_ = chrono::steady_clock::now() + (gap_ ? GAP_TIME : chrono::milliseconds(randomInt( 1800, 3900 )));
 }
 
 bool PlayerThing::checkCollision(const TrailThing &o) const {

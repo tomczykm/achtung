@@ -8,19 +8,11 @@
 #include "game/StateGame.hpp"
 #include "game/StateSandbox.hpp"
 
-Application::Application():
-    window_(nullptr),
-    renderer_(nullptr),
-    gameState_(),
-    changeState_(nullptr),
-    quit_(false),
-    projectName_(PROJECT_NAME)
-{}
-
 Application::~Application() {
     log_ << info << "Cleanup";
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);
+    IMG_Quit();
     SDL_Quit();
 }
 
@@ -38,7 +30,7 @@ bool Application::init() {
         log_ << warning << "VSync is off";
     }
 
-    window_ = SDL_CreateWindow(projectName_.c_str(), SDL_WINDOWPOS_UNDEFINED,
+    window_ = SDL_CreateWindow(PROJECT_NAME, SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED, settings_.getResW(), settings_.getResH(),
         SDL_WINDOW_SHOWN | (settings_.getFullscreen() ? SDL_WINDOW_FULLSCREEN : 0));
 

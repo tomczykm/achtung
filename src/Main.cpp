@@ -4,7 +4,7 @@
 int main(int argc, char **argv) {
     Application app;
     if (!app.init()) {
-        log_ << error <<"Initialization failed";
+        log_ << error << "Initialization failed";
         return -1;
     }
 

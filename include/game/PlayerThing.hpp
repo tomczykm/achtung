@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <deque>
 #include <chrono>
 
@@ -8,12 +9,11 @@
 
 #include "game/TrailThing.hpp"
 
-using namespace std::chrono;
+namespace chrono = std::chrono;
 
 class PlayerThing {
 public:
-    PlayerThing(std::string n, SDL_Scancode left, SDL_Scancode right);
-    ~PlayerThing();
+    PlayerThing(std::string_view name, SDL_Scancode left, SDL_Scancode right);
 
     void input();
     void move(double timeStep);
@@ -29,27 +29,28 @@ public:
     void die() { dead_ = true; }
     bool isDead() const { return dead_; }
     bool isGap() const { return gap_; }
+
 private:
+    void gapSwitch();
+
     std::string name_;
 
-    double xPos_, yPos_;
+    // movement
+    double xPos_ = 0.0, yPos_ = 0.0;
+    double direction_ = 0.0; // in degrees
+    bool turnR_ = false, turnL_ = false;
+    int vel_ = 100; // pixels per seconds
+    static constexpr double TURN_DEG = 160;
 
-    double direction_; // in degrees
-    bool turnR_, turnL_;
+    int radius_ = 7;
+    // int score_ = 0;
 
-    static const double TURN_DEG;
-    int vel_; // pixels per seconds - depends on the size of the playfield
-
-    int radius_; // for thickness powerups
-    // int score_;
-
-    bool dead_;
+    bool dead_ = false;
 
     SDL_Scancode leftKey_, rightKey_;
 
     // gap logic
-    static const milliseconds GAP_TIME;
-    bool gap_;
-    steady_clock::time_point switch_time_;
-    void gapSwitch();
+    static constexpr chrono::milliseconds GAP_TIME{170};
+    bool gap_ = false;
+    chrono::steady_clock::time_point switchTime_ = {};
 };

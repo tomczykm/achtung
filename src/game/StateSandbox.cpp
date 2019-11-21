@@ -1,19 +1,10 @@
 #include "game/StateSandbox.hpp"
 #include "Log.hpp"
 
-StateSandbox::StateSandbox(Application &app):
-    app_(app),
-    playerTex_(app.renderer(), "dot.png"),
-    trailTex_(app.renderer(), "wall.png"),
-    player_("player", SDL_SCANCODE_Q, SDL_SCANCODE_W),
-    move_(false),
-    moveTimer_(SDL_GetTicks())
+StateSandbox::StateSandbox(Application& app):
+    app_(app)
 {
     player_.newRoundSetup(100, 600, 100, 600);
-}
-
-StateSandbox::~StateSandbox() {
-
 }
 
 void StateSandbox::input() {
@@ -21,13 +12,15 @@ void StateSandbox::input() {
 }
 
 void StateSandbox::polledInput() {
-    auto events = app_.events();
+    auto& events = app_.events();
+
     if (events.type == SDL_KEYDOWN) {
         switch(events.key.keysym.sym) {
         case SDLK_SPACE:
             move_ = true;
         }
     }
+
     if (events.type == SDL_KEYUP) {
         switch(events.key.keysym.sym) {
         case SDLK_SPACE:
@@ -43,7 +36,7 @@ void StateSandbox::logic() {
     }
 
     for (const auto& t: trails_) {
-        if (player_.checkCollision( t )) {
+        if (player_.checkCollision(t)) {
             log_ << info << "Collision!";
         }
     }
@@ -51,11 +44,11 @@ void StateSandbox::logic() {
 }
 
 void StateSandbox::render() {
-    for (auto &t: trails_) {
-        auto rec = t.getRenderRect();
+    for (auto& t: trails_) {
+        const auto& rec = t.getRenderRect();
         trailTex_.render(rec.x, rec.y, rec.w, rec.h, t.getAngle());
     }
 
-    auto rec = player_.getRenderRect();
+    const auto& rec = player_.getRenderRect();
     playerTex_.render(rec.x, rec.y, rec.w, rec.h);
 }

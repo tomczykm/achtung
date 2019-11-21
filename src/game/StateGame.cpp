@@ -5,24 +5,13 @@
 #include "Global.hpp"
 
 StateGame::StateGame(Application& app):
-    app_(app),
-    playerTex_(app.renderer(), "dot.png"),
-    trailTex_(app.renderer(), "wall.png"),
-    wt_(4),
-    bx_(0.05 * app_.settings().getResH()),
-    bw_(0.9 * app_.settings().getResH()),
-    moveTimer_(SDL_GetTicks())
-    // status_(GameplayStatus::roundBegin)
+    app_(app)
 {
     players_.emplace_back("player", SDL_SCANCODE_Q, SDL_SCANCODE_W);
     for (auto &p: players_) {
         p.newRoundSetup(100, 600, 100, 600);
     }
     lastAlive_ = players_.end();
-}
-
-StateGame::~StateGame() {
-
 }
 
 void StateGame::input() {
@@ -49,7 +38,7 @@ void StateGame::logic() {
         it->createTrail(trails_);
 
         for (const auto& t: trails_) {
-            if (it->checkCollision(t) && !it->isGap()) {
+            if (!it->isGap() && it->checkCollision(t)) {
                 it->die();
                 playerDied = true;
             }
@@ -58,7 +47,7 @@ void StateGame::logic() {
 
     if (playerDied) {
         lastAlive_ = std::partition(players_.begin(), players_.end(),
-            [] (const PlayerThing &p) { return !p.isDead(); });
+            [] (auto& p) { return !p.isDead(); });
     }
 
     moveTimer_ = SDL_GetTicks();
@@ -66,14 +55,14 @@ void StateGame::logic() {
 
 void StateGame::render() {
     // draw trails
-    for (auto &t: trails_) {
+    for (auto& t: trails_) {
         auto rec = t.getRenderRect();
         trailTex_.render(rec.x, rec.y, rec.w, rec.h, t.getAngle());
     }
 
     // draw players
-    for (auto &p: players_) {
-        auto rec = p.getRenderRect();
+    for (auto& p: players_) {
+        const auto& rec = p.getRenderRect();
         playerTex_.render(rec.x, rec.y, rec.w, rec.h);
     }
 

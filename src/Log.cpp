@@ -15,6 +15,12 @@ Logger::LogLevel& Logger::operator<<(Logger::LogLevel& level) {
     return level;
 }
 
+void Logger::flush() {
+    file_ << buffer_.str() << std::endl;
+    std::cout << buffer_.str() << std::endl;
+    buffer_.str(std::string());
+}
+
 Logger log_;
 Logger::LogLevel info(log_, "inf");
 Logger::LogLevel warning(log_, "WRN");

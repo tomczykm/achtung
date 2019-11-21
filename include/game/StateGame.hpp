@@ -20,28 +20,30 @@ enum class GameplayStatus {
 class StateGame: public IGameState {
 public:
     StateGame(Application& app);
-    ~StateGame();
 
     void input() override;
     void logic() override;
     void render() override;
     void polledInput() override;
+
 private:
     Application& app_;
 
-    Texture playerTex_;
-    Texture trailTex_;
+    Texture playerTex_{app_.renderer(), "dot.png"};
+    Texture trailTex_{app_.renderer(), "wall.png"};
 
     // dimensions for border
-    const int wt_, bx_, bw_;
+    static constexpr int wt_ = 4;
+    const int bx_ = 0.05 * app_.settings().getResH();
+    const int bw_ = 0.9 * app_.settings().getResH();
 
-    std::vector <PlayerThing> players_;
-    std::vector <PlayerThing>::iterator lastAlive_;
+    std::vector<PlayerThing> players_;
+    std::vector<PlayerThing>::iterator lastAlive_;
 
-    std::deque <TrailThing> trails_;
+    std::deque<TrailThing> trails_;
 
     // for calculating per-pixel movement speed and turn angles
-    Uint32 moveTimer_;
+    std::uint32_t moveTimer_ = SDL_GetTicks();
 
-    // GameplayStatus status_;
+    // GameplayStatus status_ = GameplayStatus::roundBegin;
 };

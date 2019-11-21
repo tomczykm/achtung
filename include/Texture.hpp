@@ -15,7 +15,7 @@ public:
     int getW() const { return mw_; }
     int getH() const { return mh_; }
 private:
-    SDL_Renderer *renderer_;
-    SDL_Texture *t_;
-    int mw_, mh_;
+    SDL_Renderer *renderer_ = nullptr;
+    SDL_Texture *t_ = nullptr;
+    int mw_ = 0, mh_ = 0;
 };

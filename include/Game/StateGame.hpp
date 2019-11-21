@@ -5,8 +5,6 @@
 #include "Texture.hpp"
 #include "Game/PlayerThing.hpp"
 
-#include <Box2D/Box2D.h>
-
 #include <vector>
 #include <deque>
 
@@ -41,8 +39,6 @@ private:
     std::vector <PlayerThing>::iterator lastAlive_;
 
     std::deque <TrailThing> trails_;
-
-    b2World world_;
 
     // for calculating per-pixel movement speed and turn angles
     Uint32 moveTimer_;

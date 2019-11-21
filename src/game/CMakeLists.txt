@@ -1,4 +1,4 @@
-set( GAME_SOURCE
+set(GAME_SOURCE
     PlayerThing.cpp
     StateGame.cpp
     StateSandbox.cpp

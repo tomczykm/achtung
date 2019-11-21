@@ -1,1 +1,1 @@
-configure_file(CMakeDefine.hpp.in "${CMAKE_CURRENT_SOURCE_DIR}/CMakeDefine.hpp")
+configure_file(CMakeDefine.hpp.in ${CMAKE_BINARY_DIR}/generated_include/CMakeDefine.hpp)

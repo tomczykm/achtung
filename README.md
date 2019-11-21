@@ -7,7 +7,7 @@ A C++ rewrite of [this game](https://en.wikipedia.org/wiki/Achtung,_die_Kurve!).
 1. Install CMake, git, build essentials, SDL2 and its extensions. On distros with apt, run: `sudo apt install cmake git build-essential libsdl2-dev libsdl2-image-dev`
 2. Download sources: `git clone https://github.com/tomczykm/freeachtung.git && cd freeachtung && git submodule update --init --recursive`
 3. Go to `build` directory, generate Makefile and build the project: `cd build && cmake .. && make`
-4. Run `src/freeachtung` to play the game
+4. Run `./freeachtung` to play the game
 
 You may also optionally run unit test with `make test`.
 
@@ -15,7 +15,7 @@ You may also optionally run unit test with `make test`.
 
 Building the game on Windows is likely possible as-is, but you're going to have to figure this out yourself (for now).
 
-### Upcoming features
+### Planned features
 
 1. Feature parity with [this version of the game](http://www.cda.pl/gry-online/6431c8/Uwaga-zakret-Achtung-Die-Kurve)
 2. Publishing Windows binaries

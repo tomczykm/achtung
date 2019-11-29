@@ -1,6 +1,8 @@
 #include "Log.hpp"
 #include <ctime>
 
+#include <fmt/core.h>
+
 Logger::Logger(const std::string &filename) {
     file_.open(filename.c_str(), std::ios::trunc);
 }

@@ -23,4 +23,4 @@ add_subdirectory(external)
 add_subdirectory(tests)
 
 add_executable(${PROJECT_NAME} $<TARGET_OBJECTS:app_core> $<TARGET_OBJECTS:game>)
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES})

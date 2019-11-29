@@ -10,3 +10,4 @@ set(APP_CORE_SOURCE
 )
 
 add_library(app_core OBJECT ${APP_CORE_SOURCE})
+target_link_libraries(app_core PRIVATE fmt::fmt)

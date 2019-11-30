@@ -2,7 +2,6 @@
 
 #include "Application.hpp"
 #include "IGameState.hpp"
-#include "Texture.hpp"
 #include "game/PlayerThing.hpp"
 
 #include <vector>
@@ -21,16 +20,12 @@ class StateGame: public IGameState {
 public:
     StateGame(const Application::Interface&);
 
-    void input() override;
+    void input(const sf::Event&) override;
     void logic() override;
     void render() override;
-    void polledInput() override;
 
 private:
     Application::Interface app_;
-
-    Texture playerTex_{/*&app_.renderer, */"dot.png"};
-    Texture trailTex_{/*&app_.renderer, */"wall.png"};
 
     // dimensions for border
     static constexpr int wt_ = 4;

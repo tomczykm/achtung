@@ -2,7 +2,6 @@
 #include <ctime>
 
 #include "Application.hpp"
-#include "Log.hpp"
 
 #include "game/StateGame.hpp"
 #include "game/StateSandbox.hpp"
@@ -13,7 +12,6 @@ Application::Application():
         PROJECT_NAME, sf::Style::Titlebar | sf::Style::Close),
     gameState_(std::make_unique<StateSandbox>(Interface{*this}))
 {
-    std::srand(std::time(nullptr));
     window_.setVerticalSyncEnabled(true);
     print::info("Initialization complete");
 }
@@ -26,11 +24,12 @@ int Application::run() {
             if (event.type == sf::Event::Closed) {
                 quit_ = true;
             }
+
+            gameState_->input(event);
         }
 
-        gameState_->input();
-
         gameState_->logic();
+
         if (changeState_) {
             changeState_();
             changeState_ = nullptr;

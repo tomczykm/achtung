@@ -5,6 +5,9 @@
 #include <deque>
 #include <chrono>
 
+#include <SFML/Graphics.hpp>
+
+#include "Log.hpp"
 #include "game/TrailThing.hpp"
 
 class PlayerThing {
@@ -17,12 +20,11 @@ public:
     void newRoundSetup(int xmin, int xmax, int ymin, int ymax);
     void createTrail(std::deque<TrailThing>&) const;
 
-    // SDL_Rect getRenderRect() const;
-    int getRadius() const { return radius_; }
+    const sf::CircleShape& getShape() const { return shape_; }
 
     bool checkCollision(const TrailThing&) const;
 
-    void die() { dead_ = true; }
+    void kill() { dead_ = true; }
     bool isDead() const { return dead_; }
     bool isGap() const { return gap_; }
 
@@ -32,13 +34,10 @@ private:
     std::string name_;
 
     // movement
-    double xPos_ = 0.0, yPos_ = 0.0;
+    sf::CircleShape shape_;
     double direction_ = 0.0; // in degrees
-    bool turnR_ = false, turnL_ = false;
     int vel_ = 100; // pixels per seconds
-    static constexpr double TURN_DEG = 160;
 
-    int radius_ = 7;
     // int score_ = 0;
 
     bool dead_ = false;

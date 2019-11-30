@@ -2,7 +2,6 @@ add_subdirectory(game/)
 
 set(APP_CORE_SOURCE
     Application.cpp
-    Texture.cpp
     Utils.cpp
     Main.cpp
     SettingsHandler.cpp

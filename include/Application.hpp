@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "CMakeDefine.hpp"
+#include "Log.hpp"
 #include "SettingsHandler.hpp"
 #include "IGameState.hpp"
 
@@ -30,6 +31,7 @@ class Application::Interface
 {
 public:
     SettingsHandler& settings;
+    sf::RenderWindow& window;
 
     void quit() {
         app_.quit_ = true;
@@ -37,6 +39,7 @@ public:
 
     template <class State, typename... Ts>
     void enterState(Ts... args) {
+        print::info("Changing state to {}", typeid(State).name());
         app_.changeState_ = [this, args...] () {
             app_.gameState_ = std::make_unique<State>(*this, args...);
         };
@@ -46,6 +49,7 @@ private:
     friend class Application;
     explicit Interface(Application& app):
         settings(app.settings_),
+        window(app.window_),
         app_(app)
     {}
 

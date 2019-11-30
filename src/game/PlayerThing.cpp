@@ -2,15 +2,22 @@
 
 #include <cmath>
 
+#include "Log.hpp"
 #include "Utils.hpp"
 
 namespace chrono = std::chrono;
 
+constexpr int BASE_RADIUS = 6;
+constexpr double TURN_DEG = 160;
+
 PlayerThing::PlayerThing(std::string_view n/*, SDL_Scancode left, SDL_Scancode right*/):
-    name_(n)
+    name_(n),
+    shape_(BASE_RADIUS)
     // leftKey_(left),
     // rightKey_(right)
-{}
+{
+    shape_.setFillColor(sf::Color::Yellow);
+}
 
 void PlayerThing::input() {
     // const auto keyStates = SDL_GetKeyboardState(nullptr);
@@ -19,8 +26,8 @@ void PlayerThing::input() {
 }
 
 void PlayerThing::move(double timeStep) {
-    if (turnL_) direction_ -= timeStep * TURN_DEG;
-    else if (turnR_) direction_ += timeStep * TURN_DEG;
+    // if (turnL_) direction_ -= timeStep * TURN_DEG;
+    // else if (turnR_) direction_ += timeStep * TURN_DEG;
 
     if (direction_ < 0) direction_ += 360;
     else if (direction_ >= 360) direction_ -= 360;
@@ -29,17 +36,23 @@ void PlayerThing::move(double timeStep) {
         gapSwitch();
     }
 
-    xPos_ += timeStep * vel_ * sin(-(M_PI/180)*direction_);
-    yPos_ += timeStep * vel_ * cos(-(M_PI/180)*direction_);
+    auto [curX, curY] = shape_.getPosition();
+
+    shape_.setPosition(
+        curX + (timeStep * vel_ * sin(-(M_PI/180)*direction_)),
+        curY + (timeStep * vel_ * cos(-(M_PI/180)*direction_))
+    );
 }
 
 // places a player randomly on the playfield and moves them a couple steps
 // so that the player can tell the direction they're going to move
 void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax) {
     dead_ = false;
-    xPos_ = randomInt(xmin, xmax);
-    yPos_ = randomInt(ymin, ymax);
     direction_ = std::rand()%360;
+    shape_.setPosition(
+        randomInt(xmin, xmax),
+        randomInt(ymin, ymax)
+    );
 
     // todo: move the player
 
@@ -49,14 +62,9 @@ void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax) {
 
 void PlayerThing::createTrail(std::deque <TrailThing> &trails) const {
     if (!gap_) {
-        trails.emplace_front(xPos_, yPos_, direction_, radius_);
+        // trails.emplace_front(xPos_, yPos_, direction_, radius_);
     }
 }
-
-// SDL_Rect PlayerThing::getRenderRect() const {
-//     return {static_cast<int>(xPos_-radius_/2), static_cast<int>(yPos_-radius_/2),
-//         radius_, radius_};
-// }
 
 void PlayerThing::gapSwitch() {
     gap_ = !gap_;

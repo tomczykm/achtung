@@ -15,13 +15,13 @@ StateGame::StateGame(const Application::Interface& ctx):
     lastAlive_ = players_.end();
 }
 
-void StateGame::input() {
-    for (auto it = players_.begin() ; it != lastAlive_ ; it++) {
-        it->input();
-    }
-}
+// void StateGame::input() {
+//     for (auto it = players_.begin() ; it != lastAlive_ ; it++) {
+//         it->input();
+//     }
+// }
 
-void StateGame::polledInput() {
+void StateGame::input(const sf::Event& event) {
     // if (app_.events.type == SDL_KEYDOWN) {
     //     switch(app_.events.key.keysym.sym) {
     //     case SDLK_SPACE:
@@ -40,7 +40,7 @@ void StateGame::logic() {
 
         for (const auto& t: trails_) {
             if (!it->isGap() && it->checkCollision(t)) {
-                it->die();
+                it->kill();
                 playerDied = true;
             }
         }

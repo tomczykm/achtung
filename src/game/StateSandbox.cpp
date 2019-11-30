@@ -6,13 +6,10 @@ StateSandbox::StateSandbox(const Application::Interface& ctx):
     app_(ctx)
 {
     player_.newRoundSetup(100, 600, 100, 600);
+    print::info("StateSandbox ready");
 }
 
-void StateSandbox::input() {
-    player_.input();
-}
-
-void StateSandbox::polledInput() {
+void StateSandbox::input(const sf::Event& event) {
     // if (app_.events.type == SDL_KEYDOWN) {
     //     switch(app_.events.key.keysym.sym) {
     //     case SDLK_SPACE:
@@ -33,17 +30,16 @@ void StateSandbox::polledInput() {
     // }
 }
 
-
 void StateSandbox::logic() {
-    if (move_) {
-        // player_.move((SDL_GetTicks() - moveTimer_) / 1000.f);
-    }
+    // if (move_) {
+    //     player_.move((SDL_GetTicks() - moveTimer_) / 1000.f);
+    // }
 
-    for (const auto& t: trails_) {
-        if (player_.checkCollision(t)) {
-            print::info("Collision!");
-        }
-    }
+    // for (const auto& t: trails_) {
+    //     if (player_.checkCollision(t)) {
+    //         print::info("Collision!");
+    //     }
+    // }
     // moveTimer_ = SDL_GetTicks();
 }
 
@@ -53,6 +49,5 @@ void StateSandbox::render() {
     //     trailTex_.render(rec.x, rec.y, rec.w, rec.h, t.getAngle());
     // }
 
-    // const auto& rec = player_.getRenderRect();
-    // playerTex_.render(rec.x, rec.y, rec.w, rec.h);
+    app_.window.draw(player_.getShape());
 }

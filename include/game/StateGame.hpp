@@ -35,7 +35,7 @@ private:
     BorderThing border_;
 
     // for calculating per-pixel movement speed and turn angles
-    std::uint32_t moveTimer_ = /*SDL_GetTicks()*/0;
+    sf::Clock moveTimer_;
 
     // GameplayStatus status_ = GameplayStatus::roundBegin;
 };

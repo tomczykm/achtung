@@ -33,16 +33,16 @@ void StateSandbox::input(const sf::Event& event) {
 }
 
 void StateSandbox::logic() {
-    // if (move_) {
-    //     player_.move((SDL_GetTicks() - moveTimer_) / 1000.f);
-    // }
+    if (move_) {
+        player_.move(moveTimer_.getElapsedTime().asMilliseconds() / 1000.f);
+    }
 
     // for (const auto& t: trails_) {
     //     if (player_.checkCollision(t)) {
     //         print::info("Collision!");
     //     }
     // }
-    // moveTimer_ = SDL_GetTicks();
+    moveTimer_.restart();
 }
 
 void StateSandbox::render() {

@@ -10,24 +10,21 @@ namespace chrono = std::chrono;
 constexpr int BASE_RADIUS = 6;
 constexpr double TURN_DEG = 160;
 
-PlayerThing::PlayerThing(std::string_view n/*, SDL_Scancode left, SDL_Scancode right*/):
+PlayerThing::PlayerThing(std::string_view n, sf::Keyboard::Key left, sf::Keyboard::Key right):
     name_(n),
-    shape_(BASE_RADIUS)
-    // leftKey_(left),
-    // rightKey_(right)
+    shape_(BASE_RADIUS),
+    leftKey_(left),
+    rightKey_(right)
 {
     shape_.setFillColor(sf::Color::Yellow);
 }
 
-void PlayerThing::input() {
-    // const auto keyStates = SDL_GetKeyboardState(nullptr);
-    // turnL_ = keyStates[ leftKey_ ] && !keyStates[ rightKey_ ];
-    // turnR_ = keyStates[ rightKey_ ];
-}
-
 void PlayerThing::move(double timeStep) {
-    // if (turnL_) direction_ -= timeStep * TURN_DEG;
-    // else if (turnR_) direction_ += timeStep * TURN_DEG;
+    if (sf::Keyboard::isKeyPressed(rightKey_)) {
+        direction_ += timeStep * TURN_DEG;
+    } else if (sf::Keyboard::isKeyPressed(leftKey_)) {
+        direction_ -= timeStep * TURN_DEG;
+    }
 
     if (direction_ < 0) direction_ += 360;
     else if (direction_ >= 360) direction_ -= 360;

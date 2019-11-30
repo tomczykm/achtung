@@ -9,17 +9,11 @@ StateGame::StateGame(const Application::Interface& ctx):
     app_(ctx),
     border_(0.05 * app_.settings.getResH(), 0.9 * app_.settings.getResH())
 {
-    players_.emplace_back("player"/*, SDL_SCANCODE_Q, SDL_SCANCODE_W*/);
+    players_.emplace_back("player", sf::Keyboard::Q, sf::Keyboard::W);
     for (auto &p: players_) {
         p.newRoundSetup(100, 600, 100, 600);
     }
     lastAlive_ = players_.end();
-}
-
-void StateGame::input(const sf::Event&) {
-    // for (auto it = players_.begin() ; it != lastAlive_ ; it++) {
-    //     it->input();
-    // }
 }
 
 void StateGame::input(const sf::Event& event) {
@@ -38,7 +32,7 @@ void StateGame::logic() {
     bool playerDied = false;
 
     for (auto player = players_.begin() ; player != lastAlive_ ; player++) {
-        // it->move((SDL_GetTicks() - moveTimer_) / 1000.f);
+        player->move(moveTimer_.getElapsedTime().asMilliseconds() / 1000.f);
         player->createTrail(trails_);
 
         for (const auto& t: trails_) {
@@ -54,7 +48,7 @@ void StateGame::logic() {
             [] (auto& p) { return !p.isDead(); });
     }
 
-    // moveTimer_ = SDL_GetTicks();
+    moveTimer_.restart();
 }
 
 void StateGame::render() {

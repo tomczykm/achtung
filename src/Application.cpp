@@ -8,11 +8,15 @@
 
 Application::Application():
     settings_("settings.dat"),
-    window_(sf::VideoMode(settings_.getResW(), settings_.getResH()),
-        PROJECT_NAME, sf::Style::Titlebar | sf::Style::Close),
     gameState_(std::make_unique<StateSandbox>(Interface{*this}))
 {
+    sf::ContextSettings windowSettings;
+    windowSettings.antialiasingLevel = 8;
+
+    window_.create(sf::VideoMode(settings_.getResW(), settings_.getResH()),
+        PROJECT_NAME, sf::Style::Titlebar | sf::Style::Close, windowSettings);
     window_.setVerticalSyncEnabled(true);
+
     print::info("Initialization complete");
 }
 

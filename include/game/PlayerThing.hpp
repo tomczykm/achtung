@@ -12,9 +12,8 @@
 
 class PlayerThing {
 public:
-    PlayerThing(std::string_view name/*, SDL_Scancode left, SDL_Scancode right*/);
+    PlayerThing(std::string_view name, sf::Keyboard::Key left, sf::Keyboard::Key right);
 
-    void input();
     void move(double timeStep);
 
     void newRoundSetup(int xmin, int xmax, int ymin, int ymax);
@@ -33,7 +32,6 @@ private:
 
     std::string name_;
 
-    // movement
     sf::CircleShape shape_;
     double direction_ = 0.0; // in degrees
     int vel_ = 100; // pixels per seconds
@@ -42,7 +40,7 @@ private:
 
     bool dead_ = false;
 
-    // SDL_Scancode leftKey_, rightKey_;
+    sf::Keyboard::Key leftKey_, rightKey_;
 
     // gap logic
     static constexpr std::chrono::milliseconds GAP_TIME{170};

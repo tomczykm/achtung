@@ -17,11 +17,11 @@ public:
 private:
     Application::Interface app_;
 
-    PlayerThing player_{"player"/*, SDL_SCANCODE_Q, SDL_SCANCODE_W*/};
+    PlayerThing player_{"player", sf::Keyboard::Q, sf::Keyboard::W};
     std::deque<TrailThing> trails_;
 
     bool move_ = false;
 
     // for calculating per-pixel movement speed and turn angles
-    std::uint32_t moveTimer_ = /*SDL_GetTicks()*/0;
+    sf::Clock moveTimer_;
 };

@@ -13,30 +13,30 @@ void StateSandbox::input() {
 }
 
 void StateSandbox::polledInput() {
-    if (app_.events.type == SDL_KEYDOWN) {
-        switch(app_.events.key.keysym.sym) {
-        case SDLK_SPACE:
-            move_ = true;
-            break;
-        case SDLK_t:
-            app_.enterState<StateGame>();
-            break;
-        }
-    }
+    // if (app_.events.type == SDL_KEYDOWN) {
+    //     switch(app_.events.key.keysym.sym) {
+    //     case SDLK_SPACE:
+    //         move_ = true;
+    //         break;
+    //     case SDLK_t:
+    //         app_.enterState<StateGame>();
+    //         break;
+    //     }
+    // }
 
-    if (app_.events.type == SDL_KEYUP) {
-        switch(app_.events.key.keysym.sym) {
-        case SDLK_SPACE:
-            move_ = false;
-            break;
-        }
-    }
+    // if (app_.events.type == SDL_KEYUP) {
+    //     switch(app_.events.key.keysym.sym) {
+    //     case SDLK_SPACE:
+    //         move_ = false;
+    //         break;
+    //     }
+    // }
 }
 
 
 void StateSandbox::logic() {
     if (move_) {
-        player_.move((SDL_GetTicks() - moveTimer_) / 1000.f);
+        // player_.move((SDL_GetTicks() - moveTimer_) / 1000.f);
     }
 
     for (const auto& t: trails_) {
@@ -44,15 +44,15 @@ void StateSandbox::logic() {
             print::info("Collision!");
         }
     }
-    moveTimer_ = SDL_GetTicks();
+    // moveTimer_ = SDL_GetTicks();
 }
 
 void StateSandbox::render() {
-    for (auto& t: trails_) {
-        const auto& rec = t.getRenderRect();
-        trailTex_.render(rec.x, rec.y, rec.w, rec.h, t.getAngle());
-    }
+    // for (auto& t: trails_) {
+    //     const auto& rec = t.getRenderRect();
+    //     trailTex_.render(rec.x, rec.y, rec.w, rec.h, t.getAngle());
+    // }
 
-    const auto& rec = player_.getRenderRect();
-    playerTex_.render(rec.x, rec.y, rec.w, rec.h);
+    // const auto& rec = player_.getRenderRect();
+    // playerTex_.render(rec.x, rec.y, rec.w, rec.h);
 }

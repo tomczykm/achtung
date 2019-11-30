@@ -5,15 +5,11 @@
 #include <deque>
 #include <chrono>
 
-#include <SDL.h>
-
 #include "game/TrailThing.hpp"
-
-namespace chrono = std::chrono;
 
 class PlayerThing {
 public:
-    PlayerThing(std::string_view name, SDL_Scancode left, SDL_Scancode right);
+    PlayerThing(std::string_view name/*, SDL_Scancode left, SDL_Scancode right*/);
 
     void input();
     void move(double timeStep);
@@ -21,7 +17,7 @@ public:
     void newRoundSetup(int xmin, int xmax, int ymin, int ymax);
     void createTrail(std::deque<TrailThing>&) const;
 
-    SDL_Rect getRenderRect() const;
+    // SDL_Rect getRenderRect() const;
     int getRadius() const { return radius_; }
 
     bool checkCollision(const TrailThing&) const;
@@ -47,10 +43,10 @@ private:
 
     bool dead_ = false;
 
-    SDL_Scancode leftKey_, rightKey_;
+    // SDL_Scancode leftKey_, rightKey_;
 
     // gap logic
-    static constexpr chrono::milliseconds GAP_TIME{170};
+    static constexpr std::chrono::milliseconds GAP_TIME{170};
     bool gap_ = false;
-    chrono::steady_clock::time_point switchTime_ = {};
+    std::chrono::steady_clock::time_point switchTime_ = {};
 };

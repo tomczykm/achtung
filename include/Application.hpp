@@ -3,8 +3,6 @@
 #include <memory>
 #include <functional>
 
-#include <SDL.h>
-
 #include "CMakeDefine.hpp"
 #include "SettingsHandler.hpp"
 #include "IGameState.hpp"
@@ -19,9 +17,9 @@ public:
     class Interface;
 
 private:
-    SDL_Window *window_ = nullptr;
-    SDL_Renderer *renderer_ = nullptr;
-    SDL_Event events_;
+    // SDL_Window *window_ = nullptr;
+    // SDL_Renderer *renderer_ = nullptr;
+    // SDL_Event events_;
 
     SettingsHandler settings_;
 
@@ -34,8 +32,8 @@ class Application::Interface
 {
 public:
     SettingsHandler& settings;
-    SDL_Renderer& renderer;
-    SDL_Event& events;
+    // SDL_Renderer& renderer;
+    // SDL_Event& events;
 
     void quit() {
         app_.quit_ = true;
@@ -52,8 +50,8 @@ private:
     friend class Application;
     explicit Interface(Application& app):
         settings(app.settings_),
-        renderer(*app.renderer_),
-        events(app.events_),
+        // renderer(*app.renderer_),
+        // events(app.events_),
         app_(app)
     {}
 

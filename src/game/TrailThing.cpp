@@ -7,6 +7,6 @@ TrailThing::TrailThing(double x, double y, int ang, int rad):
     radius_(rad)
 {}
 
-SDL_Rect TrailThing::getRenderRect() const {
-    return {static_cast<int>(xPos_-radius_/2), static_cast<int>(yPos_-radius_/2), radius_, radius_};
-}
+// SDL_Rect TrailThing::getRenderRect() const {
+//     return {static_cast<int>(xPos_-radius_/2), static_cast<int>(yPos_-radius_/2), radius_, radius_};
+// }

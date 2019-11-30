@@ -4,16 +4,18 @@
 
 #include "Global.hpp"
 
-PlayerThing::PlayerThing(std::string_view n, SDL_Scancode left, SDL_Scancode right):
-    name_(n),
-    leftKey_(left),
-    rightKey_(right)
+namespace chrono = std::chrono;
+
+PlayerThing::PlayerThing(std::string_view n/*, SDL_Scancode left, SDL_Scancode right*/):
+    name_(n)
+    // leftKey_(left),
+    // rightKey_(right)
 {}
 
 void PlayerThing::input() {
-    const auto keyStates = SDL_GetKeyboardState(nullptr);
-    turnL_ = keyStates[ leftKey_ ] && !keyStates[ rightKey_ ];
-    turnR_ = keyStates[ rightKey_ ];
+    // const auto keyStates = SDL_GetKeyboardState(nullptr);
+    // turnL_ = keyStates[ leftKey_ ] && !keyStates[ rightKey_ ];
+    // turnR_ = keyStates[ rightKey_ ];
 }
 
 void PlayerThing::move(double timeStep) {
@@ -51,10 +53,10 @@ void PlayerThing::createTrail(std::deque <TrailThing> &trails) const {
     }
 }
 
-SDL_Rect PlayerThing::getRenderRect() const {
-    return {static_cast<int>(xPos_-radius_/2), static_cast<int>(yPos_-radius_/2),
-        radius_, radius_};
-}
+// SDL_Rect PlayerThing::getRenderRect() const {
+//     return {static_cast<int>(xPos_-radius_/2), static_cast<int>(yPos_-radius_/2),
+//         radius_, radius_};
+// }
 
 void PlayerThing::gapSwitch() {
     gap_ = !gap_;

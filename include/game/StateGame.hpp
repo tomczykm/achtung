@@ -29,8 +29,8 @@ public:
 private:
     Application::Interface app_;
 
-    Texture playerTex_{&app_.renderer, "dot.png"};
-    Texture trailTex_{&app_.renderer, "wall.png"};
+    Texture playerTex_{/*&app_.renderer, */"dot.png"};
+    Texture trailTex_{/*&app_.renderer, */"wall.png"};
 
     // dimensions for border
     static constexpr int wt_ = 4;
@@ -43,7 +43,7 @@ private:
     std::deque<TrailThing> trails_;
 
     // for calculating per-pixel movement speed and turn angles
-    std::uint32_t moveTimer_ = SDL_GetTicks();
+    std::uint32_t moveTimer_ = /*SDL_GetTicks()*/0;
 
     // GameplayStatus status_ = GameplayStatus::roundBegin;
 };

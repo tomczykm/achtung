@@ -19,14 +19,14 @@ public:
 private:
     Application::Interface app_;
 
-    Texture playerTex_{&app_.renderer, "dot.png"};
-    Texture trailTex_{&app_.renderer, "wall.png"};
+    Texture playerTex_{/*&app_.renderer, */"dot.png"};
+    Texture trailTex_{/*&app_.renderer, */"wall.png"};
 
-    PlayerThing player_{"player", SDL_SCANCODE_Q, SDL_SCANCODE_W};
+    PlayerThing player_{"player"/*, SDL_SCANCODE_Q, SDL_SCANCODE_W*/};
     std::deque <TrailThing> trails_;
 
     bool move_ = false;
 
     // for calculating per-pixel movement speed and turn angles
-    std::uint32_t moveTimer_ = SDL_GetTicks();
+    std::uint32_t moveTimer_ = /*SDL_GetTicks()*/0;
 };

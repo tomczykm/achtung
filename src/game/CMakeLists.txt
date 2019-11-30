@@ -6,3 +6,4 @@ set(GAME_SOURCE
 )
 
 add_library(game OBJECT ${GAME_SOURCE})
+target_link_libraries(game PRIVATE fmt::fmt-header-only)

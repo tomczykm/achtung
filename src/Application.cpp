@@ -9,7 +9,7 @@
 #include "game/StateSandbox.hpp"
 
 Application::~Application() {
-    log_ << info << "Cleanup";
+    print::info("Cleanup");
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);
     IMG_Quit();
@@ -18,16 +18,16 @@ Application::~Application() {
 
 bool Application::init() {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-        log_ << error << "Failed to init SDL video. SDL_Error: " << SDL_GetError();
+        print::error("Failed to init SDL video. SDL_Error: {}", SDL_GetError());
         return false;
     }
 
     if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
-        log_ << warning << "Linear filtering is off";
+        print::info("Linear filtering is off");
     }
 
     if (!SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1")) {
-        log_ << warning << "VSync is off";
+        print::info("VSync is off");
     }
 
     window_ = SDL_CreateWindow(PROJECT_NAME, SDL_WINDOWPOS_UNDEFINED,
@@ -35,7 +35,7 @@ bool Application::init() {
         SDL_WINDOW_SHOWN | (settings_.getFullscreen() ? SDL_WINDOW_FULLSCREEN : 0));
 
     if (!window_) {
-        log_ << error << "Failed to create a window. SDL_Error: " << SDL_GetError();
+        print::error("Failed to create a window. SDL_Error: {}", SDL_GetError());
         return false;
     }
 
@@ -44,7 +44,7 @@ bool Application::init() {
 
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags)) {
-        log_ << error << "Failed to initialize SDL_Image. IMG_Error: " << IMG_GetError();
+        print::error("Failed to initialize SDL_Image. IMG_Error: {}", IMG_GetError());
         return false;
     }
 
@@ -52,7 +52,7 @@ bool Application::init() {
 
     gameState_ = std::make_unique<StateSandbox>(*this);
 
-    log_ << info << "Initialization complete";
+    print::info("Initialization complete");
     return true;
 }
 

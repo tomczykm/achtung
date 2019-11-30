@@ -17,7 +17,7 @@ SettingsHandler::SettingsHandler(std::string_view fname):
         file.read(reinterpret_cast<char*>(&resolution_), sizeof(Resolution));
         file.read(reinterpret_cast<char*>(&fullscreen_), sizeof(bool));
     } else {
-        log_ << warning << "Failed to read settings - reverting to defaults";
+        print::error("Failed to read settings - reverting to defaults");
         resolution_ = Resolution::r_1280_768;
         fullscreen_ = false;
     }
@@ -29,7 +29,7 @@ SettingsHandler::~SettingsHandler() {
         file.write(reinterpret_cast<char*>(&resolution_), sizeof(Resolution));
         file.write(reinterpret_cast<char*>(&fullscreen_), sizeof(bool));
     } else {
-        log_ << error << "Failed to save settings.";
+        print::error("Failed to save settings.");
     }
 }
 

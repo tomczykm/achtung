@@ -27,7 +27,7 @@ bool Texture::loadFromFile(std::string_view filename) {
     SDL_Surface *loadedSurface = IMG_Load(filename.data());
 
     if (!loadedSurface) {
-        log_ << error << "Error loading image \"" << filename << "\". IMG_Error: " << IMG_GetError();
+        print::error("Error loading image {}. IMG_Error: {}", filename, IMG_GetError());
         return false;
     }
 
@@ -35,7 +35,7 @@ bool Texture::loadFromFile(std::string_view filename) {
     newTexture = SDL_CreateTextureFromSurface(renderer_, loadedSurface);
 
     if (!newTexture) {
-        log_ << error << "Error creating texture from \"" << filename << "\"! SDL_Error: " <<  SDL_GetError();
+        print::error("Error creating texture from {}. SDL_Error: {}", filename, SDL_GetError());
         return false;
     }
 

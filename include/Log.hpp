@@ -1,41 +1,42 @@
 #pragma once
 
-#include <string>
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include <cstdio>
+#include <memory>
+#include <string_view>
+#include <fmt/format.h>
 
-class Logger {
-public:
-    struct LogLevel {
-        LogLevel(Logger& log, const std::string& code):
-            log_(log),
-            code_(code)
-        {}
+namespace print::detail
+{
 
-        template<typename T>
-        LogLevel& operator<<(T&& t) {
-            log_.buffer_ << std::forward<T>(t);
-            return *this;
-        }
-
-        Logger& log_;
-        const std::string code_;
-    };
-
-    explicit Logger(const std::string &filename = "event.log");
-    ~Logger();
-
-    LogLevel& operator<<(LogLevel&);
-
-private:
-    void flush();
-
-    std::ofstream file_;
-    std::stringstream buffer_;
+struct FCloseDeleter {
+    void operator()(std::FILE* f) {
+        fclose(f);
+    }
 };
 
-extern Logger log_;
-extern Logger::LogLevel info;
-extern Logger::LogLevel warning;
-extern Logger::LogLevel error;
+extern std::unique_ptr<std::FILE, FCloseDeleter> logFile;
+
+template <typename... Ts>
+void printInternal(std::string_view prefix, std::string_view formatString, Ts&&... params) {
+    const auto completePrint = fmt::format("{} {}: {}\n", time(nullptr),
+        prefix, fmt::format(formatString, std::forward<Ts>(params)...));
+    fmt::print(completePrint);
+    fmt::print(logFile.get(), completePrint);
+}
+
+}  // namespace print::detail
+
+namespace print
+{
+
+template <typename... Ts>
+void info(std::string_view formatString, Ts&&... params) {
+    detail::printInternal("inf", formatString, std::forward<Ts>(params)...);
+}
+
+template <typename... Ts>
+void error(std::string_view formatString, Ts&&... params) {
+    detail::printInternal("ERR", formatString, std::forward<Ts>(params)...);
+}
+
+}  // namespace print

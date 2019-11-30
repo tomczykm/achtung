@@ -37,7 +37,7 @@ void StateSandbox::logic() {
 
     for (const auto& t: trails_) {
         if (player_.checkCollision(t)) {
-            log_ << info << "Collision!";
+            print::info("Collision!");
         }
     }
     moveTimer_ = SDL_GetTicks();

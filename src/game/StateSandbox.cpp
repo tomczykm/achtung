@@ -35,21 +35,21 @@ void StateSandbox::input(const sf::Event& event) {
 void StateSandbox::logic() {
     if (move_) {
         player_.move(moveTimer_.getElapsedTime().asMilliseconds() / 1000.f);
+        player_.createTrail(trails_);
     }
 
-    // for (const auto& t: trails_) {
-    //     if (player_.checkCollision(t)) {
-    //         print::info("Collision!");
-    //     }
-    // }
+    for (const auto& t: trails_) {
+        if (player_.checkCollision(t)) {
+            print::info("Collision!");
+        }
+    }
     moveTimer_.restart();
 }
 
 void StateSandbox::render() {
-    // for (auto& t: trails_) {
-    //     const auto& rec = t.getRenderRect();
-    //     trailTex_.render(rec.x, rec.y, rec.w, rec.h, t.getAngle());
-    // }
+    for (const auto& t: trails_) {
+        app_.window.draw(t.getShape());
+    }
 
     app_.window.draw(player_.getShape());
 }

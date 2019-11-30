@@ -1,12 +1,13 @@
 #include "game/TrailThing.hpp"
 
-TrailThing::TrailThing(double x, double y, int ang, int rad):
-    xPos_(x),
-    yPos_(y),
-    angle_(ang),
-    radius_(rad)
-{}
+constexpr float TRAIL_HEIGHT = 3;
 
-// SDL_Rect TrailThing::getRenderRect() const {
-//     return {static_cast<int>(xPos_-radius_/2), static_cast<int>(yPos_-radius_/2), radius_, radius_};
-// }
+TrailThing::TrailThing(float x, float y, float ang, float rad, sf::Color c):
+    shape_({rad, TRAIL_HEIGHT})
+{
+    shape_.setOrigin({rad/2, TRAIL_HEIGHT/2});
+    shape_.setRotation(ang);
+    shape_.setPosition({x, y});
+    shape_.setFillColor(c);
+}
+

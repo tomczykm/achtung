@@ -7,15 +7,21 @@
 
 namespace chrono = std::chrono;
 
-constexpr int BASE_RADIUS = 6;
+namespace
+{
+constexpr int BASE_RADIUS = 4;
 constexpr double TURN_DEG = 160;
+constexpr std::chrono::milliseconds GAP_TIME{240};
+}
 
 PlayerThing::PlayerThing(std::string_view n, sf::Keyboard::Key left, sf::Keyboard::Key right):
     name_(n),
     shape_(BASE_RADIUS),
     leftKey_(left),
-    rightKey_(right)
+    rightKey_(right),
+    color_(randomInt(0, 255), randomInt(0, 255), randomInt(0, 255))
 {
+    shape_.setOrigin(BASE_RADIUS, BASE_RADIUS);
     shape_.setFillColor(sf::Color::Yellow);
 }
 
@@ -33,11 +39,11 @@ void PlayerThing::move(double timeStep) {
         gapSwitch();
     }
 
-    auto [curX, curY] = shape_.getPosition();
+    auto [xPos, yPos] = shape_.getPosition();
 
     shape_.setPosition(
-        curX + (timeStep * vel_ * sin(-(M_PI/180)*direction_)),
-        curY + (timeStep * vel_ * cos(-(M_PI/180)*direction_))
+        xPos + (timeStep * vel_ * sin(-(M_PI/180)*direction_)),
+        yPos + (timeStep * vel_ * cos(-(M_PI/180)*direction_))
     );
 }
 
@@ -59,7 +65,8 @@ void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax) {
 
 void PlayerThing::createTrail(std::deque <TrailThing> &trails) const {
     if (!gap_) {
-        // trails.emplace_front(xPos_, yPos_, direction_, radius_);
+        auto [xPos, yPos] = shape_.getPosition();
+        trails.emplace_front(xPos, yPos, direction_, shape_.getRadius()*2, color_);
     }
 }
 

@@ -41,9 +41,9 @@ private:
     bool dead_ = false;
 
     sf::Keyboard::Key leftKey_, rightKey_;
+    sf::Color color_;
 
     // gap logic
-    static constexpr std::chrono::milliseconds GAP_TIME{170};
     bool gap_ = false;
     std::chrono::steady_clock::time_point switchTime_ = {};
 };

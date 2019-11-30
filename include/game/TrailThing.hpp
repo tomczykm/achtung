@@ -1,15 +1,12 @@
 #pragma once
 
-// #include <SDL.h>
+#include <SFML/Graphics.hpp>
 
 class TrailThing {
 public:
-    TrailThing(double x, double y, int ang, int rad);
-    // SDL_Rect getRenderRect() const;
+    TrailThing(float x, float y, float angle, float radius, sf::Color);
 
-    double getAngle() const { return angle_; }
+    const sf::RectangleShape& getShape() const { return shape_; }
 private:
-    double xPos_, yPos_;
-    double angle_;
-    int radius_;
+    sf::RectangleShape shape_;
 };

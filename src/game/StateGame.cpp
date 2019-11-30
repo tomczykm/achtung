@@ -52,11 +52,9 @@ void StateGame::logic() {
 }
 
 void StateGame::render() {
-    // // draw trails
-    // for (auto& t: trails_) {
-    //     auto rec = t.getRenderRect();
-    //     trailTex_.render(rec.x, rec.y, rec.w, rec.h, t.getAngle());
-    // }
+    for (const auto& t: trails_) {
+        app_.window.draw(t.getShape());
+    }
 
     for (const auto& shape: border_.getShapes()) {
         app_.window.draw(shape);

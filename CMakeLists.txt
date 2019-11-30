@@ -8,6 +8,8 @@ include(FindPkgConfig)
 pkg_search_module(SDL2 REQUIRED sdl2)
 pkg_search_module(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
 
+find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
+
 include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(${SDL2IMAGE_INCLUDE_DIRS})
 include_directories(${CMAKE_BINARY_DIR}/generated_include)
@@ -24,3 +26,4 @@ add_subdirectory(tests)
 
 add_executable(${PROJECT_NAME} $<TARGET_OBJECTS:app_core> $<TARGET_OBJECTS:game>)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics)

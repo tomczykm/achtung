@@ -36,9 +36,9 @@ int Application::run() {
             changeState_ = nullptr;
         }
 
-        // SDL_RenderClear(renderer_);
+        window_.clear(sf::Color::Black);
         gameState_->render();
-        // SDL_RenderPresent(renderer_);
+        window_.display();
     }
     return 0;
 }

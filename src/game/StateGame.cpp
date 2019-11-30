@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "Global.hpp"
+#include "Utils.hpp"
 
 StateGame::StateGame(const Application::Interface& ctx):
     app_(ctx)

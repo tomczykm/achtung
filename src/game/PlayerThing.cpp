@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "Global.hpp"
+#include "Utils.hpp"
 
 namespace chrono = std::chrono;
 

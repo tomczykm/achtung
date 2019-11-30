@@ -19,7 +19,7 @@ public:
 
 private:
     SettingsHandler settings_;
-    sf::Window window_;
+    sf::RenderWindow window_;
 
     std::unique_ptr<IGameState> gameState_;
     std::function<void()> changeState_;

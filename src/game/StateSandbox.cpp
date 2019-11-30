@@ -1,8 +1,9 @@
 #include "game/StateSandbox.hpp"
+#include "game/StateGame.hpp"
 #include "Log.hpp"
 
-StateSandbox::StateSandbox(Application& app):
-    app_(app)
+StateSandbox::StateSandbox(const Application::Interface& ctx):
+    app_(ctx)
 {
     player_.newRoundSetup(100, 600, 100, 600);
 }
@@ -12,19 +13,22 @@ void StateSandbox::input() {
 }
 
 void StateSandbox::polledInput() {
-    auto& events = app_.events();
-
-    if (events.type == SDL_KEYDOWN) {
-        switch(events.key.keysym.sym) {
+    if (app_.events.type == SDL_KEYDOWN) {
+        switch(app_.events.key.keysym.sym) {
         case SDLK_SPACE:
             move_ = true;
+            break;
+        case SDLK_t:
+            app_.enterState<StateGame>();
+            break;
         }
     }
 
-    if (events.type == SDL_KEYUP) {
-        switch(events.key.keysym.sym) {
+    if (app_.events.type == SDL_KEYUP) {
+        switch(app_.events.key.keysym.sym) {
         case SDLK_SPACE:
             move_ = false;
+            break;
         }
     }
 }

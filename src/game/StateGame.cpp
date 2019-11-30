@@ -1,11 +1,12 @@
 #include "game/StateGame.hpp"
+#include "game/StateSandbox.hpp"
 
 #include <algorithm>
 
 #include "Global.hpp"
 
-StateGame::StateGame(Application& app):
-    app_(app)
+StateGame::StateGame(const Application::Interface& ctx):
+    app_(ctx)
 {
     players_.emplace_back("player", SDL_SCANCODE_Q, SDL_SCANCODE_W);
     for (auto &p: players_) {
@@ -21,11 +22,11 @@ void StateGame::input() {
 }
 
 void StateGame::polledInput() {
-    if (app_.events().type == SDL_KEYDOWN) {
-        switch(app_.events().key.keysym.sym) {
+    if (app_.events.type == SDL_KEYDOWN) {
+        switch(app_.events.key.keysym.sym) {
         case SDLK_SPACE:
             // space (hehe) for shitty debugging
-            ;
+            app_.enterState<StateSandbox>();
         }
     }
 }
@@ -67,7 +68,7 @@ void StateGame::render() {
     }
 
     // drawing outer walls
-    auto renderer = app_.renderer();
+    auto renderer = &app_.renderer;
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0x00, 0xFF);
     SDL_Rect rect;
     // top

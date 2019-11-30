@@ -19,7 +19,7 @@ enum class GameplayStatus {
 
 class StateGame: public IGameState {
 public:
-    StateGame(Application&);
+    StateGame(const Application::Interface&);
 
     void input() override;
     void logic() override;
@@ -27,15 +27,15 @@ public:
     void polledInput() override;
 
 private:
-    Application& app_;
+    Application::Interface app_;
 
-    Texture playerTex_{app_.renderer(), "dot.png"};
-    Texture trailTex_{app_.renderer(), "wall.png"};
+    Texture playerTex_{&app_.renderer, "dot.png"};
+    Texture trailTex_{&app_.renderer, "wall.png"};
 
     // dimensions for border
     static constexpr int wt_ = 4;
-    const int bx_ = 0.05 * app_.settings().getResH();
-    const int bw_ = 0.9 * app_.settings().getResH();
+    const int bx_ = 0.05 * app_.settings.getResH();
+    const int bw_ = 0.9 * app_.settings.getResH();
 
     std::vector<PlayerThing> players_;
     std::vector<PlayerThing>::iterator lastAlive_;

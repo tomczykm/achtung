@@ -3,7 +3,7 @@
 #include "Texture.hpp"
 #include "Log.hpp"
 
-Texture::Texture(SDL_Renderer *renderer, std::string_view filename = {}):
+Texture::Texture(SDL_Renderer* renderer, std::string_view filename = {}):
     renderer_(renderer)
 {
     if (!filename.empty()) {

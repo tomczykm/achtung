@@ -11,7 +11,7 @@ public:
     bool loadFromFile(std::string_view filename);
     void render(int x, int y) const;
     void render(int x, int y, int w, int h, double angle = 0.0,
-        SDL_Point *center = nullptr, SDL_Rect *clip = nullptr) const;
+        SDL_Point* center = nullptr, SDL_Rect* clip = nullptr) const;
     int getW() const { return mw_; }
     int getH() const { return mh_; }
 private:

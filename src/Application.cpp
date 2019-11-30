@@ -50,7 +50,7 @@ bool Application::init() {
 
     std::srand(std::time(nullptr));
 
-    gameState_ = std::make_unique<StateSandbox>(*this);
+    gameState_ = std::make_unique<StateSandbox>(Interface{*this});
 
     print::info("Initialization complete");
     return true;
@@ -60,7 +60,7 @@ int Application::run() {
     while (!quit_) {
         while (SDL_PollEvent(&events_)) {
             if (events_.type == SDL_QUIT) {
-                quitGame();
+                quit_ = true;
             }
             gameState_->polledInput();
         }

@@ -16,20 +16,8 @@ public:
     bool init();
     int run();
 
-    template <class State, typename... Ts>
-    void enterState(Ts... args) {
-        changeState_ = [this, args...] () {
-            gameState_ = std::make_unique<State>(*this, args...);
-        };
-    }
+    class Interface;
 
-    void quitGame() {
-        quit_ = true;
-    }
-
-    SettingsHandler& settings() { return settings_; }
-    SDL_Renderer* renderer() { return renderer_; }
-    SDL_Event& events() { return events_; }
 private:
     SDL_Window *window_ = nullptr;
     SDL_Renderer *renderer_ = nullptr;
@@ -40,4 +28,34 @@ private:
     std::unique_ptr<IGameState> gameState_;
     std::function<void()> changeState_;
     bool quit_ = false;
+};
+
+class Application::Interface
+{
+public:
+    SettingsHandler& settings;
+    SDL_Renderer& renderer;
+    SDL_Event& events;
+
+    void quit() {
+        app_.quit_ = true;
+    }
+
+    template <class State, typename... Ts>
+    void enterState(Ts... args) {
+        app_.changeState_ = [this, args...] () {
+            app_.gameState_ = std::make_unique<State>(*this, args...);
+        };
+    }
+
+private:
+    friend class Application;
+    explicit Interface(Application& app):
+        settings(app.settings_),
+        renderer(*app.renderer_),
+        events(app.events_),
+        app_(app)
+    {}
+
+    Application& app_;
 };

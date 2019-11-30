@@ -3,25 +3,23 @@
 #include <memory>
 #include <functional>
 
+#include <SFML/Graphics.hpp>
+
 #include "CMakeDefine.hpp"
 #include "SettingsHandler.hpp"
 #include "IGameState.hpp"
 
 class Application {
 public:
-    ~Application();
+    Application();
 
-    bool init();
     int run();
 
     class Interface;
 
 private:
-    // SDL_Window *window_ = nullptr;
-    // SDL_Renderer *renderer_ = nullptr;
-    // SDL_Event events_;
-
     SettingsHandler settings_;
+    sf::Window window_;
 
     std::unique_ptr<IGameState> gameState_;
     std::function<void()> changeState_;
@@ -32,8 +30,6 @@ class Application::Interface
 {
 public:
     SettingsHandler& settings;
-    // SDL_Renderer& renderer;
-    // SDL_Event& events;
 
     void quit() {
         app_.quit_ = true;
@@ -50,8 +46,6 @@ private:
     friend class Application;
     explicit Interface(Application& app):
         settings(app.settings_),
-        // renderer(*app.renderer_),
-        // events(app.events_),
         app_(app)
     {}
 

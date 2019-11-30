@@ -10,24 +10,26 @@ StateSandbox::StateSandbox(const Application::Interface& ctx):
 }
 
 void StateSandbox::input(const sf::Event& event) {
-    // if (app_.events.type == SDL_KEYDOWN) {
-    //     switch(app_.events.key.keysym.sym) {
-    //     case SDLK_SPACE:
-    //         move_ = true;
-    //         break;
-    //     case SDLK_t:
-    //         app_.enterState<StateGame>();
-    //         break;
-    //     }
-    // }
+    if (event.type == sf::Event::KeyPressed) {
+        switch(event.key.code) {
+        case sf::Keyboard::Space:
+            move_ = true;
+            break;
+        case sf::Keyboard::T:
+            app_.enterState<StateGame>();
+            break;
+        default: break;
+        }
+    }
 
-    // if (app_.events.type == SDL_KEYUP) {
-    //     switch(app_.events.key.keysym.sym) {
-    //     case SDLK_SPACE:
-    //         move_ = false;
-    //         break;
-    //     }
-    // }
+    if (event.type == sf::Event::KeyReleased) {
+        switch(event.key.code) {
+        case sf::Keyboard::Space:
+            move_ = false;
+            break;
+        default: break;
+        }
+    }
 }
 
 void StateSandbox::logic() {

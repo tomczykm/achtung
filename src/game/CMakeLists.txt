@@ -1,4 +1,5 @@
 set(GAME_SOURCE
+    BorderThing.cpp
     PlayerThing.cpp
     StateGame.cpp
     StateSandbox.cpp

@@ -3,6 +3,7 @@
 #include "Application.hpp"
 #include "IGameState.hpp"
 #include "game/PlayerThing.hpp"
+#include "game/BorderThing.hpp"
 
 #include <vector>
 #include <deque>
@@ -27,15 +28,11 @@ public:
 private:
     Application::Interface app_;
 
-    // dimensions for border
-    static constexpr int wt_ = 4;
-    const int bx_ = 0.05 * app_.settings.getResH();
-    const int bw_ = 0.9 * app_.settings.getResH();
-
     std::vector<PlayerThing> players_;
     std::vector<PlayerThing>::iterator lastAlive_;
 
     std::deque<TrailThing> trails_;
+    BorderThing border_;
 
     // for calculating per-pixel movement speed and turn angles
     std::uint32_t moveTimer_ = /*SDL_GetTicks()*/0;

@@ -38,9 +38,12 @@ void StateSandbox::logic() {
         player_.createTrail(trails_);
     }
 
-    for (const auto& t: trails_) {
-        if (player_.checkCollision(t)) {
-            print::info("Collision!");
+    constexpr auto SKIP_TRAILS = 15u;
+    if (trails_.size() > SKIP_TRAILS) {
+        for (auto t = trails_.begin() + SKIP_TRAILS; t != trails_.end(); t++) {
+            if (player_.checkCollision(t->getShape())) {
+                t->setColor(sf::Color::Red);
+            }
         }
     }
     moveTimer_.restart();

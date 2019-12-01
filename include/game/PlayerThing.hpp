@@ -21,7 +21,7 @@ public:
 
     const sf::CircleShape& getShape() const { return shape_; }
 
-    bool checkCollision(const TrailThing&) const;
+    bool checkCollision(const sf::Shape&) const;
 
     void kill() { dead_ = true; }
     bool isDead() const { return dead_; }

@@ -19,7 +19,8 @@ PlayerThing::PlayerThing(std::string_view n, sf::Keyboard::Key left, sf::Keyboar
     shape_(BASE_RADIUS),
     leftKey_(left),
     rightKey_(right),
-    color_(randomInt(0, 255), randomInt(0, 255), randomInt(0, 255))
+    // color_(randomInt(0, 255), randomInt(0, 255), randomInt(0, 255))
+    color_(sf::Color::Green)
 {
     shape_.setOrigin(BASE_RADIUS, BASE_RADIUS);
     shape_.setFillColor(sf::Color::Yellow);
@@ -82,6 +83,7 @@ void PlayerThing::gapSwitch() {
     switchTime_ = chrono::steady_clock::now() + (gap_ ? GAP_TIME : chrono::milliseconds(randomInt( 1800, 3900 )));
 }
 
-bool PlayerThing::checkCollision(const TrailThing &o) const {
-    return false;
+bool PlayerThing::checkCollision(const sf::Shape &o) const {
+    // return false;
+    return shape_.getGlobalBounds().intersects(o.getGlobalBounds());
 }

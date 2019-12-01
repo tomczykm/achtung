@@ -9,7 +9,7 @@ namespace chrono = std::chrono;
 
 namespace
 {
-constexpr int BASE_RADIUS = 4;
+constexpr int BASE_RADIUS = 3;
 constexpr double TURN_DEG = 160;
 constexpr std::chrono::milliseconds GAP_TIME{240};
 }
@@ -40,7 +40,6 @@ void PlayerThing::move(double timeStep) {
     }
 
     auto [xPos, yPos] = shape_.getPosition();
-
     shape_.setPosition(
         xPos + (timeStep * vel_ * sin(-(M_PI/180)*direction_)),
         yPos + (timeStep * vel_ * cos(-(M_PI/180)*direction_))
@@ -49,7 +48,7 @@ void PlayerThing::move(double timeStep) {
 
 // places a player randomly on the playfield and moves them a couple steps
 // so that the player can tell the direction they're going to move
-void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax) {
+void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax, std::deque<TrailThing>& trails) {
     dead_ = false;
     direction_ = std::rand()%360;
     shape_.setPosition(
@@ -57,13 +56,21 @@ void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax) {
         randomInt(ymin, ymax)
     );
 
-    // todo: move the player
-
     gap_ = true;
     gapSwitch();
+
+    // move a little bit
+    for (int i = 0; i < 4; i++) {
+        createTrail(trails);
+        auto [xPos, yPos] = shape_.getPosition();
+        shape_.setPosition(
+            xPos + (0.02 * vel_ * sin(-(M_PI/180)*direction_)),
+            yPos + (0.02 * vel_ * cos(-(M_PI/180)*direction_))
+        );
+    }
 }
 
-void PlayerThing::createTrail(std::deque <TrailThing> &trails) const {
+void PlayerThing::createTrail(std::deque<TrailThing>& trails) const {
     if (!gap_) {
         auto [xPos, yPos] = shape_.getPosition();
         trails.emplace_front(xPos, yPos, direction_, shape_.getRadius()*2, color_);

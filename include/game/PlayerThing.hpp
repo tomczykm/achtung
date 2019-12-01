@@ -16,7 +16,7 @@ public:
 
     void move(double timeStep);
 
-    void newRoundSetup(int xmin, int xmax, int ymin, int ymax);
+    void newRoundSetup(int xmin, int xmax, int ymin, int ymax, std::deque<TrailThing>&);
     void createTrail(std::deque<TrailThing>&) const;
 
     const sf::CircleShape& getShape() const { return shape_; }

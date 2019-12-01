@@ -11,7 +11,7 @@ StateGame::StateGame(const Application::Interface& ctx):
 {
     players_.emplace_back("player", sf::Keyboard::Q, sf::Keyboard::W);
     for (auto &p: players_) {
-        p.newRoundSetup(100, 600, 100, 600);
+        p.newRoundSetup(100, 600, 100, 600, trails_);
     }
     lastAlive_ = players_.end();
 }

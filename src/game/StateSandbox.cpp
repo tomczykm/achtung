@@ -5,7 +5,7 @@
 StateSandbox::StateSandbox(const Application::Interface& ctx):
     app_(ctx)
 {
-    player_.newRoundSetup(100, 600, 100, 600);
+    player_.newRoundSetup(100, 600, 100, 600, trails_);
     print::info("StateSandbox ready");
 }
 

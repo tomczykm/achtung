@@ -18,5 +18,5 @@ add_subdirectory(include)
 add_subdirectory(external)
 add_subdirectory(tests)
 
-add_executable(${PROJECT_NAME} $<TARGET_OBJECTS:app_core> $<TARGET_OBJECTS:game>)
+add_executable(${PROJECT_NAME} $<TARGET_OBJECTS:app_core> $<TARGET_OBJECTS:game> $<TARGET_OBJECTS:menu>)
 target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics)

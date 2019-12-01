@@ -7,8 +7,9 @@
 
 #include "CMakeDefine.hpp"
 #include "Log.hpp"
-#include "SettingsHandler.hpp"
+#include "SettingsManager.hpp"
 #include "IGameState.hpp"
+#include "Utils.hpp"
 
 class Application {
 public:
@@ -19,7 +20,7 @@ public:
     class Interface;
 
 private:
-    SettingsHandler settings_;
+    SettingsManager settings_;
     sf::RenderWindow window_;
 
     std::unique_ptr<IGameState> gameState_;
@@ -30,7 +31,7 @@ private:
 class Application::Interface
 {
 public:
-    SettingsHandler& settings;
+    SettingsManager& settings;
     sf::RenderWindow& window;
 
     void quit() {
@@ -39,7 +40,7 @@ public:
 
     template <class State, typename... Ts>
     void enterState(Ts... args) {
-        print::info("Changing state to {}", typeid(State).name());
+        print::info("Changing state to {}", stripLeadingNumbers(typeid(State).name()));
         app_.changeState_ = [this, args...] () {
             app_.gameState_ = std::make_unique<State>(*this, args...);
         };

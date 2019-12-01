@@ -1,10 +1,11 @@
-add_subdirectory(game/)
+add_subdirectory(game)
+add_subdirectory(menu)
 
 set(APP_CORE_SOURCE
     Application.cpp
     Utils.cpp
     Main.cpp
-    SettingsHandler.cpp
+    SettingsManager.cpp
 )
 
 add_library(app_core OBJECT ${APP_CORE_SOURCE})

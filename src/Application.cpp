@@ -3,12 +3,11 @@
 
 #include "Application.hpp"
 
-#include "game/StateGame.hpp"
-#include "game/StateSandbox.hpp"
+#include "menu/StateMenu.hpp"
 
 Application::Application():
     settings_("settings.dat"),
-    gameState_(std::make_unique<StateSandbox>(Interface{*this}))
+    gameState_(std::make_unique<StateMenu>(Interface{*this}))
 {
     sf::ContextSettings windowSettings;
     windowSettings.antialiasingLevel = 8;

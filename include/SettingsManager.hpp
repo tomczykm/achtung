@@ -35,10 +35,10 @@ enum class Resolution {
 
 inline AspRatio GetAspRatio(Resolution res);
 
-class SettingsHandler {
+class SettingsManager {
 public:
-    SettingsHandler (std::string_view filename);
-    ~SettingsHandler();
+    SettingsManager (std::string_view filename);
+    ~SettingsManager();
 
     int getResW() const;
     int getResH() const;

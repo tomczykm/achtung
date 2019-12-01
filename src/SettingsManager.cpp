@@ -1,4 +1,4 @@
-#include "SettingsHandler.hpp"
+#include "SettingsManager.hpp"
 #include "Log.hpp"
 
 inline AspRatio GetAspectRatio(Resolution res) {
@@ -9,7 +9,7 @@ inline AspRatio GetAspectRatio(Resolution res) {
     else return AspRatio::r_54;
 }
 
-SettingsHandler::SettingsHandler(std::string_view fname):
+SettingsManager::SettingsManager(std::string_view fname):
     filename_(fname)
 {
     std::fstream file{filename_.c_str(), std::ios::in | std::ios::binary};
@@ -23,7 +23,7 @@ SettingsHandler::SettingsHandler(std::string_view fname):
     }
 }
 
-SettingsHandler::~SettingsHandler() {
+SettingsManager::~SettingsManager() {
     std::fstream file(filename_.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
     if (file) {
         file.write(reinterpret_cast<char*>(&resolution_), sizeof(Resolution));
@@ -33,7 +33,7 @@ SettingsHandler::~SettingsHandler() {
     }
 }
 
-int SettingsHandler::getResW() const {
+int SettingsManager::getResW() const {
     switch (resolution_) {
     case Resolution::r_1024_768:
         return 1024;
@@ -63,7 +63,7 @@ int SettingsHandler::getResW() const {
     }
 }
 
-int SettingsHandler::getResH() const {
+int SettingsManager::getResH() const {
     switch (resolution_) {
     case Resolution::r_1024_768:
     case Resolution::r_1360_768:

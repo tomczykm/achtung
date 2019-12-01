@@ -14,6 +14,8 @@ StateGame::StateGame(const Application::Interface& ctx):
         p.newRoundSetup(100, 600, 100, 600, trails_);
     }
     lastAlive_ = players_.end();
+
+    print::info("StateGame ready");
 }
 
 void StateGame::input(const sf::Event& event) {

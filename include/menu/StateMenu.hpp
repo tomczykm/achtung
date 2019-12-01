@@ -2,9 +2,11 @@
 
 #include "IGameState.hpp"
 
+#include <optional>
 #include <SFML/Graphics.hpp>
 
 #include "Application.hpp"
+#include "menu/Button.hpp"
 
 class StateMenu : public IGameState {
 public:
@@ -19,4 +21,8 @@ private:
     sf::Font uiFont_;
 
     sf::Text titleText_;
+
+    Button toSandboxButton_;
+
+    Button* clickedButton_ = nullptr;
 };

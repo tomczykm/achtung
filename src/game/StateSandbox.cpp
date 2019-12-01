@@ -1,5 +1,6 @@
 #include "game/StateSandbox.hpp"
 #include "game/StateGame.hpp"
+#include "menu/StateMenu.hpp"
 #include "Log.hpp"
 
 StateSandbox::StateSandbox(const Application::Interface& ctx):
@@ -17,6 +18,9 @@ void StateSandbox::input(const sf::Event& event) {
             break;
         case sf::Keyboard::T:
             app_.enterState<StateGame>();
+            break;
+        case sf::Keyboard::Escape:
+            app_.enterState<StateMenu>();
             break;
         default: break;
         }

@@ -1,5 +1,4 @@
 #include "game/StateSandbox.hpp"
-#include "game/StateGame.hpp"
 #include "menu/StateMenu.hpp"
 #include "Log.hpp"
 
@@ -15,9 +14,6 @@ void StateSandbox::input(const sf::Event& event) {
         switch(event.key.code) {
         case sf::Keyboard::Space:
             move_ = true;
-            break;
-        case sf::Keyboard::T:
-            app_.enterState<StateGame>();
             break;
         case sf::Keyboard::Escape:
             app_.enterState<StateMenu>();

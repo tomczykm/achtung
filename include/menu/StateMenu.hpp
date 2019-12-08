@@ -19,10 +19,9 @@ private:
     Application::Interface app_;
 
     sf::Font uiFont_;
-
     sf::Text titleText_;
 
-    Button toSandboxButton_;
+    std::array<Button, 2> buttons_;
 
-    Button* clickedButton_ = nullptr;
+    decltype(buttons_)::const_iterator clickedButton_ = buttons_.end();
 };

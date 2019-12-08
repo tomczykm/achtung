@@ -20,6 +20,7 @@ enum class GameplayStatus {
 class StateGame: public IGameState {
 public:
     StateGame(const Application::Interface&);
+    ~StateGame();
 
     void input(const sf::Event&) override;
     void logic() override;

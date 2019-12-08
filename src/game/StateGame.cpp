@@ -1,5 +1,4 @@
 #include "game/StateGame.hpp"
-#include "game/StateSandbox.hpp"
 
 #include <algorithm>
 
@@ -14,8 +13,13 @@ StateGame::StateGame(const Application::Interface& ctx):
         p.newRoundSetup(100, 600, 100, 600, trails_);
     }
     lastAlive_ = players_.end();
+    app_.window.setMouseCursorVisible(false);
 
     print::info("StateGame ready");
+}
+
+StateGame::~StateGame() {
+    app_.window.setMouseCursorVisible(true);
 }
 
 void StateGame::input(const sf::Event& event) {
@@ -23,7 +27,6 @@ void StateGame::input(const sf::Event& event) {
         switch(event.key.code) {
         case sf::Keyboard::Space:
             // space (hehe) for shitty debugging
-            app_.enterState<StateSandbox>();
             break;
         default: break;
         }

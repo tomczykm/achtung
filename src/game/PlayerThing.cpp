@@ -19,8 +19,7 @@ PlayerThing::PlayerThing(std::string_view n, sf::Keyboard::Key left, sf::Keyboar
     shape_(BASE_RADIUS),
     leftKey_(left),
     rightKey_(right),
-    // color_(randomInt(0, 255), randomInt(0, 255), randomInt(0, 255))
-    color_(sf::Color::Green)
+    color_(xor_rand::next(0, 255), xor_rand::next(0, 255), xor_rand::next(0, 255))
 {
     shape_.setOrigin(BASE_RADIUS, BASE_RADIUS);
     shape_.setFillColor(sf::Color::Yellow);
@@ -51,10 +50,10 @@ void PlayerThing::move(double timeStep) {
 // so that the player can tell the direction they're going to move
 void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax, std::deque<TrailThing>& trails) {
     dead_ = false;
-    direction_ = std::rand()%360;
+    direction_ = xor_rand::next(0, 360);
     shape_.setPosition(
-        randomInt(xmin, xmax),
-        randomInt(ymin, ymax)
+        xor_rand::next(xmin, xmax),
+        xor_rand::next(ymin, ymax)
     );
 
     gap_ = true;
@@ -80,7 +79,7 @@ void PlayerThing::createTrail(std::deque<TrailThing>& trails) const {
 
 void PlayerThing::gapSwitch() {
     gap_ = !gap_;
-    switchTime_ = chrono::steady_clock::now() + (gap_ ? GAP_TIME : chrono::milliseconds(randomInt( 1800, 3900 )));
+    switchTime_ = chrono::steady_clock::now() + (gap_ ? GAP_TIME : chrono::milliseconds(xor_rand::next( 1800, 3900 )));
 }
 
 bool PlayerThing::checkCollision(const sf::Shape &o) const {

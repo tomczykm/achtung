@@ -39,7 +39,7 @@ public:
 
     template <class State, typename... Ts>
     void enterState(Ts... args) {
-        print::info("Changing state to {}", stripLeadingNumbers(typeid(State).name()));
+        print::info("Changing state to {}", stripLeadingDigits(typeid(State).name()));
         app_.changeState_ = [this, args...] () {
             app_.gameState_ = std::make_unique<State>(*this, args...);
         };

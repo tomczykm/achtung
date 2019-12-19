@@ -5,11 +5,14 @@
 StateMenu::StateMenu(const Application::Interface& app):
     app_(app),
     buttons_{
-        Button{{500, 300}, "Go to sandbox", uiFont_, [this] () {
+        Button{{1000, 200}, "Go to sandbox", uiFont_, [this] () {
             app_.enterState<StateSandbox>();
         }},
-        Button{{300, 300}, "Start game", uiFont_, [this] () {
+        Button{{850, 200}, "Start game", uiFont_, [this] () {
             app_.enterState<StateGame>();
+        }},
+        Button{{50, 600}, "Add player", uiFont_, [this] () {
+            addPlayer();
         }}
     }
 {
@@ -56,4 +59,8 @@ void StateMenu::render() {
     for (const auto& button: buttons_) {
         button.draw(app_.window);
     }
+}
+
+void StateMenu::addPlayer() {
+
 }

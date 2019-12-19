@@ -15,7 +15,6 @@ Button::Button(sf::Vector2f pos, std::string_view caption, const sf::Font& font,
     caption_.setPosition(pos);
 }
 
-
 void Button::draw(sf::RenderTarget& t) const {
     t.draw(shape_);
     t.draw(caption_);

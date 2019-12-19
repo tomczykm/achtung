@@ -9,7 +9,7 @@
 
 class StateSandbox: public IGameState {
 public:
-    StateSandbox(const Application::Interface&);
+    explicit StateSandbox(const Application::Interface&);
 
     void input(const sf::Event&) override;
     void logic() override;

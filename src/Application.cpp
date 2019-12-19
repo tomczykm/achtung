@@ -1,9 +1,7 @@
-#include <cstdlib>
-#include <ctime>
-
 #include "Application.hpp"
 
 #include "menu/StateMenu.hpp"
+#include "CMakeDefine.hpp"
 
 Application::Application():
     settings_("settings.dat"),

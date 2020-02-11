@@ -4,8 +4,9 @@
 #include "CMakeDefine.hpp"
 
 Application::Application():
-    settings_("settings.dat"),
-    gameState_(std::make_unique<StateMenu>(Interface{*this}))
+    settings_{"settings.dat"},
+    gui_{window_},
+    gameState_{std::make_unique<StateMenu>(Interface{*this})}
 {
     sf::ContextSettings windowSettings;
     windowSettings.antialiasingLevel = 8;

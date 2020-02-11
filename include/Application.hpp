@@ -4,6 +4,7 @@
 #include <functional>
 
 #include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 
 #include "Log.hpp"
 #include "SettingsManager.hpp"
@@ -21,6 +22,7 @@ public:
 private:
     SettingsManager settings_;
     sf::RenderWindow window_;
+    tgui::Gui gui_;
 
     std::unique_ptr<IGameState> gameState_;
     std::function<void()> changeState_;

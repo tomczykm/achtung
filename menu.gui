@@ -1,0 +1,87 @@
+Renderer.ButtonRenderer {
+    backgroundcolor = #F5F5F5;
+    backgroundcolordisabled = #E6E6E6;
+    backgroundcolordown = #EBEBEB;
+    backgroundcolorhover = white;
+    bordercolor = #3C3C3C;
+    bordercolordisabled = #7D7D7D;
+    bordercolordown = black;
+    bordercolorfocused = #1E1EB4;
+    bordercolorhover = black;
+    borders = (1, 1, 1, 1);
+    textcolor = #3C3C3C;
+    textcolordisabled = #7D7D7D;
+    textcolordown = black;
+    textcolorhover = black;
+}
+
+Renderer.PanelRenderer {
+    backgroundcolor = transparent;
+    bordercolor = red;
+    borders = (2, 2, 2, 2);
+}
+
+Panel.Main {
+    Size = (&.height/4*3, 90%);
+    Position = ((&.width - width) / 2, 5%);
+    Renderer = &PanelRenderer;
+
+    Label.Title {
+        Position = (30, 30);
+        Size = (207.8, 43);
+        Text = freeachtung;
+        TextSize = 32;
+
+        Renderer {
+            backgroundcolor = transparent;
+            bordercolor = #3C3C3C;
+            borders = (0, 0, 0, 0);
+            textcolor = yellow;
+        }
+    }
+
+    Panel.PlayerList {
+        Size = (40%, 70%);
+        Position = (10%, Title.bottom + 50);
+        Renderer = &PanelRenderer;
+
+        Label {
+            Position = (30, 30);
+            Size = (207.8, 43);
+            Text = Players;
+            TextSize = 14;
+
+            Renderer {
+                backgroundcolor = transparent;
+                bordercolor = #3C3C3C;
+                borders = (0, 0, 0, 0);
+                textcolor = yellow;
+            }
+        }
+    }
+
+    Button.AddPlayer {
+        Text = Add Player;
+        Size = (120, 55);
+        Position = (10%, &.bottom - height*2.5);
+        TextSize = 18;
+        renderer = &ButtonRenderer;
+    }
+
+    Button.StartGame {
+        Size = (120, 55);
+        Position = (AddPlayer.right + 50, AddPlayer.top);
+        Text = Start;
+        TextSize = 18;
+        renderer = &ButtonRenderer;
+    }
+
+    Button.QuitGame {
+        Size = (120, 55);
+        Position = (90% - width, StartGame.top);
+        Text = Quit;
+        TextSize = 18;
+        renderer = &ButtonRenderer;
+    }
+
+}

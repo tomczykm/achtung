@@ -37,6 +37,7 @@ public:
     tgui::Gui& gui;
 
     void quit() {
+        print::info("quit");
         app_.quit_ = true;
     }
 

@@ -18,7 +18,7 @@ extern std::unique_ptr<std::FILE, FCloseDeleter> logFile;
 
 template <typename... Ts>
 void printInternal(std::string_view prefix, std::string_view formatString, Ts&&... params) {
-    const auto completePrint = fmt::format("{} {}: {}\n", time(nullptr),
+    const auto completePrint = fmt::format("{} {} {}\n", time(nullptr),
         prefix, fmt::format(formatString, std::forward<Ts>(params)...));
     fmt::print(completePrint);
     fmt::print(logFile.get(), completePrint);
@@ -31,12 +31,12 @@ namespace print
 
 template <typename... Ts>
 void info(std::string_view formatString, Ts&&... params) {
-    detail::printInternal("inf", formatString, std::forward<Ts>(params)...);
+    detail::printInternal("info:", formatString, std::forward<Ts>(params)...);
 }
 
 template <typename... Ts>
 void error(std::string_view formatString, Ts&&... params) {
-    detail::printInternal("ERR", formatString, std::forward<Ts>(params)...);
+    detail::printInternal("Error!", formatString, std::forward<Ts>(params)...);
 }
 
 }  // namespace print

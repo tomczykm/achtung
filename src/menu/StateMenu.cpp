@@ -3,18 +3,7 @@
 #include "game/StateSandbox.hpp"
 
 StateMenu::StateMenu(const Application::Interface& app):
-    app_(app),
-    buttons_{
-        Button{{1000, 200}, "Go to sandbox", uiFont_, [this] () {
-            app_.enterState<StateSandbox>();
-        }},
-        Button{{850, 200}, "Start game", uiFont_, [this] () {
-            app_.enterState<StateGame>();
-        }},
-        Button{{50, 600}, "Add player", uiFont_, [this] () {
-            addPlayer();
-        }}
-    }
+    app_(app)
 {
     uiFont_.loadFromFile("ui.ttf");
 
@@ -29,16 +18,6 @@ StateMenu::StateMenu(const Application::Interface& app):
 }
 
 void StateMenu::input(const sf::Event& event) {
-    if (event.type == sf::Event::MouseButtonReleased
-        && event.mouseButton.button == sf::Mouse::Left)
-    {
-        for (const auto& button: buttons_) {
-            if (button.getClickableArea().contains(event.mouseButton.x, event.mouseButton.y)) {
-                clickedButton_ = &button;
-            }
-        }
-    }
-
     if (event.type == sf::Event::KeyPressed) {
         if (event.key.code == sf::Keyboard::Escape) {
             app_.quit();
@@ -47,18 +26,11 @@ void StateMenu::input(const sf::Event& event) {
 }
 
 void StateMenu::logic() {
-    if (clickedButton_ != buttons_.end()) {
-        clickedButton_->action();
-        clickedButton_ = buttons_.end();
-    }
+
 }
 
 void StateMenu::render() {
     app_.window.draw(titleText_);
-
-    for (const auto& button: buttons_) {
-        button.draw(app_.window);
-    }
 }
 
 void StateMenu::addPlayer() {

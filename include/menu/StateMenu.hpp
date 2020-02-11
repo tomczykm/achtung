@@ -6,7 +6,6 @@
 #include <SFML/Graphics.hpp>
 
 #include "Application.hpp"
-#include "menu/Button.hpp"
 
 class StateMenu : public IGameState {
 public:
@@ -22,8 +21,4 @@ private:
 
     sf::Font uiFont_;
     sf::Text titleText_;
-
-    std::array<Button, 3> buttons_;
-
-    decltype(buttons_)::const_iterator clickedButton_ = buttons_.end();
 };

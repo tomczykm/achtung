@@ -1,5 +1,4 @@
 set (MENU_SOURCE
-    Button.cpp
     StateMenu.cpp
 )
 

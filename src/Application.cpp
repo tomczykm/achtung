@@ -29,17 +29,20 @@ int Application::run() {
             }
 
             gameState_->input(event);
+            gui_.handleEvent(event);
         }
 
         gameState_->logic();
 
         if (changeState_) {
+            gui_.removeAllWidgets();
             changeState_();
             changeState_ = nullptr;
         }
 
         window_.clear(sf::Color::Black);
         gameState_->render();
+        gui_.draw();
         window_.display();
     }
     return 0;

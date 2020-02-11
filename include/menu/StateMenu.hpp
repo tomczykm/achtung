@@ -3,7 +3,7 @@
 #include "IGameState.hpp"
 
 #include <optional>
-#include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 
 #include "Application.hpp"
 
@@ -19,6 +19,8 @@ private:
 
     Application::Interface app_;
 
-    sf::Font uiFont_;
-    sf::Text titleText_;
+    tgui::Label::Ptr titleLabel_;
+
+    tgui::Button::Ptr startGameButton_;
+    tgui::Button::Ptr quitButton_;
 };

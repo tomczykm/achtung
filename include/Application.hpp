@@ -34,6 +34,7 @@ class Application::Interface
 public:
     SettingsManager& settings;
     sf::RenderWindow& window;
+    tgui::Gui& gui;
 
     void quit() {
         app_.quit_ = true;
@@ -50,9 +51,10 @@ public:
 private:
     friend class Application;
     explicit Interface(Application& app):
-        settings(app.settings_),
-        window(app.window_),
-        app_(app)
+        settings{app.settings_},
+        window{app.window_},
+        gui{app.gui_},
+        app_{app}
     {}
 
     Application& app_;

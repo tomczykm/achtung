@@ -4,14 +4,15 @@
 
 #include "Utils.hpp"
 
-StateGame::StateGame(const Application::Interface& ctx):
+StateGame::StateGame(const Application::Interface& ctx, const std::vector<PlayerInfo>& infos):
     app_(ctx),
     border_(0.05 * app_.settings.getResH(), 0.9 * app_.settings.getResH())
 {
-    players_.emplace_back("player", sf::Keyboard::Q, sf::Keyboard::W);
-    for (auto &p: players_) {
-        p.newRoundSetup(100, 600, 100, 600, trails_);
+    for (const auto& info: infos) {
+        players_.emplace_back(info);
+        players_.back().newRoundSetup(100, 600, 100, 600, trails_);
     }
+
     lastAlive_ = players_.end();
     app_.window.setMouseCursorVisible(false);
 
@@ -37,8 +38,8 @@ void StateGame::logic() {
     bool playerDied = false;
 
     for (auto player = players_.begin() ; player != lastAlive_ ; player++) {
-        player->move(moveTimer_.getElapsedTime().asMilliseconds() / 1000.f);
         player->createTrail(trails_);
+        player->move(moveTimer_.getElapsedTime().asMilliseconds() / 1000.f);
 
         for (const auto& shape: border_.getShapes()) {
             if (!player->isGap() && player->checkCollision(shape)) {

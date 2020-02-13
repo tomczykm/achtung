@@ -1,6 +1,6 @@
 set(GAME_SOURCE
     BorderThing.cpp
-    PlayerThing.cpp
+    Player.cpp
     StateGame.cpp
     StateSandbox.cpp
     TrailThing.cpp

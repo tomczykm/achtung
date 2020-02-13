@@ -10,9 +10,15 @@
 #include "Log.hpp"
 #include "game/TrailThing.hpp"
 
+struct PlayerInfo {
+    std::string name;
+    sf::Keyboard::Key left, right;
+    sf::Color color;
+};
+
 class PlayerThing {
 public:
-    PlayerThing(std::string_view name, sf::Keyboard::Key left, sf::Keyboard::Key right);
+    explicit PlayerThing(const PlayerInfo&);
 
     void move(double timeStep);
 
@@ -30,7 +36,7 @@ public:
 private:
     void gapSwitch();
 
-    std::string name_;
+    PlayerInfo info_;
 
     sf::CircleShape shape_;
     double direction_ = 0.0; // in degrees
@@ -39,9 +45,6 @@ private:
     // int score_ = 0;
 
     bool dead_ = false;
-
-    sf::Keyboard::Key leftKey_, rightKey_;
-    sf::Color color_;
 
     // gap logic
     bool gap_ = false;

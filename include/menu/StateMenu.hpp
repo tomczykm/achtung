@@ -6,6 +6,7 @@
 #include <TGUI/TGUI.hpp>
 
 #include "Application.hpp"
+#include "game/Player.hpp"
 
 class StateMenu : public IGameState {
 public:
@@ -16,6 +17,7 @@ public:
     void render() override {}
 private:
     void addPlayer();
+    std::vector<PlayerInfo> preparePlayerInfos();
     void loadGui();
 
     Application::Interface app_;

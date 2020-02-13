@@ -4,7 +4,7 @@
 
 #include "Application.hpp"
 #include "IGameState.hpp"
-#include "game/PlayerThing.hpp"
+#include "game/Player.hpp"
 #include "game/TrailThing.hpp"
 
 class StateSandbox: public IGameState {
@@ -17,7 +17,7 @@ public:
 private:
     Application::Interface app_;
 
-    PlayerThing player_{"player", sf::Keyboard::Q, sf::Keyboard::W};
+    PlayerThing player_;
     std::deque<TrailThing> trails_;
 
     bool move_ = false;

@@ -2,7 +2,7 @@
 
 #include "Application.hpp"
 #include "IGameState.hpp"
-#include "game/PlayerThing.hpp"
+#include "game/Player.hpp"
 #include "game/BorderThing.hpp"
 
 #include <vector>
@@ -19,7 +19,7 @@ enum class GameplayStatus {
 
 class StateGame: public IGameState {
 public:
-    explicit StateGame(const Application::Interface&);
+    StateGame(const Application::Interface&, const std::vector<PlayerInfo>&);
     ~StateGame();
 
     void input(const sf::Event&) override;

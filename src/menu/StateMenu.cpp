@@ -21,6 +21,10 @@ void StateMenu::addPlayer() {
     print::info(__func__);
 }
 
+std::vector<PlayerInfo> StateMenu::preparePlayerInfos() {
+    return {{"player", sf::Keyboard::Q, sf::Keyboard::W, sf::Color::Red}};
+}
+
 void StateMenu::loadGui() {
     app_.gui.loadWidgetsFromFile("../menu.gui");
 
@@ -29,7 +33,7 @@ void StateMenu::loadGui() {
     });
 
     app_.gui.get("StartGame")->connect("pressed", [this] () {
-        app_.enterState<StateGame>();
+        app_.enterState<StateGame>(preparePlayerInfos());
     });
 
     app_.gui.get("QuitGame")->connect("pressed", [this] () {

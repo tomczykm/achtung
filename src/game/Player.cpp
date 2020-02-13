@@ -1,4 +1,4 @@
-#include "game/PlayerThing.hpp"
+#include "game/Player.hpp"
 
 #include <cmath>
 
@@ -14,21 +14,18 @@ constexpr double TURN_DEG = 160;
 constexpr std::chrono::milliseconds GAP_TIME{240};
 }
 
-PlayerThing::PlayerThing(std::string_view n, sf::Keyboard::Key left, sf::Keyboard::Key right):
-    name_(n),
-    shape_(BASE_RADIUS),
-    leftKey_(left),
-    rightKey_(right),
-    color_(xor_rand::next(0, 255), xor_rand::next(0, 255), xor_rand::next(0, 255))
+PlayerThing::PlayerThing(const PlayerInfo& info):
+    info_(info),
+    shape_(BASE_RADIUS)
 {
     shape_.setOrigin(BASE_RADIUS, BASE_RADIUS);
     shape_.setFillColor(sf::Color::Yellow);
 }
 
 void PlayerThing::move(double timeStep) {
-    if (sf::Keyboard::isKeyPressed(rightKey_)) {
+    if (sf::Keyboard::isKeyPressed(info_.right)) {
         direction_ += timeStep * TURN_DEG;
-    } else if (sf::Keyboard::isKeyPressed(leftKey_)) {
+    } else if (sf::Keyboard::isKeyPressed(info_.left)) {
         direction_ -= timeStep * TURN_DEG;
     }
 
@@ -73,7 +70,7 @@ void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax, std::deq
 void PlayerThing::createTrail(std::deque<TrailThing>& trails) const {
     if (!gap_) {
         auto [xPos, yPos] = shape_.getPosition();
-        trails.emplace_front(xPos, yPos, direction_, shape_.getRadius()*2, color_);
+        trails.emplace_front(xPos, yPos, direction_, shape_.getRadius()*2, info_.color);
     }
 }
 
@@ -83,6 +80,5 @@ void PlayerThing::gapSwitch() {
 }
 
 bool PlayerThing::checkCollision(const sf::Shape &o) const {
-    // return false;
     return shape_.getGlobalBounds().intersects(o.getGlobalBounds());
 }

@@ -19,6 +19,8 @@ private:
     void addPlayer();
     std::vector<PlayerInfo> preparePlayerInfos();
     void loadGui();
+    std::size_t getCurrentNumPlayers();
 
     Application::Interface app_;
+    std::uint32_t latestPlayerId_ = 0u;
 };

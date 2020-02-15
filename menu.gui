@@ -28,35 +28,35 @@ Panel.Main {
 
     Label.Title {
         Position = (30, 30);
-        Size = (207.8, 43);
         Text = freeachtung;
         TextSize = 32;
 
         Renderer {
             backgroundcolor = transparent;
-            bordercolor = #3C3C3C;
-            borders = (0, 0, 0, 0);
             textcolor = yellow;
         }
     }
 
-    Panel.PlayerList {
+    Panel.PlayerListOuterPanel {
         Size = (40%, 70%);
         Position = (10%, Title.bottom + 50);
         Renderer = &PanelRenderer;
 
         Label {
-            Position = (30, 30);
-            Size = (207.8, 43);
+            Position = (30, 15);
             Text = Players;
-            TextSize = 14;
+            TextSize = 22;
 
             Renderer {
                 backgroundcolor = transparent;
-                bordercolor = #3C3C3C;
-                borders = (0, 0, 0, 0);
                 textcolor = yellow;
             }
+        }
+
+        Panel.PlayerListInnerPanel {
+            Size = (90%, 88%);
+            Position = (5%, 10%);
+            Renderer = &PanelRenderer;
         }
     }
 

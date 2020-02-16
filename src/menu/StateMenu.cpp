@@ -16,7 +16,6 @@ StateMenu::StateMenu(const Application::Interface& app):
     app_{app}
 {
     loadGui();
-    addPlayer();
     print::info("StateMenu ready");
 }
 
@@ -40,43 +39,47 @@ void StateMenu::addPlayer() {
     newEntryPanel->setRenderer(playerListPanel->getSharedRenderer()->getData());
     newEntryPanel->setPosition("0", std::to_string(getCurrentNumPlayers()*PLAYER_LIST_ENTRY_HEIGHT));
 
-    const auto newId = PlayerId{playerInfos_.size() == 0 ? 0 : playerInfos_.rbegin()->first + 1};
+    const auto playerId = PlayerId{playerInfos_.size() == 0 ? 0 : playerInfos_.rbegin()->first + 1};
 
-    const auto widgetNamePrefix = "Player" + std::to_string(newId);
+    const auto widgetNamePrefix = fmt::format("Player{}", playerId);
 
     const auto color = sf::Color{xor_rand::next(0,255), xor_rand::next(0,255), xor_rand::next(0,255)};
-    const auto info = PlayerInfo{widgetNamePrefix + "Name", sf::Keyboard::Q, sf::Keyboard::W, color};
-
-    auto nameLabel = tgui::Label::create(info.name);
-    nameLabel->setTextSize(17);
-    nameLabel->setSize(150, "100%");  // todo: hardcoded width bad, should be automatic
-    nameLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-    nameLabel->setPosition("10", "50%-height/2");
-    nameLabel->getRenderer()->setTextColor(info.color);
-    newEntryPanel->add(nameLabel, widgetNamePrefix + "Label");
+    const auto info = PlayerInfo{"", sf::Keyboard::Unknown, sf::Keyboard::Unknown, color};
 
     auto removeButton = tgui::Button::create("Rem");
     removeButton->setPosition("100% - 10 - width", "15%");
     removeButton->setSize("30", "70%");
     removeButton->connect("pressed", [=] () {
-        if (!setKeysMode_ || *setKeysMode_ != newId)
-            removePlayer(newId, newEntryPanel);
+        if (setKeysMode_ && *setKeysMode_ != playerId)
+            removePlayer(playerId, newEntryPanel);
     });
-    newEntryPanel->add(removeButton, widgetNamePrefix + "Remove");
+    newEntryPanel->add(removeButton, fmt::format("{}Remove", widgetNamePrefix));
 
-    auto keysLabel = tgui::Label::create("Q   W");
+    auto keysLabel = tgui::Label::create("_   _");
     keysLabel->setPosition(widgetNamePrefix + "Remove.left - 5 - width", "50%-height/2");
     keysLabel->setTextSize(17);
     keysLabel->setSize(60, "100%");  // todo: hardcoded width bad, should be automatic
     keysLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
     keysLabel->getRenderer()->setTextColor(info.color);
     keysLabel->connect("clicked", [=] () {
-        enterSetKeysMode(newId);
+        enterSetKeysMode(playerId);
     });
-    newEntryPanel->add(keysLabel, widgetNamePrefix + "Keys");
+    newEntryPanel->add(keysLabel, fmt::format("{}Keys", widgetNamePrefix));
 
-    playerListPanel->add(newEntryPanel, widgetNamePrefix + "Panel");
-    playerInfos_.emplace(newId, info);
+    auto nameEdit = tgui::EditBox::create();
+    nameEdit->setTextSize(17);
+    nameEdit->setSize(widgetNamePrefix + "Keys.left - 20", "80%");
+    nameEdit->setText(info.name);
+    nameEdit->getRenderer()->setDefaultTextColor(info.color);
+    nameEdit->setPosition("10", "50%-height/2");
+    nameEdit->getRenderer()->setTextColor(info.color);
+    nameEdit->connect("TextChanged", [=] () {
+        playerInfos_[playerId].name = nameEdit->getText();
+    });
+    newEntryPanel->add(nameEdit, fmt::format("{}Label", widgetNamePrefix));
+
+    playerListPanel->add(newEntryPanel, fmt::format("{}Panel", widgetNamePrefix));
+    playerInfos_.emplace(playerId, info);
 }
 
 std::vector<PlayerInfo> StateMenu::preparePlayerInfos() {
@@ -129,11 +132,9 @@ void StateMenu::enterSetKeysMode(PlayerId player) {
 
     setKeysMode_ = player;
 
-    app_.getWidget<tgui::Label>("Player" + std::to_string(player) + "Keys")->
-        setText("..   ..");
-
     playerInfos_[player].left = sf::Keyboard::Unknown;
     playerInfos_[player].right = sf::Keyboard::Unknown;
+    updateKeysLabel(player);
 }
 
 void StateMenu::setKey(PlayerId player, sf::Keyboard::Key key) {
@@ -142,17 +143,18 @@ void StateMenu::setKey(PlayerId player, sf::Keyboard::Key key) {
     };
     if (forbidden.find(key) != forbidden.end()) return;
 
-    auto label = app_.getWidget<tgui::Label>("Player" + std::to_string(player) + "Keys");
     if (playerInfos_[player].left == sf::Keyboard::Key::Unknown) {
         playerInfos_[player].left = key;
-        label->setText(std::string{keycodeToStr(key)} + "   ..");
     } else {
         playerInfos_[player].right = key;
-        auto labelText = std::string{label->getText()};
-        labelText.replace(labelText.find(".."), 2, keycodeToStr(key));
-        label->setText(labelText);
         setKeysMode_ = std::nullopt;
     }
+    updateKeysLabel(player);
+}
+
+void StateMenu::updateKeysLabel(PlayerId player) {
+    app_.getWidget<tgui::Label>(fmt::format("Player{}Keys", player))->setText(fmt::format("{}   {}",
+        keycodeToStr(playerInfos_[player].left), keycodeToStr(playerInfos_[player].right)));
 }
 
 void StateMenu::recalculatePlayerListPositions() {

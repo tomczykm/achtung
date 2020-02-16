@@ -49,6 +49,7 @@ std::string_view stripLeadingDigits(std::string_view s) {
 
 std::string_view keycodeToStr(sf::Keyboard::Key key) {
     switch (key) {
+        case sf::Keyboard::Key::Unknown: return "..";
         case sf::Keyboard::Key::A: return "A";
         case sf::Keyboard::Key::B: return "B";
         case sf::Keyboard::Key::C: return "C";
@@ -86,15 +87,15 @@ std::string_view keycodeToStr(sf::Keyboard::Key key) {
         case sf::Keyboard::Key::Num8: return "Num8";
         case sf::Keyboard::Key::Num9: return "Num9";
         case sf::Keyboard::Key::Escape: return "Esc";
-        case sf::Keyboard::Key::LControl: return "LC";
-        case sf::Keyboard::Key::LShift: return "LS";
-        case sf::Keyboard::Key::LAlt: return "LA";
-        case sf::Keyboard::Key::LSystem: return "LSy";
-        case sf::Keyboard::Key::RControl: return "RC";
-        case sf::Keyboard::Key::RShift: return "RS";
-        case sf::Keyboard::Key::RAlt: return "RA";
-        case sf::Keyboard::Key::RSystem: return "RSy";
-        case sf::Keyboard::Key::Menu: return "Men";
+        case sf::Keyboard::Key::LControl: return "LCtrl";
+        case sf::Keyboard::Key::LShift: return "LShift";
+        case sf::Keyboard::Key::LAlt: return "LAlt";
+        case sf::Keyboard::Key::LSystem: return "LSys";
+        case sf::Keyboard::Key::RControl: return "RCtrl";
+        case sf::Keyboard::Key::RShift: return "RShift";
+        case sf::Keyboard::Key::RAlt: return "RAlt";
+        case sf::Keyboard::Key::RSystem: return "RSys";
+        case sf::Keyboard::Key::Menu: return "Menu";
         case sf::Keyboard::Key::LBracket: return "[";
         case sf::Keyboard::Key::RBracket: return "]";
         case sf::Keyboard::Key::Semicolon: return ";";
@@ -106,20 +107,20 @@ std::string_view keycodeToStr(sf::Keyboard::Key key) {
         case sf::Keyboard::Key::Tilde: return "`";
         case sf::Keyboard::Key::Equal: return "=";
         case sf::Keyboard::Key::Hyphen: return "-";
-        case sf::Keyboard::Key::Space: return "Sp";
-        case sf::Keyboard::Key::Enter: return "Ret";
+        case sf::Keyboard::Key::Space: return "Space";
+        case sf::Keyboard::Key::Enter: return "Enter";
         case sf::Keyboard::Key::Backspace: return "Bksp";
         case sf::Keyboard::Key::Tab: return "Tab";
-        case sf::Keyboard::Key::PageUp: return "PgU";
-        case sf::Keyboard::Key::PageDown: return "PgD";
+        case sf::Keyboard::Key::PageUp: return "PgUp";
+        case sf::Keyboard::Key::PageDown: return "PgDown";
         case sf::Keyboard::Key::End: return "End";
-        case sf::Keyboard::Key::Home: return "Hom";
+        case sf::Keyboard::Key::Home: return "Home";
         case sf::Keyboard::Key::Insert: return "Ins";
         case sf::Keyboard::Key::Delete: return "Del";
-        case sf::Keyboard::Key::Add: return "Add";
-        case sf::Keyboard::Key::Subtract: return "Sub";
-        case sf::Keyboard::Key::Multiply: return "Mul";
-        case sf::Keyboard::Key::Divide: return "Div";
+        case sf::Keyboard::Key::Add: return "+";
+        case sf::Keyboard::Key::Subtract: return "-";
+        case sf::Keyboard::Key::Multiply: return "*";
+        case sf::Keyboard::Key::Divide: return "/";
         case sf::Keyboard::Key::Left: return "Left";
         case sf::Keyboard::Key::Right: return "Right";
         case sf::Keyboard::Key::Up: return "Up";

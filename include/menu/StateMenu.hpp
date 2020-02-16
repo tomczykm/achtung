@@ -29,6 +29,7 @@ private:
 
     void enterSetKeysMode(PlayerId);
     void setKey(PlayerId, sf::Keyboard::Key);
+    void updateKeysLabel(PlayerId);
 
     void recalculatePlayerListPositions();
 

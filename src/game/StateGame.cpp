@@ -7,6 +7,7 @@
 
 StateGame::StateGame(const Application::Interface& ctx, const std::vector<PlayerInfo>& infos):
     app_{ctx},
+    scoreVictoryGoal_{(infos.size()-1)*10},
     border_{0.05 * app_.settings.getResH(), 0.9 * app_.settings.getResH()}
 {
     app_.window.setMouseCursorVisible(false);
@@ -95,10 +96,20 @@ void StateGame::loadGui() {
         print::error("Failed to load GUI layout from {}. {}", filename, e.what());
         exit(-1);
     }
+
+    auto goalLabel = app_.getWidget<tgui::Label>("ScoreGoal");
+    goalLabel->setText(fmt::format("Goal: {}", scoreVictoryGoal_));
 }
 
 void StateGame::sortScoreList() {
     // todo
+}
+
+bool StateGame::victoryGoalAchieved() {
+    for (const auto& p : players_) {
+        if (p.getScore() == scoreVictoryGoal_) return true;
+    }
+    return false;
 }
 
 
@@ -173,7 +184,11 @@ void StateGame::Running::onTick() {
         gs.sortScoreList();
 
         if (gs.lastAlive_ - gs.players_.begin() == 1) {
-            gs.changeState<RoundEnd>();
+            if (gs.victoryGoalAchieved()) {
+                gs.changeState<GameEnd>();
+            } else {
+                gs.changeState<RoundEnd>();
+            }
         }
     }
 
@@ -207,7 +222,7 @@ StateGame::GameEnd::GameEnd(StateGame& s):
 }
 
 void StateGame::GameEnd::onSpacebar() {
-    gs.changeState<RoundBegin>();
+    gs.app_.enterState<StateMenu>();
 }
 
 void StateGame::GameEnd::onEscape() {

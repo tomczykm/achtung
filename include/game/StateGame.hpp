@@ -24,6 +24,8 @@ private:
     void loadGui();
     void sortScoreList();
 
+    bool victoryGoalAchieved();
+
     template <typename State>
     void changeState() { state_ = std::make_unique<State>(*this); }
 
@@ -35,6 +37,8 @@ private:
 
     std::vector<PlayerThing> players_;
     std::vector<PlayerThing>::iterator lastAlive_;
+
+    uint32_t scoreVictoryGoal_;
 
     BorderThing border_;
 

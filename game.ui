@@ -9,3 +9,12 @@ Panel.Scores {
     Position = (&.height * 0.6, 20%);  // todo: set to 5% to right of game border
     Renderer = &PanelRenderer;
 }
+
+Label.ScoreGoal {
+    Position = (&.height * 0.6, 15%);  // todo: set to 5% to right of game border
+    TextSize = 24;
+    Renderer {
+        backgroundcolor = transparent;
+        textcolor = yellow;
+    }
+}

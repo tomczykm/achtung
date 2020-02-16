@@ -4,7 +4,7 @@
 
 StateSandbox::StateSandbox(const Application::Interface& ctx):
     app_{ctx},
-    player_{{"player", sf::Keyboard::Q, sf::Keyboard::W, sf::Color::Red}}
+    player_{{"player", sf::Keyboard::Q, sf::Keyboard::W, sf::Color::Red}, nullptr}
 {
     player_.newRoundSetup(100, 600, 100, 600, trails_);
     print::info("StateSandbox ready");

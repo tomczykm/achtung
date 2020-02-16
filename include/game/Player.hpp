@@ -6,6 +6,7 @@
 #include <chrono>
 
 #include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 
 #include "Log.hpp"
 #include "game/TrailThing.hpp"
@@ -18,7 +19,7 @@ struct PlayerInfo {
 
 class PlayerThing {
 public:
-    explicit PlayerThing(const PlayerInfo&);
+    explicit PlayerThing(const PlayerInfo&, tgui::Label::Ptr scoreLabel);
 
     void move(double timeStep);
 
@@ -28,6 +29,9 @@ public:
     const sf::CircleShape& getShape() const { return shape_; }
 
     bool checkCollision(const sf::Shape&) const;
+
+    void addPoint();
+    uint32_t getScore() const { return score_; }
 
     void kill() { dead_ = true; }
     bool isDead() const { return dead_; }
@@ -42,7 +46,8 @@ private:
     double direction_ = 0.0; // in degrees
     int vel_ = 100; // pixels per seconds
 
-    // int score_ = 0;
+    uint32_t score_ = 0;
+    tgui::Label::Ptr scoreLabel_;
 
     bool dead_ = false;
 

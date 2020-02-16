@@ -14,9 +14,10 @@ constexpr double TURN_DEG = 160;
 constexpr std::chrono::milliseconds GAP_TIME{240};
 }
 
-PlayerThing::PlayerThing(const PlayerInfo& info):
-    info_(info),
-    shape_(BASE_RADIUS)
+PlayerThing::PlayerThing(const PlayerInfo& info, tgui::Label::Ptr scoreLabel):
+    info_{info},
+    shape_{BASE_RADIUS},
+    scoreLabel_{scoreLabel}
 {
     shape_.setOrigin(BASE_RADIUS, BASE_RADIUS);
     shape_.setFillColor(sf::Color::Yellow);
@@ -53,10 +54,11 @@ void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax, std::deq
         xor_rand::next(ymin, ymax)
     );
 
+    // a little trick to set switch time without code duplication
     gap_ = true;
     gapSwitch();
 
-    // move a little bit
+    // move a little bit forward
     for (int i = 0; i < 4; i++) {
         createTrail(trails);
         auto [xPos, yPos] = shape_.getPosition();
@@ -81,4 +83,11 @@ void PlayerThing::gapSwitch() {
 
 bool PlayerThing::checkCollision(const sf::Shape &o) const {
     return shape_.getGlobalBounds().intersects(o.getGlobalBounds());
+}
+
+void PlayerThing::addPoint() {
+    score_ += 1;
+    if (scoreLabel_) {
+        scoreLabel_->setText(std::to_string(score_));
+    }
 }

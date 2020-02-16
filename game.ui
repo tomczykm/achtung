@@ -1,0 +1,11 @@
+Renderer.PanelRenderer {
+    backgroundcolor = transparent;
+    bordercolor = red;
+    borders = (2, 2, 2, 2);
+}
+
+Panel.Scores {
+    Size = (12%, 60%);
+    Position = (&.height * 0.6, 20%);  // todo: set to 5% to right of game border
+    Renderer = &PanelRenderer;
+}

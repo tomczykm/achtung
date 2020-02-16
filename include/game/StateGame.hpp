@@ -14,7 +14,7 @@ enum class GameplayStatus {
     running, // when everybody is furiously trying to kill each other; move to PAUSE, ROUND_END or GAME_END
     pause, // when a player needs a break; move to RUNNING or quit the game in progress
     roundEnd, // when there's only one standing; move to ROUND_BEGIN
-    gameEnd // when a player has reached the score goal and is declared a winner; move to another gamestate (TODO)
+    gameEnd // when a player has reached the score goal and is declared a winner; move to another gamestate
 };
 
 class StateGame: public IGameState {
@@ -27,12 +27,17 @@ public:
     void render() override;
 
 private:
+    std::vector<PlayerThing> initializePlayers(const std::vector<PlayerInfo>&);
+    void loadGui();
+    void sortScoreList();
+
     Application::Interface app_;
+
+    std::deque<TrailThing> trails_;
 
     std::vector<PlayerThing> players_;
     std::vector<PlayerThing>::iterator lastAlive_;
 
-    std::deque<TrailThing> trails_;
     BorderThing border_;
 
     // for calculating per-pixel movement speed and turn angles

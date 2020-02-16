@@ -21,8 +21,14 @@ StateMenu::StateMenu(const Application::Interface& app):
 
 void StateMenu::input(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::Escape) {
+        switch (event.key.code) {
+        case  sf::Keyboard::Escape:
             app_.quit();
+            break;
+        case sf::Keyboard::F12:
+            app_.enterState<StateSandbox>();
+            break;
+        default: break;
         }
 
         if (setKeysMode_) {
@@ -83,15 +89,15 @@ void StateMenu::addPlayer() {
 }
 
 std::vector<PlayerInfo> StateMenu::preparePlayerInfos() {
-    std::vector<PlayerInfo> infos;
-    std::transform(playerInfos_.begin(), playerInfos_.end(), std::back_inserter(infos), [] (const auto& kvPair) {
+    std::vector<PlayerInfo> infos(playerInfos_.size());
+    std::transform(playerInfos_.cbegin(), playerInfos_.cend(), infos.begin(), [] (const auto& kvPair) {
         return kvPair.second;
     });
     return infos;
 }
 
 void StateMenu::loadGui() {
-    constexpr auto filename = "../menu.gui";
+    constexpr auto filename = "../menu.ui";
     try {
         app_.gui.loadWidgetsFromFile(filename);
     }
@@ -139,11 +145,12 @@ void StateMenu::enterSetKeysMode(PlayerId player) {
 
 void StateMenu::setKey(PlayerId player, sf::Keyboard::Key key) {
     static std::set<sf::Keyboard::Key> forbidden = {
-        sf::Keyboard::Key::Enter, sf::Keyboard::Key::Escape, sf::Keyboard::Key::Space
+         sf::Keyboard::Enter,  sf::Keyboard::Escape,
+         sf::Keyboard::Space,  sf::Keyboard::F12
     };
     if (forbidden.find(key) != forbidden.end()) return;
 
-    if (playerInfos_[player].left == sf::Keyboard::Key::Unknown) {
+    if (playerInfos_[player].left ==  sf::Keyboard::Unknown) {
         playerInfos_[player].left = key;
     } else {
         playerInfos_[player].right = key;

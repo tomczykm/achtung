@@ -5,6 +5,7 @@
 #include <memory>
 #include <map>
 #include <cstdint>
+#include <optional>
 #include <TGUI/TGUI.hpp>
 
 #include "Application.hpp"
@@ -25,8 +26,14 @@ private:
     void loadGui();
     std::size_t getCurrentNumPlayers();
     void removePlayer(PlayerId, tgui::Panel::Ptr);
+
+    void enterSetKeysMode(PlayerId);
+    void setKey(PlayerId, sf::Keyboard::Key);
+
     void recalculatePlayerListPositions();
 
     Application::Interface app_;
     std::map<PlayerId, PlayerInfo> playerInfos_;
+
+    std::optional<PlayerId> setKeysMode_;
 };

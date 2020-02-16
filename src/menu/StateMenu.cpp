@@ -25,6 +25,10 @@ void StateMenu::input(const sf::Event& event) {
         if (event.key.code == sf::Keyboard::Escape) {
             app_.quit();
         }
+
+        if (setKeysMode_) {
+            setKey(*setKeysMode_, event.key.code);
+        }
     }
 }
 
@@ -45,6 +49,8 @@ void StateMenu::addPlayer() {
 
     auto nameLabel = tgui::Label::create(info.name);
     nameLabel->setTextSize(17);
+    nameLabel->setSize(150, "100%");  // todo: hardcoded width bad, should be automatic
+    nameLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
     nameLabel->setPosition("10", "50%-height/2");
     nameLabel->getRenderer()->setTextColor(info.color);
     newEntryPanel->add(nameLabel, widgetNamePrefix + "Label");
@@ -53,18 +59,19 @@ void StateMenu::addPlayer() {
     removeButton->setPosition("100% - 10 - width", "15%");
     removeButton->setSize("30", "70%");
     removeButton->connect("pressed", [=] () {
-        removePlayer(newId, newEntryPanel);
+        if (!setKeysMode_ || *setKeysMode_ != newId)
+            removePlayer(newId, newEntryPanel);
     });
     newEntryPanel->add(removeButton, widgetNamePrefix + "Remove");
 
     auto keysLabel = tgui::Label::create("Q   W");
-    keysLabel->setPosition(widgetNamePrefix + "Remove.left - 6% - width", "50%-height/2");
+    keysLabel->setPosition(widgetNamePrefix + "Remove.left - 5 - width", "50%-height/2");
     keysLabel->setTextSize(17);
-    keysLabel->setSize(60, "100%");
+    keysLabel->setSize(60, "100%");  // todo: hardcoded width bad, should be automatic
     keysLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
     keysLabel->getRenderer()->setTextColor(info.color);
-    keysLabel->connect("clicked", [newId] () {
-        print::info("clicked keys of {}", newId);
+    keysLabel->connect("clicked", [=] () {
+        enterSetKeysMode(newId);
     });
     newEntryPanel->add(keysLabel, widgetNamePrefix + "Keys");
 
@@ -108,12 +115,44 @@ std::size_t StateMenu::getCurrentNumPlayers() {
         getWidgets().size();
 }
 
-void StateMenu::removePlayer(PlayerId id, tgui::Panel::Ptr panel) {
-    print::info("Remove player {}", id);
+void StateMenu::removePlayer(PlayerId player, tgui::Panel::Ptr panel) {
+    print::info("Remove player {}", player);
     app_.getWidget<tgui::Panel>("PlayerListInnerPanel")->remove(panel);
     recalculatePlayerListPositions();
 
-    playerInfos_.erase(id);
+    playerInfos_.erase(player);
+}
+
+void StateMenu::enterSetKeysMode(PlayerId player) {
+    if (setKeysMode_) return;
+    print::info("set keys of {}", player);
+
+    setKeysMode_ = player;
+
+    app_.getWidget<tgui::Label>("Player" + std::to_string(player) + "Keys")->
+        setText("..   ..");
+
+    playerInfos_[player].left = sf::Keyboard::Unknown;
+    playerInfos_[player].right = sf::Keyboard::Unknown;
+}
+
+void StateMenu::setKey(PlayerId player, sf::Keyboard::Key key) {
+    static std::set<sf::Keyboard::Key> forbidden = {
+        sf::Keyboard::Key::Enter, sf::Keyboard::Key::Escape, sf::Keyboard::Key::Space
+    };
+    if (forbidden.find(key) != forbidden.end()) return;
+
+    auto label = app_.getWidget<tgui::Label>("Player" + std::to_string(player) + "Keys");
+    if (playerInfos_[player].left == sf::Keyboard::Key::Unknown) {
+        playerInfos_[player].left = key;
+        label->setText(std::string{keycodeToStr(key)} + "   ..");
+    } else {
+        playerInfos_[player].right = key;
+        auto labelText = std::string{label->getText()};
+        labelText.replace(labelText.find(".."), 2, keycodeToStr(key));
+        label->setText(labelText);
+        setKeysMode_ = std::nullopt;
+    }
 }
 
 void StateMenu::recalculatePlayerListPositions() {

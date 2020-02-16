@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "menu/StateMenu.hpp"
 #include "Utils.hpp"
 
 StateGame::StateGame(const Application::Interface& ctx, const std::vector<PlayerInfo>& infos):
@@ -14,6 +15,8 @@ StateGame::StateGame(const Application::Interface& ctx, const std::vector<Player
     players_ = initializePlayers(infos);
     lastAlive_ = players_.end();
 
+    state_ = std::make_unique<RoundBegin>(*this);
+
     print::info("StateGame ready");
 }
 
@@ -25,7 +28,10 @@ void StateGame::input(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
         switch(event.key.code) {
         case sf::Keyboard::Space:
-            // space (hehe) for shitty debugging
+            state_->onSpacebar();
+            break;
+        case sf::Keyboard::Escape:
+            state_->onEscape();
             break;
         default: break;
         }
@@ -33,46 +39,7 @@ void StateGame::input(const sf::Event& event) {
 }
 
 void StateGame::logic() {
-    bool playerDied = false;
-
-    for (auto player = players_.begin() ; player != lastAlive_ ; player++) {
-        player->createTrail(trails_);
-        player->move(moveTimer_.getElapsedTime().asMilliseconds() / 1000.f);
-
-        for (const auto& shape: border_.getShapes()) {
-            if (!player->isGap() && player->checkCollision(shape)) {
-                player->kill();
-                playerDied = true;
-            }
-        }
-
-        // this is fairly shoddy, better come up with a better idea on skipping later
-
-        // the reason we skip the newest bunch of trail segments is that
-        // we don't want to check if we collide with segments we just created
-        // (we obviously do, they're right underneath and we don't want to die immediately)
-        constexpr auto SKIP_TRAILS = 15u;  // TODO: fix, hardcoding this value will result in instakill with many players
-        if (trails_.size() > SKIP_TRAILS) {
-            for (auto t = trails_.begin() + SKIP_TRAILS; t != trails_.end(); t++) {
-                if (!player->isGap() && player->checkCollision(t->getShape())) {
-                    player->kill();
-                    playerDied = true;
-                }
-            }
-        }
-    }
-
-    if (playerDied) {
-        lastAlive_ = std::partition(players_.begin(), players_.end(),
-            [] (auto& p) { return !p.isDead(); });
-
-        for (auto player = players_.begin() ; player != lastAlive_ ; ++player) {
-            player->addPoint();
-        }
-        sortScoreList();
-    }
-
-    moveTimer_.restart();
+    state_->onTick();
 }
 
 void StateGame::render() {
@@ -99,21 +66,20 @@ std::vector<PlayerThing> StateGame::initializePlayers(const std::vector<PlayerIn
 
         auto nameLabel = tgui::Label::create(info.name);
         nameLabel->getRenderer()->setTextColor(info.color);
-        nameLabel->setSize("150%", HEIGHT);
+        nameLabel->setSize("100%", HEIGHT);
         nameLabel->setPosition(0, i*HEIGHT);
         nameLabel->setTextSize(TEXT_SIZE);
         scoresPanel->add(nameLabel);
 
         auto scoreLabel = tgui::Label::create("0");
         scoreLabel->getRenderer()->setTextColor(info.color);
-        scoreLabel->setSize("150%", HEIGHT);
+        scoreLabel->setSize("100%", HEIGHT);
         scoreLabel->setPosition(0, i*HEIGHT);
         scoreLabel->setTextSize(TEXT_SIZE);
-        scoreLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+        scoreLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
         scoresPanel->add(scoreLabel);
 
         players.emplace_back(info, scoreLabel);
-        players.back().newRoundSetup(100, 600, 100, 600, trails_);
 
         ++i;
     }
@@ -133,4 +99,117 @@ void StateGame::loadGui() {
 
 void StateGame::sortScoreList() {
     // todo
+}
+
+
+StateGame::RoundBegin::RoundBegin(StateGame& s):
+    RoundState{s}
+{
+    print::info(PRINT, __func__);
+    gs.trails_.clear();
+    for (auto& player : gs.players_) {
+        player.newRoundSetup(100, 600, 100, 600, gs.trails_);
+    }
+    gs.lastAlive_ = gs.players_.end();
+}
+
+void StateGame::RoundBegin::onSpacebar() {
+    gs.changeState<Running>();
+}
+
+void StateGame::RoundBegin::onEscape() {
+    gs.app_.enterState<StateMenu>();
+}
+
+
+StateGame::Running::Running(StateGame& s):
+    RoundState{s}
+{
+    print::info(PRINT, __func__);
+    gs.moveTimer_.restart();
+}
+
+void StateGame::Running::onSpacebar() {
+    gs.changeState<Pause>();
+}
+
+void StateGame::Running::onTick() {
+    bool playerDied = false;
+
+    for (auto player = gs.players_.begin() ; player != gs.lastAlive_ ; player++) {
+        player->createTrail(gs.trails_);
+        player->move(gs.moveTimer_.getElapsedTime().asMilliseconds() / 1000.f);
+
+        for (const auto& shape: gs.border_.getShapes()) {
+            if (!player->isGap() && player->checkCollision(shape)) {
+                player->kill();
+                playerDied = true;
+            }
+        }
+
+        // following code fairly shoddy, better come up with a better idea on skipping later:
+        // the reason we skip the newest bunch of trail segments is that
+        // we don't want to check if we collide with segments we just created
+        // (we obviously do, they're right underneath and we don't want to die immediately)
+
+        constexpr auto SKIP_TRAILS = 15u;  // todo: fix, hardcoding this value will result in instakill with several players in the game
+        if (gs.trails_.size() > SKIP_TRAILS) {
+            for (auto t = gs.trails_.begin() + SKIP_TRAILS; t != gs.trails_.end(); t++) {
+                if (!player->isGap() && player->checkCollision(t->getShape())) {
+                    player->kill();
+                    playerDied = true;
+                }
+            }
+        }
+    }
+
+    if (playerDied) {
+        gs.lastAlive_ = std::partition(gs.players_.begin(), gs.players_.end(),
+            [] (auto& p) { return !p.isDead(); });
+
+        for (auto player = gs.players_.begin() ; player != gs.lastAlive_ ; ++player) {
+            player->addPoint();
+        }
+        gs.sortScoreList();
+
+        if (gs.lastAlive_ - gs.players_.begin() == 1) {
+            gs.changeState<RoundEnd>();
+        }
+    }
+
+    gs.moveTimer_.restart();
+}
+
+
+void StateGame::Pause::onSpacebar() {
+    gs.changeState<Running>();
+}
+
+void StateGame::Pause::onEscape() {
+    gs.app_.enterState<StateMenu>();
+}
+
+
+void StateGame::RoundEnd::onSpacebar() {
+    gs.changeState<RoundBegin>();
+}
+
+void StateGame::RoundEnd::onEscape() {
+    gs.app_.enterState<StateMenu>();
+}
+
+
+StateGame::GameEnd::GameEnd(StateGame& s):
+    RoundState{s}
+{
+    print::info(PRINT, __func__);
+    // todo: show end of game splash screen
+}
+
+void StateGame::GameEnd::onSpacebar() {
+    gs.changeState<RoundBegin>();
+}
+
+void StateGame::GameEnd::onEscape() {
+    gs.app_.enterState<StateMenu>();
 }

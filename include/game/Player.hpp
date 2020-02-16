@@ -33,7 +33,7 @@ public:
     void addPoint();
     uint32_t getScore() const { return score_; }
 
-    void kill() { dead_ = true; }
+    void kill();
     bool isDead() const { return dead_; }
     bool isGap() const { return gap_; }
 

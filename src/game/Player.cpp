@@ -91,3 +91,8 @@ void PlayerThing::addPoint() {
         scoreLabel_->setText(std::to_string(score_));
     }
 }
+
+void PlayerThing::kill() {
+    print::info("kill {}", info_.name);
+    dead_ = true;
+}

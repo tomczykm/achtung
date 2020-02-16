@@ -2,7 +2,9 @@
 
 #include "IGameState.hpp"
 
-#include <optional>
+#include <memory>
+#include <map>
+#include <cstdint>
 #include <TGUI/TGUI.hpp>
 
 #include "Application.hpp"
@@ -16,12 +18,15 @@ public:
     void logic() override {}
     void render() override {}
 private:
+    using PlayerId = std::uint32_t;
+
     void addPlayer();
     std::vector<PlayerInfo> preparePlayerInfos();
     void loadGui();
     std::size_t getCurrentNumPlayers();
+    void removePlayer(PlayerId, tgui::Panel::Ptr);
     void recalculatePlayerListPositions();
 
     Application::Interface app_;
-    std::uint32_t latestPlayerId_ = 0u;
+    std::map<PlayerId, PlayerInfo> playerInfos_;
 };

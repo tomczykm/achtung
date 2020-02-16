@@ -1,6 +1,9 @@
+#include <algorithm>
+
 #include "menu/StateMenu.hpp"
 #include "game/StateGame.hpp"
 #include "game/StateSandbox.hpp"
+#include "Utils.hpp"
 
 namespace
 {
@@ -26,18 +29,23 @@ void StateMenu::input(const sf::Event& event) {
 
 void StateMenu::addPlayer() {
     print::info(__func__);
-    auto playerListPanel = std::static_pointer_cast<tgui::Panel>(app_.gui.get("PlayerListInnerPanel"));
+    auto playerListPanel = app_.getWidget<tgui::Panel>("PlayerListInnerPanel");
 
     auto newEntryPanel = tgui::Panel::create({"100%", "60"});
     newEntryPanel->setRenderer(playerListPanel->getSharedRenderer()->getData());
     newEntryPanel->setPosition("0", std::to_string(getCurrentNumPlayers()*PLAYER_LIST_ENTRY_HEIGHT));
 
-    auto widgetNamePrefix = "Player" + std::to_string(latestPlayerId_++);
+    auto newId = playerInfos_.size() == 0 ? 0 : playerInfos_.rbegin()->first + 1;
 
-    auto nameLabel = tgui::Label::create(widgetNamePrefix + "Name");
-    nameLabel->setTextSize(20);
+    auto widgetNamePrefix = "Player" + std::to_string(newId);
+
+    const auto color = sf::Color{xor_rand::next(0,255), xor_rand::next(0,255), xor_rand::next(0,255)};
+    const auto info = PlayerInfo{widgetNamePrefix + "Name", sf::Keyboard::Q, sf::Keyboard::W, color};
+
+    auto nameLabel = tgui::Label::create(info.name);
+    nameLabel->setTextSize(17);
     nameLabel->setPosition("10", "50%-height/2");
-    nameLabel->getRenderer()->setTextColor("red");
+    nameLabel->getRenderer()->setTextColor(info.color);
     nameLabel->getRenderer()->setBackgroundColor("transparent");
     newEntryPanel->add(nameLabel, widgetNamePrefix + "Label");
 
@@ -45,31 +53,36 @@ void StateMenu::addPlayer() {
     removeButton->setPosition("100% - 10 - width", "15%");
     removeButton->setSize("30", "70%");
     removeButton->connect("pressed", [=] () {
-        playerListPanel->remove(newEntryPanel);
-        recalculatePlayerListPositions();
+        removePlayer(newId, newEntryPanel);
     });
     newEntryPanel->add(removeButton, widgetNamePrefix + "Remove");
 
     auto rkeyButton = tgui::Button::create("R");
     rkeyButton->setPosition(widgetNamePrefix + "Remove.left - 6% - width", "15%");
     rkeyButton->setSize("30", "70%");
+    rkeyButton->connect("pressed", [newId] () {
+        print::info("Set Rkey of {}", newId);
+    });
     newEntryPanel->add(rkeyButton, widgetNamePrefix + "Right");
 
     auto lkeyButton = tgui::Button::create("L");
     lkeyButton->setPosition(widgetNamePrefix + "Right.left - 5 - width", "15%");
     lkeyButton->setSize("30", "70%");
+    lkeyButton->connect("pressed", [newId] () {
+        print::info("Set Lkey of {}", newId);
+    });
     newEntryPanel->add(lkeyButton, widgetNamePrefix + "Left");
 
     playerListPanel->add(newEntryPanel, widgetNamePrefix + "Panel");
+    playerInfos_.emplace(newId, info);
 }
 
 std::vector<PlayerInfo> StateMenu::preparePlayerInfos() {
-    auto playerListPanel = std::static_pointer_cast<tgui::Panel>(app_.gui.get("PlayerListInnerPanel"));
-    auto playerPanels = playerListPanel->getWidgets();
-
-    print::info("Preparing infos for {} players", playerPanels.size());
-
-    return {{"player", sf::Keyboard::Q, sf::Keyboard::W, sf::Color::Red}};
+    std::vector<PlayerInfo> infos;
+    std::transform(playerInfos_.begin(), playerInfos_.end(), std::back_inserter(infos), [] (const auto& kvPair) {
+        return kvPair.second;
+    });
+    return infos;
 }
 
 void StateMenu::loadGui() {
@@ -98,6 +111,14 @@ void StateMenu::loadGui() {
 std::size_t StateMenu::getCurrentNumPlayers() {
     return std::static_pointer_cast<tgui::Panel>(app_.gui.get("PlayerListInnerPanel"))->
         getWidgets().size();
+}
+
+void StateMenu::removePlayer(PlayerId id, tgui::Panel::Ptr panel) {
+    print::info("Remove player {}", id);
+    app_.getWidget<tgui::Panel>("PlayerListInnerPanel")->remove(panel);
+    recalculatePlayerListPositions();
+
+    playerInfos_.erase(id);
 }
 
 void StateMenu::recalculatePlayerListPositions() {

@@ -49,6 +49,11 @@ public:
         };
     }
 
+    template <typename Widget>
+    auto getWidget(std::string_view name) {
+        return std::static_pointer_cast<Widget>(gui.get(name.data()));
+    }
+
 private:
     friend class Application;
     explicit Interface(Application& app):

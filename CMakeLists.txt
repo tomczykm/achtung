@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project("freeachtung")
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wno-narrowing")
 
 find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 find_package(TGUI 0.8 REQUIRED)

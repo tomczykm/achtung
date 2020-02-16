@@ -16,6 +16,7 @@ StateMenu::StateMenu(const Application::Interface& app):
     app_{app}
 {
     loadGui();
+    addPlayer();
     print::info("StateMenu ready");
 }
 
@@ -35,9 +36,9 @@ void StateMenu::addPlayer() {
     newEntryPanel->setRenderer(playerListPanel->getSharedRenderer()->getData());
     newEntryPanel->setPosition("0", std::to_string(getCurrentNumPlayers()*PLAYER_LIST_ENTRY_HEIGHT));
 
-    auto newId = playerInfos_.size() == 0 ? 0 : playerInfos_.rbegin()->first + 1;
+    const auto newId = PlayerId{playerInfos_.size() == 0 ? 0 : playerInfos_.rbegin()->first + 1};
 
-    auto widgetNamePrefix = "Player" + std::to_string(newId);
+    const auto widgetNamePrefix = "Player" + std::to_string(newId);
 
     const auto color = sf::Color{xor_rand::next(0,255), xor_rand::next(0,255), xor_rand::next(0,255)};
     const auto info = PlayerInfo{widgetNamePrefix + "Name", sf::Keyboard::Q, sf::Keyboard::W, color};
@@ -46,7 +47,6 @@ void StateMenu::addPlayer() {
     nameLabel->setTextSize(17);
     nameLabel->setPosition("10", "50%-height/2");
     nameLabel->getRenderer()->setTextColor(info.color);
-    nameLabel->getRenderer()->setBackgroundColor("transparent");
     newEntryPanel->add(nameLabel, widgetNamePrefix + "Label");
 
     auto removeButton = tgui::Button::create("Rem");
@@ -57,21 +57,16 @@ void StateMenu::addPlayer() {
     });
     newEntryPanel->add(removeButton, widgetNamePrefix + "Remove");
 
-    auto rkeyButton = tgui::Button::create("R");
-    rkeyButton->setPosition(widgetNamePrefix + "Remove.left - 6% - width", "15%");
-    rkeyButton->setSize("30", "70%");
-    rkeyButton->connect("pressed", [newId] () {
-        print::info("Set Rkey of {}", newId);
+    auto keysLabel = tgui::Label::create("Q   W");
+    keysLabel->setPosition(widgetNamePrefix + "Remove.left - 6% - width", "50%-height/2");
+    keysLabel->setTextSize(17);
+    keysLabel->setSize(60, "100%");
+    keysLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+    keysLabel->getRenderer()->setTextColor(info.color);
+    keysLabel->connect("clicked", [newId] () {
+        print::info("clicked keys of {}", newId);
     });
-    newEntryPanel->add(rkeyButton, widgetNamePrefix + "Right");
-
-    auto lkeyButton = tgui::Button::create("L");
-    lkeyButton->setPosition(widgetNamePrefix + "Right.left - 5 - width", "15%");
-    lkeyButton->setSize("30", "70%");
-    lkeyButton->connect("pressed", [newId] () {
-        print::info("Set Lkey of {}", newId);
-    });
-    newEntryPanel->add(lkeyButton, widgetNamePrefix + "Left");
+    newEntryPanel->add(keysLabel, widgetNamePrefix + "Keys");
 
     playerListPanel->add(newEntryPanel, widgetNamePrefix + "Panel");
     playerInfos_.emplace(newId, info);

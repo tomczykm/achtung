@@ -44,6 +44,10 @@ void StateMenu::addPlayer() {
     auto removeButton = tgui::Button::create("Rem");
     removeButton->setPosition("100% - 10 - width", "15%");
     removeButton->setSize("30", "70%");
+    removeButton->connect("pressed", [=] () {
+        playerListPanel->remove(newEntryPanel);
+        recalculatePlayerListPositions();
+    });
     newEntryPanel->add(removeButton, widgetNamePrefix + "Remove");
 
     auto rkeyButton = tgui::Button::create("R");
@@ -94,4 +98,14 @@ void StateMenu::loadGui() {
 std::size_t StateMenu::getCurrentNumPlayers() {
     return std::static_pointer_cast<tgui::Panel>(app_.gui.get("PlayerListInnerPanel"))->
         getWidgets().size();
+}
+
+void StateMenu::recalculatePlayerListPositions() {
+    auto playerListPanel = std::static_pointer_cast<tgui::Panel>(app_.gui.get("PlayerListInnerPanel"));
+    auto playerPanels = playerListPanel->getWidgets();
+
+    std::size_t i = 0;
+    for (auto& panel : playerPanels) {
+        panel->setPosition({0, PLAYER_LIST_ENTRY_HEIGHT*(i++)});
+    }
 }

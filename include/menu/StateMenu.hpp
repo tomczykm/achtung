@@ -20,6 +20,7 @@ private:
     std::vector<PlayerInfo> preparePlayerInfos();
     void loadGui();
     std::size_t getCurrentNumPlayers();
+    void recalculatePlayerListPositions();
 
     Application::Interface app_;
     std::uint32_t latestPlayerId_ = 0u;

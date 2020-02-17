@@ -23,7 +23,7 @@ public:
 
     void move(double timeStep);
 
-    void newRoundSetup(int xmin, int xmax, int ymin, int ymax, std::deque<TrailThing>&);
+    void newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailThing>&);
     void createTrail(std::deque<TrailThing>&) const;
 
     const sf::CircleShape& getShape() const { return shape_; }
@@ -36,6 +36,8 @@ public:
     void kill();
     bool isDead() const { return dead_; }
     bool isGap() const { return gap_; }
+
+    std::string_view name() const { return info_.name; }
 
 private:
     void gapSwitch();

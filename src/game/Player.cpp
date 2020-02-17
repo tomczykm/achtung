@@ -44,15 +44,10 @@ void PlayerThing::move(double timeStep) {
     );
 }
 
-// places a player randomly on the playfield and moves them a couple steps
-// so that the player can tell the direction they're going to move
-void PlayerThing::newRoundSetup(int xmin, int xmax, int ymin, int ymax, std::deque<TrailThing>& trails) {
+void PlayerThing::newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailThing>& trails) {
     dead_ = false;
     direction_ = xor_rand::next(0, 360);
-    shape_.setPosition(
-        xor_rand::next(xmin, xmax),
-        xor_rand::next(ymin, ymax)
-    );
+    shape_.setPosition(xPos, yPos);
 
     // a little trick to set switch time without code duplication
     gap_ = true;
@@ -93,6 +88,8 @@ void PlayerThing::addPoint() {
 }
 
 void PlayerThing::kill() {
-    print::info("kill {}", info_.name);
-    dead_ = true;
+    if (!dead_) {
+        print::info("kill {}", info_.name);
+        dead_ = true;
+    }
 }

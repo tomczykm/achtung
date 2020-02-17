@@ -5,6 +5,13 @@
 #include "menu/StateMenu.hpp"
 #include "Utils.hpp"
 
+namespace
+{
+// todo: pick a real values for these
+constexpr uint32_t PLAY_AREA_POS_MIN = 100;
+constexpr uint32_t PLAY_AREA_POS_MAX = 600;
+}
+
 StateGame::StateGame(const Application::Interface& ctx, const std::vector<PlayerInfo>& infos):
     app_{ctx},
     scoreVictoryGoal_{(infos.size()-1)*10},
@@ -13,8 +20,7 @@ StateGame::StateGame(const Application::Interface& ctx, const std::vector<Player
     app_.window.setMouseCursorVisible(false);
 
     loadGui();
-    players_ = initializePlayers(infos);
-    lastAlive_ = players_.end();
+    initializePlayers(infos);
 
     state_ = std::make_unique<RoundBegin>(*this);
 
@@ -44,6 +50,10 @@ void StateGame::logic() {
 }
 
 void StateGame::render() {
+    for (const auto& p: powerups_) {
+        app_.window.draw(p.getShape());
+    }
+
     for (const auto& t: trails_) {
         app_.window.draw(t.getShape());
     }
@@ -57,8 +67,7 @@ void StateGame::render() {
     }
 }
 
-std::vector<PlayerThing> StateGame::initializePlayers(const std::vector<PlayerInfo>& infos) {
-    std::vector<PlayerThing> players;
+void StateGame::initializePlayers(const std::vector<PlayerInfo>& infos) {
     auto scoresPanel = app_.getWidget<tgui::Panel>("Scores");
     auto i = 0u;
     for (const auto& info : infos) {
@@ -80,11 +89,10 @@ std::vector<PlayerThing> StateGame::initializePlayers(const std::vector<PlayerIn
         scoreLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
         scoresPanel->add(scoreLabel);
 
-        players.emplace_back(info, scoreLabel);
+        players_.emplace_back(info, scoreLabel);
 
         ++i;
     }
-    return players;
 }
 
 void StateGame::loadGui() {
@@ -105,6 +113,60 @@ void StateGame::sortScoreList() {
     // todo
 }
 
+bool StateGame::checkCollisions(PlayerThing& player) {
+    for (const auto& shape: border_.getShapes()) {
+        if (!player.isGap() && player.checkCollision(shape)) {
+            player.kill();
+            return true;
+        }
+    }
+
+    // following code fairly shoddy, better come up with a better idea on skipping later:
+    // the reason we skip the newest bunch of trail segments is that
+    // we don't want to check if we collide with segments we just created
+    // (we obviously do, they're right underneath and we don't want to die immediately)
+
+    constexpr auto SKIP_TRAILS = 15u;  // todo: fix, hardcoding this value will result in instakill with several players in the game
+    if (trails_.size() > SKIP_TRAILS) {
+        for (auto t = trails_.begin() + SKIP_TRAILS; t != trails_.end(); t++) {
+            if (!player.isGap() && player.checkCollision(t->getShape())) {
+                player.kill();
+                return true;
+            }
+        }
+    }
+
+    auto powerup = powerups_.begin();
+    while (powerup != powerups_.end()) {
+        if (player.checkCollision(powerup->getShape())) {
+            print::info("{} got a powerup", player.name());
+            powerup = powerups_.erase(powerup);
+        } else {
+            ++powerup;
+        }
+    }
+
+    return false;
+}
+
+void StateGame::awardPoints() {
+    lastAlive_ = std::partition(players_.begin(), players_.end(),
+        [] (auto& p) { return !p.isDead(); });
+
+    for (auto player = players_.begin() ; player != lastAlive_ ; ++player) {
+        player->addPoint();
+    }
+    sortScoreList();
+
+    if (lastAlive_ - players_.begin() == 1) {
+        if (victoryGoalAchieved()) {
+            changeState<GameEnd>();
+        } else {
+            changeState<RoundEnd>();
+        }
+    }
+}
+
 bool StateGame::victoryGoalAchieved() {
     for (const auto& p : players_) {
         if (p.getScore() == scoreVictoryGoal_) return true;
@@ -112,14 +174,21 @@ bool StateGame::victoryGoalAchieved() {
     return false;
 }
 
+void StateGame::resetPowerupSpawnTimer() {
+    powerupSpawnTimer_.restart();
+    timeUntilNextPowerupSpawn_ = sf::milliseconds(xor_rand::next(7500, 11500));
+}
 
-StateGame::RoundBegin::RoundBegin(StateGame& s):
-    RoundState{s}
-{
-    print::info(PRINT, __func__);
+
+void StateGame::RoundBegin::onEnter() {
     gs.trails_.clear();
+    gs.powerups_.clear();
     for (auto& player : gs.players_) {
-        player.newRoundSetup(100, 600, 100, 600, gs.trails_);
+        player.newRoundSetup(
+            xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
+            xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
+            gs.trails_
+        );
     }
     gs.lastAlive_ = gs.players_.end();
 }
@@ -133,11 +202,9 @@ void StateGame::RoundBegin::onEscape() {
 }
 
 
-StateGame::Running::Running(StateGame& s):
-    RoundState{s}
-{
-    print::info(PRINT, __func__);
+void StateGame::Running::onEnter() {
     gs.moveTimer_.restart();
+    gs.resetPowerupSpawnTimer();
 }
 
 void StateGame::Running::onSpacebar() {
@@ -146,50 +213,25 @@ void StateGame::Running::onSpacebar() {
 
 void StateGame::Running::onTick() {
     bool playerDied = false;
-
-    for (auto player = gs.players_.begin() ; player != gs.lastAlive_ ; player++) {
+    for (auto player = gs.players_.begin() ; player != gs.lastAlive_ ; ++player) {
         player->createTrail(gs.trails_);
         player->move(gs.moveTimer_.getElapsedTime().asMilliseconds() / 1000.f);
 
-        for (const auto& shape: gs.border_.getShapes()) {
-            if (!player->isGap() && player->checkCollision(shape)) {
-                player->kill();
-                playerDied = true;
-            }
-        }
-
-        // following code fairly shoddy, better come up with a better idea on skipping later:
-        // the reason we skip the newest bunch of trail segments is that
-        // we don't want to check if we collide with segments we just created
-        // (we obviously do, they're right underneath and we don't want to die immediately)
-
-        constexpr auto SKIP_TRAILS = 15u;  // todo: fix, hardcoding this value will result in instakill with several players in the game
-        if (gs.trails_.size() > SKIP_TRAILS) {
-            for (auto t = gs.trails_.begin() + SKIP_TRAILS; t != gs.trails_.end(); t++) {
-                if (!player->isGap() && player->checkCollision(t->getShape())) {
-                    player->kill();
-                    playerDied = true;
-                }
-            }
+        if (gs.checkCollisions(*player)) {
+            playerDied = true;
         }
     }
 
+    if (gs.powerupSpawnTimer_.getElapsedTime() > gs.timeUntilNextPowerupSpawn_) {
+        gs.resetPowerupSpawnTimer();
+        gs.powerups_.emplace_back(
+            xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
+            xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX)
+        );
+    }
+
     if (playerDied) {
-        gs.lastAlive_ = std::partition(gs.players_.begin(), gs.players_.end(),
-            [] (auto& p) { return !p.isDead(); });
-
-        for (auto player = gs.players_.begin() ; player != gs.lastAlive_ ; ++player) {
-            player->addPoint();
-        }
-        gs.sortScoreList();
-
-        if (gs.lastAlive_ - gs.players_.begin() == 1) {
-            if (gs.victoryGoalAchieved()) {
-                gs.changeState<GameEnd>();
-            } else {
-                gs.changeState<RoundEnd>();
-            }
-        }
+        gs.awardPoints();
     }
 
     gs.moveTimer_.restart();
@@ -214,10 +256,7 @@ void StateGame::RoundEnd::onEscape() {
 }
 
 
-StateGame::GameEnd::GameEnd(StateGame& s):
-    RoundState{s}
-{
-    print::info(PRINT, __func__);
+void StateGame::GameEnd::onEnter() {
     // todo: show end of game splash screen
 }
 

@@ -1,7 +1,5 @@
 Renderer.PanelRenderer {
     backgroundcolor = transparent;
-    bordercolor = red;
-    borders = (2, 2, 2, 2);
 }
 
 Panel.Scores {

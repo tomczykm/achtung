@@ -2,7 +2,6 @@
 
 #include "menu/StateMenu.hpp"
 #include "game/StateGame.hpp"
-#include "game/StateSandbox.hpp"
 #include "Utils.hpp"
 
 namespace
@@ -21,14 +20,8 @@ StateMenu::StateMenu(const Application::Interface& app):
 
 void StateMenu::input(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
-        switch (event.key.code) {
-        case  sf::Keyboard::Escape:
+        if (event.key.code == sf::Keyboard::Escape) {
             app_.quit();
-            break;
-        case sf::Keyboard::F12:
-            app_.enterState<StateSandbox>();
-            break;
-        default: break;
         }
 
         if (setKeysMode_) {
@@ -153,8 +146,7 @@ void StateMenu::enterSetKeysMode(PlayerId player) {
 
 void StateMenu::setKey(PlayerId player, sf::Keyboard::Key key) {
     static std::set<sf::Keyboard::Key> forbidden = {
-         sf::Keyboard::Enter,  sf::Keyboard::Escape,
-         sf::Keyboard::Space,  sf::Keyboard::F12
+        sf::Keyboard::Enter, sf::Keyboard::Escape, sf::Keyboard::Space
     };
     if (forbidden.find(key) != forbidden.end()) return;
 

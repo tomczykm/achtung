@@ -24,6 +24,7 @@ private:
     void addPlayer();
     std::vector<PlayerInfo> preparePlayerInfos();
     void loadGui();
+    bool canStartGame();
     std::size_t getCurrentNumPlayers();
     void removePlayer(PlayerId, tgui::Panel::Ptr);
 

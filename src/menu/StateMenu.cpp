@@ -111,12 +111,20 @@ void StateMenu::loadGui() {
     });
 
     app_.gui.get("StartGame")->connect("pressed", [this] () {
-        app_.enterState<StateGame>(preparePlayerInfos());
+        if (canStartGame()) app_.enterState<StateGame>(preparePlayerInfos());
     });
 
     app_.gui.get("QuitGame")->connect("pressed", [this] () {
         app_.quit();
     });
+}
+
+bool StateMenu::canStartGame() {
+    auto playersHaveSetValues = std::all_of(playerInfos_.cbegin(), playerInfos_.cend(), [] (const auto& pair) {
+        const auto& p = pair.second;
+        return p.left != sf::Keyboard::Unknown && p.right != sf::Keyboard::Unknown && p.name != "";
+    });
+    return playerInfos_.size() > 1 && playersHaveSetValues;
 }
 
 std::size_t StateMenu::getCurrentNumPlayers() {

@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include "menu/StateMenu.hpp"
-#include "Utils.hpp"
+#include "app/Utils.hpp"
 
 namespace
 {
@@ -40,9 +40,6 @@ void StateGame::input(const sf::Event& event) {
         case sf::Keyboard::Escape:
             state_->onEscape();
             break;
-        // case sf::Keyboard::P:
-        //     players_.front().applyHaste(sf::milliseconds(3500));
-        // break;
         default: break;
         }
     }

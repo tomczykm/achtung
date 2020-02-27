@@ -1,6 +1,3 @@
-set (MENU_SOURCE
+target_sources(${PROJECT_NAME} PUBLIC
     StateMenu.cpp
 )
-
-add_library(menu OBJECT ${MENU_SOURCE})
-target_link_libraries(menu PRIVATE fmt::fmt-header-only)

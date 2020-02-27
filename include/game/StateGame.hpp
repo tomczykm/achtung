@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Application.hpp"
-#include "IGameState.hpp"
+#include "app/Application.hpp"
+#include "app/IGameState.hpp"
 #include "game/Player.hpp"
 #include "game/BorderThing.hpp"
 #include "game/PickMeUp.hpp"

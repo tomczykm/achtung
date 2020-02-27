@@ -2,15 +2,15 @@
 #include <ctime>
 #include <memory>
 
-#include "Application.hpp"
-#include "Log.hpp"
+#include "app/Application.hpp"
+#include "app/Log.hpp"
 
 namespace print::detail
 {
 std::unique_ptr<std::FILE, FCloseDeleter> logFile;
 }
 
-int main(int argc, char **argv) {
+int main() {
     print::detail::logFile.reset(std::fopen("event.log", "w"));
     {
         const auto time = std::time(nullptr);

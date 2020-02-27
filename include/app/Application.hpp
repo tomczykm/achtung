@@ -6,10 +6,10 @@
 #include <SFML/Graphics.hpp>
 #include <TGUI/TGUI.hpp>
 
-#include "Log.hpp"
-#include "SettingsManager.hpp"
-#include "IGameState.hpp"
-#include "Utils.hpp"
+#include "app/Log.hpp"
+#include "app/SettingsManager.hpp"
+#include "app/IGameState.hpp"
+#include "app/Utils.hpp"
 
 class Application {
 public:

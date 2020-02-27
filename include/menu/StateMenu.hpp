@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IGameState.hpp"
+#include "app/IGameState.hpp"
 
 #include <memory>
 #include <map>
@@ -8,7 +8,7 @@
 #include <optional>
 #include <TGUI/TGUI.hpp>
 
-#include "Application.hpp"
+#include "app/Application.hpp"
 #include "game/Player.hpp"
 
 class StateMenu : public IGameState {

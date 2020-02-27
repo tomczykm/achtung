@@ -3,8 +3,8 @@
 #include <cmath>
 #include <algorithm>
 
-#include "Log.hpp"
-#include "Utils.hpp"
+#include "app/Log.hpp"
+#include "app/Utils.hpp"
 
 namespace chrono = std::chrono;
 

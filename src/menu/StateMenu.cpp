@@ -2,7 +2,7 @@
 
 #include "menu/StateMenu.hpp"
 #include "game/StateGame.hpp"
-#include "Utils.hpp"
+#include "app/Utils.hpp"
 
 namespace
 {

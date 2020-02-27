@@ -1,5 +1,5 @@
-#include "SettingsManager.hpp"
-#include "Log.hpp"
+#include "app/SettingsManager.hpp"
+#include "app/Log.hpp"
 
 inline AspRatio GetAspectRatio(Resolution res) {
     if (res == Resolution::null) return AspRatio::null;

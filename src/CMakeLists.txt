@@ -1,12 +1,7 @@
-add_subdirectory(game)
-add_subdirectory(menu)
-
-set(APP_CORE_SOURCE
-    Application.cpp
-    Utils.cpp
+target_sources(${PROJECT_NAME} PRIVATE
     Main.cpp
-    SettingsManager.cpp
 )
 
-add_library(app_core OBJECT ${APP_CORE_SOURCE})
-target_link_libraries(app_core PRIVATE fmt::fmt-header-only)
+add_subdirectory(game)
+add_subdirectory(menu)
+add_subdirectory(app)

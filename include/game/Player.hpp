@@ -8,8 +8,8 @@
 #include <SFML/Graphics.hpp>
 #include <TGUI/TGUI.hpp>
 
-#include "Log.hpp"
 #include "game/TrailThing.hpp"
+#include "game/Effect.hpp"
 
 struct PlayerInfo {
     std::string name;
@@ -39,8 +39,13 @@ public:
 
     std::string_view name() const { return info_.name; }
 
+    // timed effects
+    void applyHaste(sf::Time duration);
+    void applySlow(sf::Time duration);
+
 private:
     void gapSwitch();
+    void endExpiredEffects();
 
     PlayerInfo info_;
 
@@ -56,4 +61,6 @@ private:
     // gap logic
     bool gap_ = false;
     std::chrono::steady_clock::time_point switchTime_ = {};
+
+    std::vector<TimedEffect> effects_;
 };

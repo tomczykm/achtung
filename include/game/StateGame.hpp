@@ -4,7 +4,7 @@
 #include "IGameState.hpp"
 #include "game/Player.hpp"
 #include "game/BorderThing.hpp"
-#include "game/PowerupThing.hpp"
+#include "game/PickMeUp.hpp"
 
 #include <vector>
 #include <deque>
@@ -20,6 +20,7 @@ public:
 
 private:
     class RoundState;
+    using PlayerIt = std::vector<PlayerThing>::iterator;
 
     void initializePlayers(const std::vector<PlayerInfo>&);
     void loadGui();
@@ -29,8 +30,7 @@ private:
     void awardPoints();
     bool victoryGoalAchieved();
 
-    void resetPowerupSpawnTimer();
-
+    void resetPickmeupSpawnTimer();
     template <typename State>
     void changeState() { state_ = std::make_unique<State>(*this); }
 
@@ -41,7 +41,7 @@ private:
     std::deque<TrailThing> trails_;
 
     std::vector<PlayerThing> players_;
-    std::vector<PlayerThing>::iterator lastAlive_;
+    PlayerIt lastAlive_;
 
     uint32_t scoreVictoryGoal_;
 
@@ -49,9 +49,9 @@ private:
 
     sf::Clock moveTimer_; // for calculating per-pixel movement speed and turn angles
 
-    std::vector<PowerupThing> powerups_;
-    sf::Clock powerupSpawnTimer_;
-    sf::Time timeUntilNextPowerupSpawn_;
+    std::vector<PickMeUp> pickmeups_;
+    sf::Clock pickmeupSpawnTimer_;
+    sf::Time timeUntilNextPickmeupSpawn_;
 
     struct RoundState {
         virtual void onEnter() = 0;

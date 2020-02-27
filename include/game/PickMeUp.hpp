@@ -1,11 +1,10 @@
 #pragma once
 
-#include <cstdint>
 #include <SFML/Graphics.hpp>
 
-class PowerupThing {
+class PickMeUp {
 public:
-    PowerupThing(uint32_t xPos, uint32_t yPos);
+    PickMeUp(uint32_t xPos, uint32_t yPos);
 
     const sf::CircleShape& getShape() const { return shape_; }
 private:

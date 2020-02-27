@@ -1,6 +1,7 @@
 #include "game/Player.hpp"
 
 #include <cmath>
+#include <algorithm>
 
 #include "Log.hpp"
 #include "Utils.hpp"
@@ -24,6 +25,8 @@ PlayerThing::PlayerThing(const PlayerInfo& info, tgui::Label::Ptr scoreLabel):
 }
 
 void PlayerThing::move(double timeStep) {
+    endExpiredEffects();
+
     if (sf::Keyboard::isKeyPressed(info_.right)) {
         direction_ += timeStep * TURN_DEG;
     } else if (sf::Keyboard::isKeyPressed(info_.left)) {
@@ -45,6 +48,7 @@ void PlayerThing::move(double timeStep) {
 }
 
 void PlayerThing::newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailThing>& trails) {
+    effects_.clear();
     dead_ = false;
     direction_ = xor_rand::next(0, 360);
     shape_.setPosition(xPos, yPos);
@@ -58,8 +62,8 @@ void PlayerThing::newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailTh
         createTrail(trails);
         auto [xPos, yPos] = shape_.getPosition();
         shape_.setPosition(
-            xPos + (0.02 * vel_ * sin(-(M_PI/180)*direction_)),
-            yPos + (0.02 * vel_ * cos(-(M_PI/180)*direction_))
+            xPos + (2 * sin(-(M_PI/180)*direction_)),
+            yPos + (2 * cos(-(M_PI/180)*direction_))
         );
     }
 }
@@ -92,4 +96,31 @@ void PlayerThing::kill() {
         print::info("kill {}", info_.name);
         dead_ = true;
     }
+}
+
+void PlayerThing::endExpiredEffects() {
+    effects_.erase(std::remove_if(effects_.begin(), effects_.end(), [] (const auto& effect) {
+        return effect.isExpired();
+    }), effects_.end());
+}
+
+void PlayerThing::applyHaste(sf::Time duration) {
+    constexpr auto VELOCITY_MODIFIER = 100;
+    print::info("Apply haste to {}", info_.name);
+
+    vel_ += VELOCITY_MODIFIER;
+    auto onExpire = [this] () { print::info("haste end"); vel_ -= VELOCITY_MODIFIER; };
+
+    effects_.emplace_back(duration, onExpire);
+}
+
+void PlayerThing::applySlow(sf::Time duration) {
+    constexpr auto VELOCITY_MODIFIER = 33;
+    print::info("Apply slow to {}", info_.name);
+    if (vel_ <= VELOCITY_MODIFIER) return;
+
+    vel_ -= VELOCITY_MODIFIER;
+    auto onExpire = [this] () { vel_ += VELOCITY_MODIFIER; };
+
+    effects_.emplace_back(duration, onExpire);
 }

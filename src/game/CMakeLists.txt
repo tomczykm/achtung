@@ -1,7 +1,7 @@
 set(GAME_SOURCE
     BorderThing.cpp
     Player.cpp
-    PowerupThing.cpp
+    PickMeUp.cpp
     StateGame.cpp
     TrailThing.cpp
 )

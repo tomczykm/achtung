@@ -40,6 +40,9 @@ void StateGame::input(const sf::Event& event) {
         case sf::Keyboard::Escape:
             state_->onEscape();
             break;
+        // case sf::Keyboard::P:
+        //     players_.front().applyHaste(sf::milliseconds(3500));
+        // break;
         default: break;
         }
     }
@@ -50,7 +53,7 @@ void StateGame::logic() {
 }
 
 void StateGame::render() {
-    for (const auto& p: powerups_) {
+    for (const auto& p: pickmeups_) {
         app_.window.draw(p.getShape());
     }
 
@@ -136,13 +139,14 @@ bool StateGame::checkCollisions(PlayerThing& player) {
         }
     }
 
-    auto powerup = powerups_.begin();
-    while (powerup != powerups_.end()) {
-        if (player.checkCollision(powerup->getShape())) {
-            print::info("{} got a powerup", player.name());
-            powerup = powerups_.erase(powerup);
+    auto pickmeup = pickmeups_.begin();
+    while (pickmeup != pickmeups_.end()) {
+        if (player.checkCollision(pickmeup->getShape())) {
+            print::info("{} got a pickmeup", player.name());
+            player.applyHaste(sf::milliseconds(2500));
+            pickmeup = pickmeups_.erase(pickmeup);
         } else {
-            ++powerup;
+            ++pickmeup;
         }
     }
 
@@ -174,15 +178,15 @@ bool StateGame::victoryGoalAchieved() {
     return false;
 }
 
-void StateGame::resetPowerupSpawnTimer() {
-    powerupSpawnTimer_.restart();
-    timeUntilNextPowerupSpawn_ = sf::milliseconds(xor_rand::next(7500, 11500));
+void StateGame::resetPickmeupSpawnTimer() {
+    pickmeupSpawnTimer_.restart();
+    timeUntilNextPickmeupSpawn_ = sf::milliseconds(xor_rand::next(7500, 11500));
 }
 
 
 void StateGame::RoundBegin::onEnter() {
     gs.trails_.clear();
-    gs.powerups_.clear();
+    gs.pickmeups_.clear();
     for (auto& player : gs.players_) {
         player.newRoundSetup(
             xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
@@ -204,7 +208,7 @@ void StateGame::RoundBegin::onEscape() {
 
 void StateGame::Running::onEnter() {
     gs.moveTimer_.restart();
-    gs.resetPowerupSpawnTimer();
+    gs.resetPickmeupSpawnTimer();
 }
 
 void StateGame::Running::onSpacebar() {
@@ -222,9 +226,9 @@ void StateGame::Running::onTick() {
         }
     }
 
-    if (gs.powerupSpawnTimer_.getElapsedTime() > gs.timeUntilNextPowerupSpawn_) {
-        gs.resetPowerupSpawnTimer();
-        gs.powerups_.emplace_back(
+    if (gs.pickmeupSpawnTimer_.getElapsedTime() > gs.timeUntilNextPickmeupSpawn_) {
+        gs.resetPickmeupSpawnTimer();
+        gs.pickmeups_.emplace_back(
             xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
             xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX)
         );

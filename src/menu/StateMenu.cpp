@@ -51,7 +51,7 @@ void StateMenu::addPlayer() {
     removeButton->setPosition("100% - 10 - width", "15%");
     removeButton->setSize("30", "70%");
     removeButton->connect("pressed", [=] () {
-        if (setKeysMode_ && *setKeysMode_ != playerId)
+        if (!setKeysMode_ || (setKeysMode_ && *setKeysMode_ != playerId))
             removePlayer(playerId, newEntryPanel);
     });
     newEntryPanel->add(removeButton, fmt::format("{}Remove", widgetNamePrefix));

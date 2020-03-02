@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "menu/StateMenu.hpp"
+#include "app/ResourceManager.hpp"
 #include "app/Utils.hpp"
 
 namespace
@@ -96,12 +97,16 @@ void StateGame::initializePlayers(const std::vector<PlayerInfo>& infos) {
 }
 
 void StateGame::loadGui() {
-    constexpr auto filename = "../game.ui";
+    constexpr auto resName = "game.ui";
     try {
-        app_.gui.loadWidgetsFromFile(filename);
+        app_.gui.loadWidgetsFromStream(ResourceManager::openResource(resName));
+    }
+    catch (const std::invalid_argument&) {
+        print::error("Failed to open resource {}", resName);
+        exit(-1);
     }
     catch (const tgui::Exception& e) {
-        print::error("Failed to load GUI layout from {}. {}", filename, e.what());
+        print::error("Failed to create GUI from {}. {}", resName, e.what());
         exit(-1);
     }
 

@@ -16,6 +16,5 @@ int main() {
         const auto time = std::time(nullptr);
         xor_rand::seed(time, time >> 8, time << 8, time >> 16);
     }
-    Application app;
-    return app.run();
+    return Application{}.run();
 }

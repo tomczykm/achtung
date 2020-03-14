@@ -10,7 +10,7 @@ namespace print::detail
 
 struct FCloseDeleter {
     void operator()(std::FILE* f) {
-        fclose(f);
+        std::fclose(f);
     }
 };
 

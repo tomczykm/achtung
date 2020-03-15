@@ -178,10 +178,14 @@ void StateGame::awardPoints() {
 }
 
 bool StateGame::victoryGoalAchieved() {
-    for (const auto& p : players_) {
-        if (p.getScore() >= scoreVictoryGoal_) return true;
-    }
-    return false;
+    std::vector<uint32_t> scores;
+    std::transform(players_.cbegin(), players_.cend(), std::back_inserter(scores), [] (const auto& p) {
+        return p.getScore();
+    });
+    std::sort(scores.begin(), scores.end());
+
+    return scores.front() >= scoreVictoryGoal_
+        && scores.front() - *(scores.begin()+1) >= 2; // first place needs to be at least two points ahead
 }
 
 StateGame::PlayerIt StateGame::getPlayer(std::string_view name) {

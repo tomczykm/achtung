@@ -27,8 +27,8 @@ public:
     void createTrail(std::deque<TrailThing>&) const;
 
     const sf::CircleShape& getShape() const { return shape_; }
-
     sf::Color getColor() const { return info_.color; }
+    int getVelocity() const { return vel_; }
 
     bool checkCollision(const sf::Shape&) const;
 

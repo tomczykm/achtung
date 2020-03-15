@@ -215,7 +215,7 @@ StateGame::PlayerIt StateGame::getPlayer(std::string_view name) {
 void StateGame::createRandomPickMeUp() {
     resetPickmeupSpawnTimer();
     auto [onPickMeUp, texture] = getRandomPickMeUpEffect();
-    if (xor_rand::next(1, 7) == 7) texture = AssetManager::Texture::RandomPickMeUp;
+    if (xor_rand::next(1, static_cast<int>(PickUpType::Count)) == 1) texture = AssetManager::Texture::RandomPickMeUp;
     pickmeups_.emplace_back(
         xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
         xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
@@ -286,13 +286,13 @@ void StateGame::addHaste(PlayerIt player, sf::Time duration) {
 }
 
 void StateGame::addSlow(PlayerIt player, sf::Time duration) {
-    constexpr auto VEL_CHANGE = -33;
+    const auto velChange = -(player->getVelocity() / 2);
     constexpr auto DEG_CHANGE = 5;
-    player->changeVelocity(VEL_CHANGE);
+    player->changeVelocity(velChange);
     player->changeTurn(DEG_CHANGE);
-    player->addTimedEffect(duration, [this, name=player->name()] () {
+    player->addTimedEffect(duration, [this, velChange, name=player->name()] () {
         auto player = getPlayer(name);
-        player->changeVelocity(-VEL_CHANGE);
+        player->changeVelocity(-velChange);
         player->changeTurn(-DEG_CHANGE);
     });
 }

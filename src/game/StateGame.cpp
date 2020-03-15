@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include "menu/StateMenu.hpp"
-#include "app/ResourceManager.hpp"
+#include "app/AssetManager.hpp"
 #include "app/Utils.hpp"
 
 namespace
@@ -11,6 +11,14 @@ namespace
 // todo: pick a real values for these
 constexpr uint32_t PLAY_AREA_POS_MIN = 100;
 constexpr uint32_t PLAY_AREA_POS_MAX = 600;
+
+AssetManager::TextureSet gameTextures = {
+        AssetManager::Texture::SelfHaste,
+        AssetManager::Texture::OpponentHaste,
+        AssetManager::Texture::SelfSlow,
+        AssetManager::Texture::OpponentSlow
+};
+
 }
 
 StateGame::StateGame(const Application::Interface& ctx, const std::vector<PlayerInfo>& infos):
@@ -23,12 +31,15 @@ StateGame::StateGame(const Application::Interface& ctx, const std::vector<Player
     loadGui();
     initializePlayers(infos);
 
+    app_.assets.loadTextures(gameTextures);
+
     state_ = std::make_unique<RoundBegin>(*this);
 
     print::info("StateGame ready");
 }
 
 StateGame::~StateGame() {
+    app_.assets.releaseTextures(gameTextures);
     app_.window.setMouseCursorVisible(true);
 }
 
@@ -99,7 +110,7 @@ void StateGame::initializePlayers(const std::vector<PlayerInfo>& infos) {
 void StateGame::loadGui() {
     constexpr auto resName = "game.ui";
     try {
-        app_.gui.loadWidgetsFromStream(ResourceManager::openResource(resName));
+        app_.gui.loadWidgetsFromStream(AssetManager::openResource(resName));
     }
     catch (const std::invalid_argument&) {
         print::error("Failed to open resource {}", resName);

@@ -2,11 +2,11 @@
 
 #include <toml.hpp>
 
-#include "app/ResourceManager.hpp"
+#include "app/AssetManager.hpp"
 #include "app/Log.hpp"
 
 ConfigManager::ConfigManager():
-    filename_{ResourceManager::getActualFileName("config.toml")}
+    filename_{AssetManager::getActualFileName("config.toml")}
 {
     loadFromFile();
 }

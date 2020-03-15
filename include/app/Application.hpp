@@ -7,6 +7,7 @@
 #include <TGUI/TGUI.hpp>
 
 #include "app/Log.hpp"
+#include "app/AssetManager.hpp"
 #include "app/ConfigManager.hpp"
 #include "app/IGameState.hpp"
 #include "app/Utils.hpp"
@@ -20,6 +21,7 @@ public:
     class Interface;
 
 private:
+    AssetManager assets_;
     ConfigManager config_;
     sf::RenderWindow window_;
     tgui::Gui gui_;
@@ -32,6 +34,7 @@ private:
 class Application::Interface
 {
 public:
+    AssetManager& assets;
     ConfigManager& config;
     sf::RenderWindow& window;
     tgui::Gui& gui;
@@ -57,6 +60,7 @@ public:
 private:
     friend class Application;
     explicit Interface(Application& app):
+        assets{app.assets_},
         config{app.config_},
         window{app.window_},
         gui{app.gui_},

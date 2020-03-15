@@ -4,7 +4,7 @@
 #include <iterator>
 
 #include "game/StateGame.hpp"
-#include "app/ResourceManager.hpp"
+#include "app/AssetManager.hpp"
 #include "app/Utils.hpp"
 
 namespace
@@ -95,7 +95,7 @@ std::vector<PlayerInfo> StateMenu::preparePlayerInfos() {
 void StateMenu::loadGui() {
     constexpr auto resName = "menu.ui";
     try {
-        app_.gui.loadWidgetsFromStream(ResourceManager::openResource(resName));
+        app_.gui.loadWidgetsFromStream(AssetManager::openResource(resName));
     }
     catch (const std::invalid_argument&) {
         print::error("Failed to open resource {}", resName);

@@ -15,7 +15,9 @@ public:
         SelfHaste,
         OpponentHaste,
         SelfSlow,
-        OpponentSlow
+        OpponentSlow,
+        ClearTrails,
+        RandomPickMeUp
     };
     using TextureSet = const std::set<AssetManager::Texture>;
 

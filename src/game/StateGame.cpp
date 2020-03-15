@@ -144,16 +144,14 @@ bool StateGame::checkCollisions(PlayerThing& player) {
     // (we obviously do, they're right underneath and we don't want to die immediately)
 
     auto toSkip = 15u;
-    if (trails_.size() > toSkip) {
-        for (const auto& t: trails_) {
-            if (t.getShape().getFillColor() == player.getColor() && toSkip > 0) {
-                --toSkip;
-                continue;
-            }
-            if (!player.isGap() && player.checkCollision(t.getShape())) {
-                player.kill();
-                return true;
-            }
+    for (const auto& t: trails_) {
+        if (t.getShape().getFillColor() == player.getColor() && toSkip > 0) {
+            --toSkip;
+            continue;
+        }
+        if (!player.isGap() && player.checkCollision(t.getShape())) {
+            player.kill();
+            return true;
         }
     }
 
@@ -209,6 +207,7 @@ StateGame::PlayerIt StateGame::getPlayer(std::string_view name) {
 void StateGame::createRandomPickMeUp() {
     resetPickmeupSpawnTimer();
     auto [onPickMeUp, texture] = getRandomPickMeUpEffect();
+    if (xor_rand::next(1, 7) == 7) texture = AssetManager::Texture::RandomPickMeUp;
     pickmeups_.emplace_back(
         xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
         xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
@@ -237,33 +236,37 @@ std::pair<PickMeUp::OnPickUp, AssetManager::Texture> StateGame::getRandomPickMeU
         return std::make_pair(makeOpponentEffect([this] (auto player) {
             addSlow(player, sf::milliseconds(3000));
         }), AssetManager::Texture::OpponentSlow);
+    case PickUpType::ClearTrails:
+        return std::make_pair(makeSelfEffect([this] (auto) {
+            trails_.clear();
+        }), AssetManager::Texture::ClearTrails);
     default:
         print::error("bad pickup type {}", type);
         throw std::runtime_error{fmt::format("bad pickup type {}", type)};
     }
 }
 
-template <typename UpdatePlayer>
-PickMeUp::OnPickUp StateGame::makeSelfEffect(UpdatePlayer update) {
-    return [this, update] (auto name) {
-        update(getPlayer(name));
+template <typename OnPickUp>
+PickMeUp::OnPickUp StateGame::makeSelfEffect(OnPickUp onPickUp) {
+    return [this, onPickUp] (auto name) {
+        onPickUp(getPlayer(name));
     };
 }
 
-template <typename UpdatePlayer>
-PickMeUp::OnPickUp StateGame::makeOpponentEffect(UpdatePlayer update) {
-    return [this, update] (auto name) {
+template <typename OnPickUp>
+PickMeUp::OnPickUp StateGame::makeOpponentEffect(OnPickUp onPickUp) {
+    return [this, onPickUp] (auto name) {
         auto pickedBy = getPlayer(name);
         for (auto player = players_.begin(); player != players_.end(); ++player) {
             if (player == pickedBy) continue;
-            update(player);
+            onPickUp(player);
         }
     };
 }
 
 void StateGame::addHaste(PlayerIt player, sf::Time duration) {
-    constexpr auto VEL_CHANGE = 100;
-    constexpr auto DEG_CHANGE = -15;
+    constexpr auto VEL_CHANGE = 110;
+    constexpr auto DEG_CHANGE = 9;
     player->changeVelocity(VEL_CHANGE);
     player->changeTurn(DEG_CHANGE);
     player->addTimedEffect(duration, [this, name=player->name()] () {

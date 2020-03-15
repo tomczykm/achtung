@@ -14,6 +14,7 @@ enum class PickUpType {
     OpponentHaste,
     SelfSlow,
     OpponentSlow,
+    ClearTrails,
 
     Count
 };

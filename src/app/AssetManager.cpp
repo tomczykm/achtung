@@ -15,7 +15,9 @@ const std::map<AssetManager::Texture, std::string_view> texToFilename = {
     {AssetManager::Texture::SelfHaste, "selfHaste.png"},
     {AssetManager::Texture::OpponentHaste, "oppHaste.png"},
     {AssetManager::Texture::SelfSlow, "selfSlow.png"},
-    {AssetManager::Texture::OpponentSlow, "oppSlow.png"}
+    {AssetManager::Texture::OpponentSlow, "oppSlow.png"},
+    {AssetManager::Texture::ClearTrails, "clear.png"},
+    {AssetManager::Texture::RandomPickMeUp, "random.png"}
 };
 
 }  // namespace

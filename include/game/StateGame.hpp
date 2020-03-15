@@ -36,10 +36,10 @@ private:
     std::pair<PickMeUp::OnPickUp, AssetManager::Texture> getRandomPickMeUpEffect();
     void resetPickmeupSpawnTimer();
 
-    template <typename UpdatePlayer>
-    PickMeUp::OnPickUp makeSelfEffect(UpdatePlayer);
-    template <typename UpdatePlayer>
-    PickMeUp::OnPickUp makeOpponentEffect(UpdatePlayer);
+    template <typename OnPickUp>
+    PickMeUp::OnPickUp makeSelfEffect(OnPickUp);
+    template <typename OnPickUp>
+    PickMeUp::OnPickUp makeOpponentEffect(OnPickUp);
 
     void addHaste(PlayerIt p, sf::Time);
     void addSlow(PlayerIt p, sf::Time);

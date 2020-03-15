@@ -1,5 +1,7 @@
 #include "app/ConfigManager.hpp"
 
+#include <toml.hpp>
+
 #include "app/ResourceManager.hpp"
 #include "app/Log.hpp"
 
@@ -21,4 +23,3 @@ void ConfigManager::loadFromFile() {
 void ConfigManager::saveToFile() {
 
 }
-

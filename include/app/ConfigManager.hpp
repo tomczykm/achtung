@@ -6,7 +6,6 @@
 #include <string_view>
 
 #include <fmt/format.h>
-#include <toml.hpp>
 
 #include "app/Log.hpp"
 

@@ -15,7 +15,6 @@ Application::Application():
     window_.create(sf::VideoMode{config_.get<int>(Setting::ResWidth), config_.get<int>(Setting::ResHeight)},
         PROJECT_NAME, sf::Style::Titlebar | sf::Style::Close | fullscreenFlag, windowSettings);
     window_.setVerticalSyncEnabled(true);
-    window_.setPosition({100, 100});
 
     print::info("Initialization complete");
 }

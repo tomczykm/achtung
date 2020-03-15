@@ -3,7 +3,6 @@
 #include <string>
 #include <string_view>
 #include <deque>
-#include <chrono>
 
 #include <SFML/Graphics.hpp>
 #include <TGUI/TGUI.hpp>
@@ -19,7 +18,7 @@ struct PlayerInfo {
 
 class PlayerThing {
 public:
-    explicit PlayerThing(const PlayerInfo&, tgui::Label::Ptr scoreLabel, float radius);
+    explicit PlayerThing(const PlayerInfo&, tgui::Label::Ptr scoreLabel, float radius, int vel);
 
     void move(double timeStep);
 
@@ -61,8 +60,8 @@ private:
 
     sf::CircleShape shape_;
     double direction_ = 0.0; // in degrees
-    int vel_ = 100; // pixels per seconds
-    double turnDegrees_ = 160;
+    int vel_; // pixels per seconds
+    double turnDegrees_ = 130;
 
     uint32_t score_ = 0;
     tgui::Label::Ptr scoreLabel_;
@@ -71,7 +70,8 @@ private:
 
     // gap logic
     bool gap_ = false;
-    std::chrono::steady_clock::time_point switchTime_ = {};
+    sf::Clock gapSwitchTimer_;
+    sf::Time gapSwitchDuration_;
 
     std::vector<TimedEffect> effects_;
 };

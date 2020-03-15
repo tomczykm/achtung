@@ -6,16 +6,10 @@
 #include "app/Log.hpp"
 #include "app/Utils.hpp"
 
-namespace chrono = std::chrono;
-
-namespace
-{
-constexpr std::chrono::milliseconds GAP_TIME{240};
-}
-
-PlayerThing::PlayerThing(const PlayerInfo& info, tgui::Label::Ptr scoreLabel, float radius):
+PlayerThing::PlayerThing(const PlayerInfo& info, tgui::Label::Ptr scoreLabel, float radius, int vel):
     info_{info},
     shape_{radius},
+    vel_{vel},
     scoreLabel_{scoreLabel}
 {
     shape_.setOrigin(radius, radius);
@@ -34,7 +28,7 @@ void PlayerThing::move(double timeStep) {
     if (direction_ < 0) direction_ += 360;
     else if (direction_ >= 360) direction_ -= 360;
 
-    if (chrono::steady_clock::now() >= switchTime_) {
+    if (gapSwitchTimer_.getElapsedTime() >= gapSwitchDuration_) {
         gapSwitch();
     }
 
@@ -75,7 +69,9 @@ void PlayerThing::createTrail(std::deque<TrailThing>& trails) const {
 
 void PlayerThing::gapSwitch() {
     gap_ = !gap_;
-    switchTime_ = chrono::steady_clock::now() + (gap_ ? GAP_TIME : chrono::milliseconds(xor_rand::next( 1800, 3900 )));
+    const auto gapTime = sf::seconds(5 * shape_.getRadius() / vel_);
+    gapSwitchDuration_ = gap_ ? gapTime : sf::milliseconds(xor_rand::next(1800, 3900));
+    gapSwitchTimer_.restart();
 }
 
 bool PlayerThing::checkCollision(const sf::Shape &o) const {

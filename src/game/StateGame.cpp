@@ -15,6 +15,7 @@ constexpr uint32_t PLAY_AREA_POS_MAX = 600;
 
 constexpr auto playerToGameAreaSizeRatio = 253.334f;
 constexpr auto pickMeUpToGameAreaSizeRatio = 32.2f;
+constexpr auto playerSpeedToGameAreaSizeRatio = 7.6f;
 
 AssetManager::TextureSet gameTextures = {
         AssetManager::Texture::SelfHaste,
@@ -25,7 +26,7 @@ AssetManager::TextureSet gameTextures = {
         AssetManager::Texture::RandomPickMeUp
 };
 
-}
+}  // namespace
 
 StateGame::StateGame(const Application::Interface& ctx, const std::vector<PlayerInfo>& infos):
     app_{ctx},
@@ -89,6 +90,7 @@ void StateGame::render() {
 
 void StateGame::initializePlayers(const std::vector<PlayerInfo>& infos) {
     const auto radius = playAreaSideLength_ / playerToGameAreaSizeRatio;
+    const auto velocity = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
     auto scoresPanel = app_.getWidget<tgui::Panel>("Scores");
     auto i = 0u;
     for (const auto& info : infos) {
@@ -110,7 +112,7 @@ void StateGame::initializePlayers(const std::vector<PlayerInfo>& infos) {
         scoreLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
         scoresPanel->add(scoreLabel);
 
-        players_.emplace_back(info, scoreLabel, radius);
+        players_.emplace_back(info, scoreLabel, radius, velocity);
 
         ++i;
     }
@@ -274,13 +276,13 @@ PickMeUp::OnPickUp StateGame::makeOpponentEffect(OnPickUp onPickUp) {
 }
 
 void StateGame::addHaste(PlayerIt player, sf::Time duration) {
-    constexpr auto VEL_CHANGE = 110;
+    const auto velChange = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
     constexpr auto DEG_CHANGE = 9;
-    player->changeVelocity(VEL_CHANGE);
+    player->changeVelocity(velChange);
     player->changeTurn(DEG_CHANGE);
-    player->addTimedEffect(duration, [this, name=player->name()] () {
+    player->addTimedEffect(duration, [this, velChange, name=player->name()] () {
         auto player = getPlayer(name);
-        player->changeVelocity(-VEL_CHANGE);
+        player->changeVelocity(-velChange);
         player->changeTurn(-DEG_CHANGE);
     });
 }

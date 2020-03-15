@@ -10,4 +10,3 @@ TrailThing::TrailThing(float x, float y, float ang, float rad, sf::Color c):
     shape_.setPosition({x, y});
     shape_.setFillColor(c);
 }
-

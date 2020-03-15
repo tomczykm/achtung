@@ -126,15 +126,19 @@ bool StateGame::checkCollisions(PlayerThing& player) {
         }
     }
 
-    // following code fairly shoddy, better come up with a better idea on skipping later:
+    // following code is fairly shoddy, better come up with a better idea for collisions later:
     // the reason we skip the newest bunch of trail segments is that
     // we don't want to check if we collide with segments we just created
     // (we obviously do, they're right underneath and we don't want to die immediately)
 
-    constexpr auto SKIP_TRAILS = 15u;  // todo: fix, hardcoding this value will result in instakill with several players in the game
-    if (trails_.size() > SKIP_TRAILS) {
-        for (auto t = trails_.begin() + SKIP_TRAILS; t != trails_.end(); t++) {
-            if (!player.isGap() && player.checkCollision(t->getShape())) {
+    auto toSkip = 15u;
+    if (trails_.size() > toSkip) {
+        for (const auto& t: trails_) {
+            if (t.getShape().getFillColor() == player.getColor() && toSkip > 0) {
+                --toSkip;
+                continue;
+            }
+            if (!player.isGap() && player.checkCollision(t.getShape())) {
                 player.kill();
                 return true;
             }
@@ -145,7 +149,7 @@ bool StateGame::checkCollisions(PlayerThing& player) {
     while (pickmeup != pickmeups_.end()) {
         if (player.checkCollision(pickmeup->getShape())) {
             print::info("{} got a pickmeup", player.name());
-            player.applyHaste(sf::milliseconds(2500));
+            pickmeup->onPickUp(player.name());
             pickmeup = pickmeups_.erase(pickmeup);
         } else {
             ++pickmeup;
@@ -175,9 +179,27 @@ void StateGame::awardPoints() {
 
 bool StateGame::victoryGoalAchieved() {
     for (const auto& p : players_) {
-        if (p.getScore() == scoreVictoryGoal_) return true;
+        if (p.getScore() >= scoreVictoryGoal_) return true;
     }
     return false;
+}
+
+StateGame::PlayerIt StateGame::getPlayer(std::string_view name) {
+    return std::find_if(players_.begin(), players_.end(), [name] (const auto& p) {
+        return p.name() == name;
+    });
+}
+
+PickMeUp::OnPickUp StateGame::getRandomPickMeUpEffect() {
+    auto type = xor_rand::next(1, static_cast<int>(PickUpType::Count)-1);
+
+    switch(static_cast<PickUpType>(type)) {
+    case PickUpType::SelfHaste:
+        return makeSelfHaste();
+    default:
+        print::error("bad pickup type {}", type);
+        throw std::runtime_error{fmt::format("bad pickup type {}", type)};
+    }
 }
 
 void StateGame::resetPickmeupSpawnTimer() {
@@ -232,7 +254,8 @@ void StateGame::Running::onTick() {
         gs.resetPickmeupSpawnTimer();
         gs.pickmeups_.emplace_back(
             xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
-            xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX)
+            xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
+            gs.getRandomPickMeUpEffect()
         );
     }
 

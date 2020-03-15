@@ -11,7 +11,6 @@ namespace chrono = std::chrono;
 namespace
 {
 constexpr int BASE_RADIUS = 3;
-constexpr double TURN_DEG = 160;
 constexpr std::chrono::milliseconds GAP_TIME{240};
 }
 
@@ -28,9 +27,9 @@ void PlayerThing::move(double timeStep) {
     endExpiredEffects();
 
     if (sf::Keyboard::isKeyPressed(info_.right)) {
-        direction_ += timeStep * TURN_DEG;
+        direction_ += timeStep * turnDegrees_;
     } else if (sf::Keyboard::isKeyPressed(info_.left)) {
-        direction_ -= timeStep * TURN_DEG;
+        direction_ -= timeStep * turnDegrees_;
     }
 
     if (direction_ < 0) direction_ += 360;
@@ -102,25 +101,4 @@ void PlayerThing::endExpiredEffects() {
     effects_.erase(std::remove_if(effects_.begin(), effects_.end(), [] (const auto& effect) {
         return effect.isExpired();
     }), effects_.end());
-}
-
-void PlayerThing::applyHaste(sf::Time duration) {
-    constexpr auto VELOCITY_MODIFIER = 100;
-    print::info("Apply haste to {}", info_.name);
-
-    vel_ += VELOCITY_MODIFIER;
-    auto onExpire = [this] () { print::info("haste end"); vel_ -= VELOCITY_MODIFIER; };
-
-    effects_.emplace_back(duration, onExpire);
-}
-
-void PlayerThing::applySlow(sf::Time duration) {
-    constexpr auto VELOCITY_MODIFIER = 33;
-    print::info("Apply slow to {}", info_.name);
-    if (vel_ <= VELOCITY_MODIFIER) return;
-
-    vel_ -= VELOCITY_MODIFIER;
-    auto onExpire = [this] () { vel_ += VELOCITY_MODIFIER; };
-
-    effects_.emplace_back(duration, onExpire);
 }

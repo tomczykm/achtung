@@ -30,7 +30,12 @@ private:
     void awardPoints();
     bool victoryGoalAchieved();
 
+    PlayerIt getPlayer(std::string_view);
+    PickMeUp::OnPickUp getRandomPickMeUpEffect();
     void resetPickmeupSpawnTimer();
+
+    PickMeUp::OnPickUp makeSelfHaste();
+
     template <typename State>
     void changeState() { state_ = std::make_unique<State>(*this); }
 

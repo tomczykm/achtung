@@ -34,6 +34,8 @@ private:
 
     void recalculatePlayerListPositions();
 
+    void startGame();
+
     Application::Interface app_;
     std::map<PlayerId, PlayerInfo> playerInfos_;
 

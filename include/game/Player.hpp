@@ -28,6 +28,8 @@ public:
 
     const sf::CircleShape& getShape() const { return shape_; }
 
+    sf::Color getColor() const { return info_.color; }
+
     bool checkCollision(const sf::Shape&) const;
 
     void addPoint();
@@ -37,11 +39,19 @@ public:
     bool isDead() const { return dead_; }
     bool isGap() const { return gap_; }
 
-    std::string_view name() const { return info_.name; }
+    const std::string& name() const { return info_.name; }
 
-    // timed effects
-    void applyHaste(sf::Time duration);
-    void applySlow(sf::Time duration);
+    void changeVelocity(int d) {
+        vel_ += d;
+    }
+    void changeTurn(int d) {
+        turnDegrees_ += d;
+    }
+
+    template <typename... Ts>
+    void addTimedEffect(Ts&&... args) {
+        effects_.emplace_back(std::forward<Ts>(args)...);
+    }
 
 private:
     void gapSwitch();
@@ -52,6 +62,7 @@ private:
     sf::CircleShape shape_;
     double direction_ = 0.0; // in degrees
     int vel_ = 100; // pixels per seconds
+    double turnDegrees_ = 160;
 
     uint32_t score_ = 0;
     tgui::Label::Ptr scoreLabel_;

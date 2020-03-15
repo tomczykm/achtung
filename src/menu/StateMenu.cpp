@@ -1,6 +1,7 @@
 #include "menu/StateMenu.hpp"
 
 #include <algorithm>
+#include <iterator>
 
 #include "game/StateGame.hpp"
 #include "app/ResourceManager.hpp"
@@ -110,7 +111,7 @@ void StateMenu::loadGui() {
     });
 
     app_.gui.get("StartGame")->connect("pressed", [this] () {
-        if (canStartGame()) app_.enterState<StateGame>(preparePlayerInfos());
+        startGame();
     });
 
     app_.gui.get("QuitGame")->connect("pressed", [this] () {
@@ -123,7 +124,14 @@ bool StateMenu::canStartGame() {
         const auto& p = pair.second;
         return p.left != sf::Keyboard::Unknown && p.right != sf::Keyboard::Unknown && p.name != "";
     });
-    return playerInfos_.size() > 1 && playersHaveSetValues;
+
+    std::set<std::string> names;
+    std::transform(playerInfos_.begin(), playerInfos_.end(), std::inserter(names, names.begin()), [] (auto& i) {
+        return i.second.name;
+    });
+    auto playersHaveUniqueNames = names.size() == playerInfos_.size();
+
+    return playerInfos_.size() > 1 && playersHaveSetValues && playersHaveUniqueNames;
 }
 
 std::size_t StateMenu::getCurrentNumPlayers() {
@@ -177,5 +185,11 @@ void StateMenu::recalculatePlayerListPositions() {
     std::size_t i = 0;
     for (auto& panel : playerPanels) {
         panel->setPosition({0, PLAYER_LIST_ENTRY_HEIGHT*(i++)});
+    }
+}
+
+void StateMenu::startGame() {
+    if (canStartGame()) {
+        app_.enterState<StateGame>(preparePlayerInfos());
     }
 }

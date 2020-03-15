@@ -35,6 +35,9 @@ private:
     void resetPickmeupSpawnTimer();
 
     PickMeUp::OnPickUp makeSelfHaste();
+    PickMeUp::OnPickUp makeSelfSlow();
+    PickMeUp::OnPickUp makeOpponentHaste();
+    PickMeUp::OnPickUp makeOpponentSlow();
 
     template <typename State>
     void changeState() { state_ = std::make_unique<State>(*this); }

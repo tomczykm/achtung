@@ -200,6 +200,12 @@ PickMeUp::OnPickUp StateGame::getRandomPickMeUpEffect() {
     switch(static_cast<PickUpType>(type)) {
     case PickUpType::SelfHaste:
         return makeSelfHaste();
+    case PickUpType::OpponentHaste:
+        return makeOpponentHaste();
+    case PickUpType::SelfSlow:
+        return makeSelfSlow();
+    case PickUpType::OpponentSlow:
+        return makeOpponentSlow();
     default:
         print::error("bad pickup type {}", type);
         throw std::runtime_error{fmt::format("bad pickup type {}", type)};

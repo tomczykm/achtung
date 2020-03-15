@@ -11,9 +11,9 @@ enum class PickUpType {
     Null = 0,
 
     SelfHaste,
-    // OpponentHaste,
-    // SelfSlow,
-    // OpponentSlow,
+    OpponentHaste,
+    SelfSlow,
+    OpponentSlow,
 
     Count
 };

@@ -4,15 +4,16 @@
 #include "CMakeDefine.hpp"
 
 Application::Application():
-    settings_{"settings.dat"},
     gui_{window_},
     gameState_{std::make_unique<StateMenu>(Interface{*this})}
 {
     sf::ContextSettings windowSettings;
     windowSettings.antialiasingLevel = 8;
 
-    window_.create(sf::VideoMode(settings_.getResW(), settings_.getResH()),
-        PROJECT_NAME, sf::Style::Titlebar | sf::Style::Close, windowSettings);
+    const auto fullscreenFlag = config_.get<bool>(Setting::Fullscreen) ? sf::Style::Fullscreen : 0;
+
+    window_.create(sf::VideoMode{config_.get<int>(Setting::ResWidth), config_.get<int>(Setting::ResHeight)},
+        PROJECT_NAME, sf::Style::Titlebar | sf::Style::Close | fullscreenFlag, windowSettings);
     window_.setVerticalSyncEnabled(true);
     window_.setPosition({100, 100});
 

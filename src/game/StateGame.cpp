@@ -16,7 +16,7 @@ constexpr uint32_t PLAY_AREA_POS_MAX = 600;
 StateGame::StateGame(const Application::Interface& ctx, const std::vector<PlayerInfo>& infos):
     app_{ctx},
     scoreVictoryGoal_{(infos.size()-1)*10},
-    border_{0.05 * app_.settings.getResH(), 0.9 * app_.settings.getResH()}
+    border_{0.05 * app_.config.get<int>(Setting::ResHeight), 0.9 * app_.config.get<int>(Setting::ResHeight)}
 {
     app_.window.setMouseCursorVisible(false);
 

@@ -7,7 +7,7 @@
 #include <TGUI/TGUI.hpp>
 
 #include "app/Log.hpp"
-#include "app/SettingsManager.hpp"
+#include "app/ConfigManager.hpp"
 #include "app/IGameState.hpp"
 #include "app/Utils.hpp"
 
@@ -20,7 +20,7 @@ public:
     class Interface;
 
 private:
-    SettingsManager settings_;
+    ConfigManager config_;
     sf::RenderWindow window_;
     tgui::Gui gui_;
 
@@ -32,7 +32,7 @@ private:
 class Application::Interface
 {
 public:
-    SettingsManager& settings;
+    ConfigManager& config;
     sf::RenderWindow& window;
     tgui::Gui& gui;
 
@@ -57,7 +57,7 @@ public:
 private:
     friend class Application;
     explicit Interface(Application& app):
-        settings{app.settings_},
+        config{app.config_},
         window{app.window_},
         gui{app.gui_},
         app_{app}

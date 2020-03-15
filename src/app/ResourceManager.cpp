@@ -1,9 +1,10 @@
 #include "app/ResourceManager.hpp"
 
 #include <array>
+#include <filesystem>
 #include <fstream>
-#include <string>
 #include <stdexcept>
+#include <string>
 
 #include <fmt/format.h>
 
@@ -11,9 +12,8 @@
 
 namespace ResourceManager {
 
-std::stringstream openResource(std::string_view resourceName) {
+std::string getActualFileName(std::string_view resourceName) {
     print::info("{}: {}", __func__, resourceName);
-
     const std::array<std::string, 4> fileNames = {
         fmt::format("res/{}", resourceName),
         resourceName.data(),
@@ -21,16 +21,20 @@ std::stringstream openResource(std::string_view resourceName) {
         fmt::format("../{}", resourceName)
     };
 
-    std::ifstream file;
-    for (const std::string_view name: fileNames) {
-        file.open(name.data());
-        if (file) {
+    for (const auto& name: fileNames) {
+        if (std::filesystem::exists(name)) {
             print::info("{}: success! the filename is {}", __func__, name);
-            break;
+            return name;
         }
     }
 
-    if (!file) throw std::invalid_argument{resourceName.data()};
+    throw std::invalid_argument{resourceName.data()};
+}
+
+std::stringstream openResource(std::string_view resourceName) {
+    print::info("{}: {}", __func__, resourceName);
+
+    std::ifstream file{getActualFileName(resourceName)};
 
     std::stringstream str;
     str << file.rdbuf();

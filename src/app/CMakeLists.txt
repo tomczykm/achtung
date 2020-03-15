@@ -1,6 +1,6 @@
 target_sources(${PROJECT_NAME} PUBLIC
     Application.cpp
+    ConfigManager.cpp
     ResourceManager.cpp
-    SettingsManager.cpp
     Utils.cpp
 )

@@ -199,17 +199,67 @@ PickMeUp::OnPickUp StateGame::getRandomPickMeUpEffect() {
 
     switch(static_cast<PickUpType>(type)) {
     case PickUpType::SelfHaste:
-        return makeSelfHaste();
+        return makeSelfEffect([this] (auto player) {
+            addHaste(player, sf::milliseconds(3500));
+        });
     case PickUpType::OpponentHaste:
-        return makeOpponentHaste();
+        return makeOpponentEffect([this] (auto player) {
+            addHaste(player, sf::milliseconds(2500));
+        });
     case PickUpType::SelfSlow:
-        return makeSelfSlow();
+        return makeSelfEffect([this] (auto player) {
+            addSlow(player, sf::milliseconds(3500));
+        });
     case PickUpType::OpponentSlow:
-        return makeOpponentSlow();
+        return makeOpponentEffect([this] (auto player) {
+            addSlow(player, sf::milliseconds(3000));
+        });
     default:
         print::error("bad pickup type {}", type);
         throw std::runtime_error{fmt::format("bad pickup type {}", type)};
     }
+}
+
+template <typename UpdatePlayer>
+PickMeUp::OnPickUp StateGame::makeSelfEffect(UpdatePlayer update) {
+    return [this, update] (auto name) {
+        update(getPlayer(name));
+    };
+}
+
+template <typename UpdatePlayer>
+PickMeUp::OnPickUp StateGame::makeOpponentEffect(UpdatePlayer update) {
+    return [this, update] (auto name) {
+        auto pickedBy = getPlayer(name);
+        for (auto player = players_.begin(); player != players_.end(); ++player) {
+            if (player == pickedBy) continue;
+            update(player);
+        }
+    };
+}
+
+void StateGame::addHaste(PlayerIt player, sf::Time duration) {
+    constexpr auto VEL_CHANGE = 100;
+    constexpr auto DEG_CHANGE = -15;
+    player->changeVelocity(VEL_CHANGE);
+    player->changeTurn(DEG_CHANGE);
+    player->addTimedEffect(duration, [this, name=player->name()] () {
+        auto player = getPlayer(name);
+        player->changeVelocity(-VEL_CHANGE);
+        player->changeTurn(-DEG_CHANGE);
+    });
+}
+
+void StateGame::addSlow(PlayerIt player, sf::Time duration) {
+    constexpr auto VEL_CHANGE = -33;
+    constexpr auto DEG_CHANGE = 5;
+    player->changeVelocity(VEL_CHANGE);
+    player->changeTurn(DEG_CHANGE);
+    player->addTimedEffect(duration, [this, name=player->name()] () {
+        auto player = getPlayer(name);
+        player->changeVelocity(-VEL_CHANGE);
+        player->changeTurn(-DEG_CHANGE);
+    });
 }
 
 void StateGame::resetPickmeupSpawnTimer() {

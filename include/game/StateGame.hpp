@@ -34,10 +34,13 @@ private:
     PickMeUp::OnPickUp getRandomPickMeUpEffect();
     void resetPickmeupSpawnTimer();
 
-    PickMeUp::OnPickUp makeSelfHaste();
-    PickMeUp::OnPickUp makeSelfSlow();
-    PickMeUp::OnPickUp makeOpponentHaste();
-    PickMeUp::OnPickUp makeOpponentSlow();
+    template <typename UpdatePlayer>
+    PickMeUp::OnPickUp makeSelfEffect(UpdatePlayer);
+    template <typename UpdatePlayer>
+    PickMeUp::OnPickUp makeOpponentEffect(UpdatePlayer);
+
+    void addHaste(PlayerIt p, sf::Time);
+    void addSlow(PlayerIt p, sf::Time);
 
     template <typename State>
     void changeState() { state_ = std::make_unique<State>(*this); }

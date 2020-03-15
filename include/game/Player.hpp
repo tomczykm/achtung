@@ -19,7 +19,7 @@ struct PlayerInfo {
 
 class PlayerThing {
 public:
-    explicit PlayerThing(const PlayerInfo&, tgui::Label::Ptr scoreLabel);
+    explicit PlayerThing(const PlayerInfo&, tgui::Label::Ptr scoreLabel, float radius);
 
     void move(double timeStep);
 

@@ -13,19 +13,26 @@ namespace
 constexpr uint32_t PLAY_AREA_POS_MIN = 100;
 constexpr uint32_t PLAY_AREA_POS_MAX = 600;
 
+constexpr auto playerToGameAreaSizeRatio = 253.334f;
+constexpr auto pickMeUpToGameAreaSizeRatio = 32.2f;
+
 AssetManager::TextureSet gameTextures = {
         AssetManager::Texture::SelfHaste,
         AssetManager::Texture::OpponentHaste,
         AssetManager::Texture::SelfSlow,
-        AssetManager::Texture::OpponentSlow
+        AssetManager::Texture::OpponentSlow,
+        AssetManager::Texture::ClearTrails,
+        AssetManager::Texture::RandomPickMeUp
 };
 
 }
 
 StateGame::StateGame(const Application::Interface& ctx, const std::vector<PlayerInfo>& infos):
     app_{ctx},
+    playAreaSideLength_{0.9 * app_.config.get<int>(Setting::ResHeight)},
+    pickMeUpRadius_{playAreaSideLength_ / pickMeUpToGameAreaSizeRatio},
     scoreVictoryGoal_{(infos.size()-1)*10},
-    border_{0.05 * app_.config.get<int>(Setting::ResHeight), 0.9 * app_.config.get<int>(Setting::ResHeight)}
+    border_{0.05 * app_.config.get<int>(Setting::ResHeight), playAreaSideLength_}
 {
     app_.window.setMouseCursorVisible(false);
 
@@ -81,6 +88,7 @@ void StateGame::render() {
 }
 
 void StateGame::initializePlayers(const std::vector<PlayerInfo>& infos) {
+    const auto radius = playAreaSideLength_ / playerToGameAreaSizeRatio;
     auto scoresPanel = app_.getWidget<tgui::Panel>("Scores");
     auto i = 0u;
     for (const auto& info : infos) {
@@ -102,7 +110,7 @@ void StateGame::initializePlayers(const std::vector<PlayerInfo>& infos) {
         scoreLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
         scoresPanel->add(scoreLabel);
 
-        players_.emplace_back(info, scoreLabel);
+        players_.emplace_back(info, scoreLabel, radius);
 
         ++i;
     }
@@ -211,6 +219,7 @@ void StateGame::createRandomPickMeUp() {
     pickmeups_.emplace_back(
         xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
         xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
+        pickMeUpRadius_,
         app_.assets.getTexture(texture),
         onPickMeUp
     );

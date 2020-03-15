@@ -10,16 +10,15 @@ namespace chrono = std::chrono;
 
 namespace
 {
-constexpr int BASE_RADIUS = 3;
 constexpr std::chrono::milliseconds GAP_TIME{240};
 }
 
-PlayerThing::PlayerThing(const PlayerInfo& info, tgui::Label::Ptr scoreLabel):
+PlayerThing::PlayerThing(const PlayerInfo& info, tgui::Label::Ptr scoreLabel, float radius):
     info_{info},
-    shape_{BASE_RADIUS},
+    shape_{radius},
     scoreLabel_{scoreLabel}
 {
-    shape_.setOrigin(BASE_RADIUS, BASE_RADIUS);
+    shape_.setOrigin(radius, radius);
     shape_.setFillColor(sf::Color::Yellow);
 }
 

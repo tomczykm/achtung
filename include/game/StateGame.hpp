@@ -49,6 +49,9 @@ private:
 
     Application::Interface app_;
 
+    float playAreaSideLength_;
+    float pickMeUpRadius_;
+
     std::unique_ptr<RoundState> state_;
 
     std::deque<TrailThing> trails_;

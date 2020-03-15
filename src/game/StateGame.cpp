@@ -1,6 +1,7 @@
 #include "game/StateGame.hpp"
 
 #include <algorithm>
+#include <functional>
 
 #include "menu/StateMenu.hpp"
 #include "app/AssetManager.hpp"
@@ -63,7 +64,7 @@ void StateGame::logic() {
 
 void StateGame::render() {
     for (const auto& p: pickmeups_) {
-        app_.window.draw(p.getShape());
+        app_.window.draw(p.getSprite());
     }
 
     for (const auto& t: trails_) {
@@ -193,7 +194,7 @@ bool StateGame::victoryGoalAchieved() {
     std::transform(players_.cbegin(), players_.cend(), std::back_inserter(scores), [] (const auto& p) {
         return p.getScore();
     });
-    std::sort(scores.begin(), scores.end());
+    std::sort(scores.begin(), scores.end(), std::greater<uint32_t>{});
 
     return scores.front() >= scoreVictoryGoal_
         && scores.front() - *(scores.begin()+1) >= 2; // first place needs to be at least two points ahead
@@ -205,26 +206,37 @@ StateGame::PlayerIt StateGame::getPlayer(std::string_view name) {
     });
 }
 
-PickMeUp::OnPickUp StateGame::getRandomPickMeUpEffect() {
-    auto type = xor_rand::next(1, static_cast<int>(PickUpType::Count)-1);
+void StateGame::createRandomPickMeUp() {
+    resetPickmeupSpawnTimer();
+    auto [onPickMeUp, texture] = getRandomPickMeUpEffect();
+    pickmeups_.emplace_back(
+        xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
+        xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
+        app_.assets.getTexture(texture),
+        onPickMeUp
+    );
+}
+
+std::pair<PickMeUp::OnPickUp, AssetManager::Texture> StateGame::getRandomPickMeUpEffect() {
+    const auto type = xor_rand::next(1, static_cast<int>(PickUpType::Count)-1);
 
     switch(static_cast<PickUpType>(type)) {
     case PickUpType::SelfHaste:
-        return makeSelfEffect([this] (auto player) {
+        return std::make_pair(makeSelfEffect([this] (auto player) {
             addHaste(player, sf::milliseconds(3500));
-        });
+        }), AssetManager::Texture::SelfHaste);
     case PickUpType::OpponentHaste:
-        return makeOpponentEffect([this] (auto player) {
+        return std::make_pair(makeOpponentEffect([this] (auto player) {
             addHaste(player, sf::milliseconds(2500));
-        });
+        }), AssetManager::Texture::OpponentHaste);
     case PickUpType::SelfSlow:
-        return makeSelfEffect([this] (auto player) {
+        return std::make_pair(makeSelfEffect([this] (auto player) {
             addSlow(player, sf::milliseconds(3500));
-        });
+        }), AssetManager::Texture::SelfSlow);
     case PickUpType::OpponentSlow:
-        return makeOpponentEffect([this] (auto player) {
+        return std::make_pair(makeOpponentEffect([this] (auto player) {
             addSlow(player, sf::milliseconds(3000));
-        });
+        }), AssetManager::Texture::OpponentSlow);
     default:
         print::error("bad pickup type {}", type);
         throw std::runtime_error{fmt::format("bad pickup type {}", type)};
@@ -322,12 +334,7 @@ void StateGame::Running::onTick() {
     }
 
     if (gs.pickmeupSpawnTimer_.getElapsedTime() > gs.timeUntilNextPickmeupSpawn_) {
-        gs.resetPickmeupSpawnTimer();
-        gs.pickmeups_.emplace_back(
-            xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
-            xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
-            gs.getRandomPickMeUpEffect()
-        );
+        gs.createRandomPickMeUp();
     }
 
     if (playerDied) {

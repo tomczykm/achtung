@@ -22,9 +22,10 @@ class PickMeUp {
 public:
     using OnPickUp = std::function<void(std::string pName)>;
 
-    PickMeUp(uint32_t xPos, uint32_t yPos, OnPickUp);
+    PickMeUp(uint32_t xPos, uint32_t yPos, const sf::Texture&, OnPickUp);
 
     const sf::CircleShape& getShape() const { return shape_; }
+    const sf::Sprite& getSprite() const { return sprite_; }
 
     void onPickUp(std::string pName) {
         print::info("{}: {} got something", __func__, pName);
@@ -33,5 +34,7 @@ public:
 
 private:
     sf::CircleShape shape_;
+    sf::Sprite sprite_;
+
     OnPickUp onPickUp_;
 };

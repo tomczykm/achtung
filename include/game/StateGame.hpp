@@ -31,7 +31,9 @@ private:
     bool victoryGoalAchieved();
 
     PlayerIt getPlayer(std::string_view);
-    PickMeUp::OnPickUp getRandomPickMeUpEffect();
+
+    void createRandomPickMeUp();
+    std::pair<PickMeUp::OnPickUp, AssetManager::Texture> getRandomPickMeUpEffect();
     void resetPickmeupSpawnTimer();
 
     template <typename UpdatePlayer>

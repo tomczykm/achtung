@@ -9,20 +9,34 @@
 PlayerThing::PlayerThing(const PlayerInfo& info, tgui::Label::Ptr scoreLabel, float radius, int vel):
     info_{info},
     shape_{radius},
+    recShape_{{radius*2, radius*2}},
     vel_{vel},
     scoreLabel_{scoreLabel}
 {
     shape_.setOrigin(radius, radius);
     shape_.setFillColor(sf::Color::Yellow);
+
+    recShape_.setOrigin(radius, radius);
+    recShape_.setFillColor(sf::Color::Yellow);
+}
+
+const sf::Shape& PlayerThing::getShape() const {
+    if (rightAngleMovement_) {
+        return recShape_;
+    } else {
+        return shape_;
+    }
 }
 
 void PlayerThing::move(double timeStep) {
     endExpiredEffects();
 
-    if (sf::Keyboard::isKeyPressed(info_.right)) {
-        direction_ += timeStep * turnDegrees_;
-    } else if (sf::Keyboard::isKeyPressed(info_.left)) {
-        direction_ -= timeStep * turnDegrees_;
+    if (!rightAngleMovement_) {
+        if (sf::Keyboard::isKeyPressed(info_.right)) {
+            direction_ += timeStep * turnDegrees_;
+        } else if (sf::Keyboard::isKeyPressed(info_.left)) {
+            direction_ -= timeStep * turnDegrees_;
+        }
     }
 
     if (direction_ < 0) direction_ += 360;
@@ -33,10 +47,20 @@ void PlayerThing::move(double timeStep) {
     }
 
     auto [xPos, yPos] = shape_.getPosition();
-    shape_.setPosition(
+    setPosition(
         xPos + (timeStep * vel_ * sin(-(M_PI/180)*direction_)),
         yPos + (timeStep * vel_ * cos(-(M_PI/180)*direction_))
     );
+}
+
+void PlayerThing::input(const sf::Event& e) {
+    if (rightAngleMovement_ && e.type == sf::Event::KeyPressed) {
+        if (e.key.code == info_.right) {
+            direction_ += 90;
+        } else if (e.key.code == info_.left) {
+            direction_ -= 90;
+        }
+    }
 }
 
 void PlayerThing::newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailThing>& trails) {
@@ -67,9 +91,14 @@ void PlayerThing::createTrail(std::deque<TrailThing>& trails) const {
     }
 }
 
+void PlayerThing::setRightAngleMovement(bool v) {
+    rightAngleMovement_ = v;
+    recShape_.setRotation(direction_);
+}
+
 void PlayerThing::gapSwitch() {
     gap_ = !gap_;
-    const auto gapTime = sf::seconds(5 * shape_.getRadius() / vel_);
+    const auto gapTime = sf::seconds(6 * shape_.getRadius() / vel_);
     gapSwitchDuration_ = gap_ ? gapTime : sf::milliseconds(xor_rand::next(1800, 3900));
     gapSwitchTimer_.restart();
 }
@@ -96,4 +125,9 @@ void PlayerThing::endExpiredEffects() {
     effects_.erase(std::remove_if(effects_.begin(), effects_.end(), [] (const auto& effect) {
         return effect.isExpired();
     }), effects_.end());
+}
+
+void PlayerThing::setPosition(float x, float y) {
+    recShape_.setPosition(x, y);
+    shape_.setPosition(x, y);
 }

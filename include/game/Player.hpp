@@ -21,11 +21,12 @@ public:
     explicit PlayerThing(const PlayerInfo&, tgui::Label::Ptr scoreLabel, float radius, int vel);
 
     void move(double timeStep);
+    void input(const sf::Event&);
 
     void newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailThing>&);
     void createTrail(std::deque<TrailThing>&) const;
 
-    const sf::CircleShape& getShape() const { return shape_; }
+    const sf::Shape& getShape() const;
     sf::Color getColor() const { return info_.color; }
     int getVelocity() const { return vel_; }
 
@@ -40,12 +41,9 @@ public:
 
     const std::string& name() const { return info_.name; }
 
-    void changeVelocity(int d) {
-        vel_ += d;
-    }
-    void changeTurn(int d) {
-        turnDegrees_ += d;
-    }
+    void changeVelocity(int d) { vel_ += d; }
+    void changeTurn(int d) { turnDegrees_ += d; }
+    void setRightAngleMovement(bool v);
 
     template <typename... Ts>
     void addTimedEffect(Ts&&... args) {
@@ -56,12 +54,17 @@ private:
     void gapSwitch();
     void endExpiredEffects();
 
+    void setPosition(float x, float y);
+
     PlayerInfo info_;
 
     sf::CircleShape shape_;
+    sf::RectangleShape recShape_; // for right angle movement
+
     double direction_ = 0.0; // in degrees
     int vel_; // pixels per seconds
     double turnDegrees_ = 130;
+    bool rightAngleMovement_ = false;
 
     uint32_t score_ = 0;
     tgui::Label::Ptr scoreLabel_;

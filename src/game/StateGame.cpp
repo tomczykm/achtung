@@ -22,6 +22,8 @@ AssetManager::TextureSet gameTextures = {
         AssetManager::Texture::OpponentHaste,
         AssetManager::Texture::SelfSlow,
         AssetManager::Texture::OpponentSlow,
+        AssetManager::Texture::SelfRightAngle,
+        AssetManager::Texture::OpponentRightAngle,
         AssetManager::Texture::ClearTrails,
         AssetManager::Texture::RandomPickMeUp
 };
@@ -62,6 +64,10 @@ void StateGame::input(const sf::Event& event) {
             state_->onEscape();
             break;
         default: break;
+        }
+
+        for (auto p = players_.begin(); p != lastAlive_; ++p) {
+            p->input(event);
         }
     }
 }
@@ -251,6 +257,14 @@ std::pair<PickMeUp::OnPickUp, AssetManager::Texture> StateGame::getRandomPickMeU
         return std::make_pair(makeSelfEffect([this] (auto) {
             trails_.clear();
         }), AssetManager::Texture::ClearTrails);
+    case PickUpType::SelfRightAngle:
+        return std::make_pair(makeSelfEffect([this] (auto player) {
+            addRightAngleMovement(player, sf::milliseconds(8500));
+        }), AssetManager::Texture::SelfRightAngle);
+    case PickUpType::OpponentRightAngle:
+        return std::make_pair(makeOpponentEffect([this] (auto player) {
+            addRightAngleMovement(player, sf::milliseconds(5500));
+        }), AssetManager::Texture::OpponentRightAngle);
     default:
         print::error("bad pickup type {}", type);
         throw std::runtime_error{fmt::format("bad pickup type {}", type)};
@@ -299,9 +313,17 @@ void StateGame::addSlow(PlayerIt player, sf::Time duration) {
     });
 }
 
+void StateGame::addRightAngleMovement(PlayerIt player, sf::Time duration) {
+    player->setRightAngleMovement(true);
+    player->addTimedEffect(duration, [this, name=player->name()] {
+        auto player = getPlayer(name);
+        player->setRightAngleMovement(false);
+    });
+}
+
 void StateGame::resetPickmeupSpawnTimer() {
     pickmeupSpawnTimer_.restart();
-    timeUntilNextPickmeupSpawn_ = sf::milliseconds(xor_rand::next(7500, 11500));
+    timeUntilNextPickmeupSpawn_ = sf::milliseconds(xor_rand::next(4500, 9000));
 }
 
 

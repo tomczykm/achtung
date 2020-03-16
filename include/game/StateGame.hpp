@@ -41,8 +41,9 @@ private:
     template <typename OnPickUp>
     PickMeUp::OnPickUp makeOpponentEffect(OnPickUp);
 
-    void addHaste(PlayerIt p, sf::Time);
-    void addSlow(PlayerIt p, sf::Time);
+    void addHaste(PlayerIt, sf::Time);
+    void addSlow(PlayerIt, sf::Time);
+    void addRightAngleMovement(PlayerIt, sf::Time);
 
     template <typename State>
     void changeState() { state_ = std::make_unique<State>(*this); }

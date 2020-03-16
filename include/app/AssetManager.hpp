@@ -16,6 +16,8 @@ public:
         OpponentHaste,
         SelfSlow,
         OpponentSlow,
+        SelfRightAngle,
+        OpponentRightAngle,
         ClearTrails,
         RandomPickMeUp
     };

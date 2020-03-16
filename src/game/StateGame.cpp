@@ -7,11 +7,7 @@
 #include "app/AssetManager.hpp"
 #include "app/Utils.hpp"
 
-namespace
-{
-// todo: pick a real values for these
-constexpr uint32_t PLAY_AREA_POS_MIN = 100;
-constexpr uint32_t PLAY_AREA_POS_MAX = 600;
+namespace {
 
 constexpr auto playerToGameAreaSizeRatio = 253.334f;
 constexpr auto pickMeUpToGameAreaSizeRatio = 32.2f;
@@ -46,10 +42,11 @@ AssetManager::TextureSet gameTextures = {
 
 StateGame::StateGame(const Application::Interface& ctx, const std::vector<PlayerInfo>& infos):
     app_{ctx},
+    playAreaCornerOffset_{0.05 * app_.config.get<int>(Setting::ResHeight)},
     playAreaSideLength_{0.9 * app_.config.get<int>(Setting::ResHeight)},
     pickMeUpRadius_{playAreaSideLength_ / pickMeUpToGameAreaSizeRatio},
     scoreVictoryGoal_{(infos.size()-1)*10},
-    border_{0.05 * app_.config.get<int>(Setting::ResHeight), playAreaSideLength_}
+    border_{playAreaCornerOffset_, playAreaSideLength_}
 {
     app_.window.setMouseCursorVisible(false);
 
@@ -248,8 +245,8 @@ void StateGame::createRandomPickMeUp() {
     auto [onPickMeUp, texture] = getRandomPickMeUpEffect();
     if (xor_rand::next(1, static_cast<int>(PickUpType::Count)) == 1) texture = AssetManager::Texture::RandomPickMeUp;
     pickmeups_.emplace_back(
-        xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
-        xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
+        xor_rand::next(playAreaCornerOffset_, playAreaCornerOffset_ + playAreaSideLength_ - 2*pickMeUpRadius_),
+        xor_rand::next(playAreaCornerOffset_, playAreaCornerOffset_ + playAreaSideLength_ - 2*pickMeUpRadius_),
         pickMeUpRadius_,
         app_.assets.getTexture(texture),
         onPickMeUp
@@ -340,13 +337,15 @@ void StateGame::resetPickmeupSpawnTimer() {
 }
 
 
-void StateGame::RoundBegin::onEnter() {
+void StateGame::RoundBegin::onEnterState() {
     gs.trails_.clear();
     gs.pickmeups_.clear();
     for (auto& player : gs.players_) {
         player.newRoundSetup(
-            xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
-            xor_rand::next(PLAY_AREA_POS_MIN, PLAY_AREA_POS_MAX),
+            xor_rand::next(gs.playAreaCornerOffset_ + 0.15 * gs.playAreaSideLength_,
+                gs.playAreaCornerOffset_ + 0.85 * gs.playAreaSideLength_),
+            xor_rand::next(gs.playAreaCornerOffset_ + 0.15 * gs.playAreaSideLength_,
+                gs.playAreaCornerOffset_ + 0.85 * gs.playAreaSideLength_),
             gs.trails_
         );
     }
@@ -362,7 +361,7 @@ void StateGame::RoundBegin::onEscape() {
 }
 
 
-void StateGame::Running::onEnter() {
+void StateGame::Running::onEnterState() {
     gs.moveTimer_.restart();
     gs.resetPickmeupSpawnTimer();
 }
@@ -412,7 +411,7 @@ void StateGame::RoundEnd::onEscape() {
 }
 
 
-void StateGame::GameEnd::onEnter() {
+void StateGame::GameEnd::onEnterState() {
     // todo: show end of game splash screen
 }
 

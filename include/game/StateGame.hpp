@@ -49,7 +49,9 @@ private:
 
     Application::Interface app_;
 
-    float playAreaSideLength_;
+    int playAreaCornerOffset_;
+    int playAreaSideLength_;
+
     float pickMeUpRadius_;
 
     std::unique_ptr<RoundState> state_;
@@ -70,7 +72,7 @@ private:
     sf::Time timeUntilNextPickmeupSpawn_;
 
     struct RoundState {
-        virtual void onEnter() = 0;
+        virtual void onEnterState() = 0;
         virtual void onSpacebar() = 0;
         virtual void onEscape() = 0;
         virtual void onTick() = 0;
@@ -82,40 +84,40 @@ private:
     static constexpr auto PRINT = "RoundState::{} ctor";
 
     struct RoundBegin : RoundState {
-        RoundBegin(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnter(); }
-        void onEnter() override;
+        RoundBegin(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
+        void onEnterState() override;
         void onSpacebar() override;
         void onEscape() override;
         void onTick() override {}
     };
 
     struct Running : RoundState {
-        Running(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnter(); }
-        void onEnter() override;
+        Running(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
+        void onEnterState() override;
         void onSpacebar() override;
         void onEscape() override {}
         void onTick() override;
     };
 
     struct Pause : RoundState {
-        Pause(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnter(); }
-        void onEnter() override {}
+        Pause(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
+        void onEnterState() override {}
         void onSpacebar() override;
         void onEscape() override;
         void onTick() override {};
     };
 
     struct RoundEnd : RoundState {
-        RoundEnd(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnter(); }
-        void onEnter() override {}
+        RoundEnd(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
+        void onEnterState() override {}
         void onSpacebar() override;
         void onEscape() override;
         void onTick() override {};
     };
 
     struct GameEnd : RoundState {
-        GameEnd(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnter(); }
-        void onEnter() override;
+        GameEnd(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
+        void onEnterState() override;
         void onSpacebar() override;
         void onEscape() override;
         void onTick() override {};

@@ -29,6 +29,8 @@ const auto oppSlowDuration = sf::milliseconds(4000);
 const auto selfRightAngleMovementDuration = sf::milliseconds(8500);
 const auto oppRightAngleMovementDuration = sf::milliseconds(5500);
 
+constexpr auto scoreListEntryHeight = 30u;
+
 AssetManager::TextureSet gameTextures = {
         AssetManager::Texture::SelfHaste,
         AssetManager::Texture::OpponentHaste,
@@ -112,25 +114,24 @@ void StateGame::initializePlayers(const std::vector<PlayerInfo>& infos) {
     auto scoresPanel = app_.getWidget<tgui::Panel>("Scores");
     auto i = 0u;
     for (const auto& info : infos) {
-        constexpr auto HEIGHT = 30u;
-        constexpr auto TEXT_SIZE = 24u;
+        constexpr auto textSize = 24u;
 
         auto nameLabel = tgui::Label::create(info.name);
         nameLabel->getRenderer()->setTextColor(info.color);
-        nameLabel->setSize("100%", HEIGHT);
-        nameLabel->setPosition(0, i*HEIGHT);
-        nameLabel->setTextSize(TEXT_SIZE);
+        nameLabel->setSize("100%", scoreListEntryHeight);
+        nameLabel->setPosition(0, i*scoreListEntryHeight);
+        nameLabel->setTextSize(textSize);
         scoresPanel->add(nameLabel);
 
         auto scoreLabel = tgui::Label::create("0");
         scoreLabel->getRenderer()->setTextColor(info.color);
-        scoreLabel->setSize("100%", HEIGHT);
-        scoreLabel->setPosition(0, i*HEIGHT);
-        scoreLabel->setTextSize(TEXT_SIZE);
+        scoreLabel->setSize("100%", scoreListEntryHeight);
+        scoreLabel->setPosition(0, i*scoreListEntryHeight);
+        scoreLabel->setTextSize(textSize);
         scoreLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
         scoresPanel->add(scoreLabel);
 
-        players_.emplace_back(info, scoreLabel, radius, velocity);
+        players_.emplace_back(info, std::make_pair(nameLabel, scoreLabel), radius, velocity);
 
         ++i;
     }
@@ -155,7 +156,17 @@ void StateGame::loadGui() {
 }
 
 void StateGame::sortScoreList() {
-    // todo
+    std::multimap<PlayerThing::Score, PlayerThing::Labels> labelsByScore;
+    std::transform(players_.cbegin(), players_.cend(), std::inserter(labelsByScore, labelsByScore.begin()),
+        [] (const auto& player) {
+            return std::make_pair(player.getScore(), player.getLabels());
+        });
+
+    auto i = 0u;
+    for (auto it = labelsByScore.rbegin(); it != labelsByScore.rend(); ++it, ++i) {
+        it->second.first->setPosition(0, i*scoreListEntryHeight);
+        it->second.second->setPosition(0, i*scoreListEntryHeight);
+    }
 }
 
 bool StateGame::checkCollisions(PlayerThing& player) {

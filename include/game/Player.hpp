@@ -18,7 +18,10 @@ struct PlayerInfo {
 
 class PlayerThing {
 public:
-    explicit PlayerThing(const PlayerInfo&, tgui::Label::Ptr scoreLabel, float radius, int vel);
+    using Score = uint32_t;
+    using Labels = std::pair<tgui::Label::Ptr, tgui::Label::Ptr>;
+
+    PlayerThing(const PlayerInfo&, Labels, float radius, int vel);
 
     void move(double timeStep);
     void input(const sf::Event&);
@@ -33,7 +36,8 @@ public:
     bool checkCollision(const sf::Shape&) const;
 
     void addPoint();
-    uint32_t getScore() const { return score_; }
+    Score getScore() const { return score_; }
+    Labels getLabels() const { return {nameLabel_, scoreLabel_}; }
 
     void kill();
     bool isDead() const { return dead_; }
@@ -66,7 +70,9 @@ private:
     double turnDegrees_ = 130;
     bool rightAngleMovement_ = false;
 
-    uint32_t score_ = 0;
+    Score score_ = 0;
+
+    tgui::Label::Ptr nameLabel_;
     tgui::Label::Ptr scoreLabel_;
 
     bool dead_ = false;

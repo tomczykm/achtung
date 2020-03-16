@@ -6,12 +6,13 @@
 #include "app/Log.hpp"
 #include "app/Utils.hpp"
 
-PlayerThing::PlayerThing(const PlayerInfo& info, tgui::Label::Ptr scoreLabel, float radius, int vel):
+PlayerThing::PlayerThing(const PlayerInfo& info, Labels labels, float radius, int vel):
     info_{info},
     shape_{radius},
     recShape_{{radius*2, radius*2}},
     vel_{vel},
-    scoreLabel_{scoreLabel}
+    nameLabel_{labels.first},
+    scoreLabel_{labels.second}
 {
     shape_.setOrigin(radius, radius);
     shape_.setFillColor(sf::Color::Yellow);

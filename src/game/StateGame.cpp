@@ -17,6 +17,18 @@ constexpr auto playerToGameAreaSizeRatio = 253.334f;
 constexpr auto pickMeUpToGameAreaSizeRatio = 32.2f;
 constexpr auto playerSpeedToGameAreaSizeRatio = 7.6f;
 
+constexpr auto hasteTurnAngleChange = 9;
+const auto selfHasteDuration = sf::milliseconds(3500);
+const auto oppHasteDuration = sf::milliseconds(2500);
+
+constexpr auto selfSlowTurnAngleChange = 3;
+constexpr auto oppSlowTurnAngleChange = 0;
+const auto selfSlowDuration = sf::milliseconds(5000);
+const auto oppSlowDuration = sf::milliseconds(4000);
+
+const auto selfRightAngleMovementDuration = sf::milliseconds(8500);
+const auto oppRightAngleMovementDuration = sf::milliseconds(5500);
+
 AssetManager::TextureSet gameTextures = {
         AssetManager::Texture::SelfHaste,
         AssetManager::Texture::OpponentHaste,
@@ -239,19 +251,23 @@ std::pair<PickMeUp::OnPickUp, AssetManager::Texture> StateGame::getRandomPickMeU
     switch(static_cast<PickUpType>(type)) {
     case PickUpType::SelfHaste:
         return std::make_pair(makeSelfEffect([this] (auto player) {
-            addHaste(player, sf::milliseconds(3500));
+            const auto velChange = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
+            addVelocityChange(player, velChange, hasteTurnAngleChange, selfHasteDuration);
         }), AssetManager::Texture::SelfHaste);
     case PickUpType::OpponentHaste:
         return std::make_pair(makeOpponentEffect([this] (auto player) {
-            addHaste(player, sf::milliseconds(2500));
+            const auto velChange = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
+            addVelocityChange(player, velChange, hasteTurnAngleChange, oppHasteDuration);
         }), AssetManager::Texture::OpponentHaste);
     case PickUpType::SelfSlow:
         return std::make_pair(makeSelfEffect([this] (auto player) {
-            addSlow(player, sf::milliseconds(3500));
+            const auto velChange = -(player->getVelocity() / 2);
+            addVelocityChange(player, velChange, selfSlowTurnAngleChange, selfSlowDuration);
         }), AssetManager::Texture::SelfSlow);
     case PickUpType::OpponentSlow:
         return std::make_pair(makeOpponentEffect([this] (auto player) {
-            addSlow(player, sf::milliseconds(3000));
+            const auto velChange = -(player->getVelocity() / 2);
+            addVelocityChange(player, velChange, oppSlowTurnAngleChange, oppSlowDuration);
         }), AssetManager::Texture::OpponentSlow);
     case PickUpType::ClearTrails:
         return std::make_pair(makeSelfEffect([this] (auto) {
@@ -259,11 +275,11 @@ std::pair<PickMeUp::OnPickUp, AssetManager::Texture> StateGame::getRandomPickMeU
         }), AssetManager::Texture::ClearTrails);
     case PickUpType::SelfRightAngle:
         return std::make_pair(makeSelfEffect([this] (auto player) {
-            addRightAngleMovement(player, sf::milliseconds(8500));
+            addRightAngleMovement(player, selfRightAngleMovementDuration);
         }), AssetManager::Texture::SelfRightAngle);
     case PickUpType::OpponentRightAngle:
         return std::make_pair(makeOpponentEffect([this] (auto player) {
-            addRightAngleMovement(player, sf::milliseconds(5500));
+            addRightAngleMovement(player, oppRightAngleMovementDuration);
         }), AssetManager::Texture::OpponentRightAngle);
     default:
         print::error("bad pickup type {}", type);
@@ -289,27 +305,13 @@ PickMeUp::OnPickUp StateGame::makeOpponentEffect(OnPickUp onPickUp) {
     };
 }
 
-void StateGame::addHaste(PlayerIt player, sf::Time duration) {
-    const auto velChange = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
-    constexpr auto DEG_CHANGE = 9;
+void StateGame::addVelocityChange(PlayerIt player, int velChange, int turnAngleChange, sf::Time duration) {
     player->changeVelocity(velChange);
-    player->changeTurn(DEG_CHANGE);
-    player->addTimedEffect(duration, [this, velChange, name=player->name()] () {
+    player->changeTurn(turnAngleChange);
+    player->addTimedEffect(duration, [=, name=player->name()] () {
         auto player = getPlayer(name);
         player->changeVelocity(-velChange);
-        player->changeTurn(-DEG_CHANGE);
-    });
-}
-
-void StateGame::addSlow(PlayerIt player, sf::Time duration) {
-    const auto velChange = -(player->getVelocity() / 2);
-    constexpr auto DEG_CHANGE = 5;
-    player->changeVelocity(velChange);
-    player->changeTurn(DEG_CHANGE);
-    player->addTimedEffect(duration, [this, velChange, name=player->name()] () {
-        auto player = getPlayer(name);
-        player->changeVelocity(-velChange);
-        player->changeTurn(-DEG_CHANGE);
+        player->changeTurn(-turnAngleChange);
     });
 }
 

@@ -41,8 +41,7 @@ private:
     template <typename OnPickUp>
     PickMeUp::OnPickUp makeOpponentEffect(OnPickUp);
 
-    void addHaste(PlayerIt, sf::Time);
-    void addSlow(PlayerIt, sf::Time);
+    void addVelocityChange(PlayerIt, int velChange, int turnAngleChange, sf::Time);
     void addRightAngleMovement(PlayerIt, sf::Time);
 
     template <typename State>

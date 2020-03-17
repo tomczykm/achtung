@@ -43,6 +43,7 @@ private:
 
     void addVelocityChange(PlayerIt, int velChange, int turnAngleChange, sf::Time);
     void addRightAngleMovement(PlayerIt, sf::Time);
+    void addControlSwap(PlayerIt, sf::Time);
 
     template <typename State>
     void changeState() { state_ = std::make_unique<State>(*this); }

@@ -19,6 +19,7 @@ const std::map<AssetManager::Texture, std::string_view> texToFilename = {
     {AssetManager::Texture::SelfRightAngle, "selfSquare.png"},
     {AssetManager::Texture::OpponentRightAngle, "oppSquare.png"},
     {AssetManager::Texture::ClearTrails, "clear.png"},
+    {AssetManager::Texture::ControlSwap, "swap.png"},
     {AssetManager::Texture::RandomPickMeUp, "random.png"}
 };
 
@@ -57,7 +58,13 @@ void AssetManager::loadTextures(TextureSet& toLoad) {
     print::info("Loading {} textures", toLoad.size());
     for (const auto t: toLoad) {
         textures_.emplace(t, sf::Texture{});
-        textures_[t].loadFromFile(getActualFileName(texToFilename.find(t)->second));
+        const auto filename = texToFilename.find(t);
+        if (filename == texToFilename.end()) {
+            const auto msg = fmt::format("Texture {} does not have an associated resource name.", t);
+            print::error(msg);
+            throw std::invalid_argument{msg};
+        }
+        textures_[t].loadFromFile(getActualFileName(filename->second));
         textures_[t].setSmooth(true);
     }
 }
@@ -70,7 +77,11 @@ void AssetManager::releaseTextures(TextureSet& toRelease) {
 }
 
 const sf::Texture& AssetManager::getTexture(Texture t) {
-    const auto found = textures_.find(t);
-    if (found == textures_.end()) throw std::invalid_argument{fmt::format("Invalid texture {}", t)};
-    return found->second;
+    const auto kvPair = textures_.find(t);
+    if (kvPair == textures_.end()) {
+        const auto msg = fmt::format("Texture {} not loaded.", t);
+        print::error(msg);
+        throw std::invalid_argument{msg};
+    }
+    return kvPair->second;
 }

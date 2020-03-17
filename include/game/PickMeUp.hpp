@@ -17,6 +17,7 @@ enum class PickUpType {
     SelfRightAngle,
     OpponentRightAngle,
     ClearTrails,
+    ControlSwap,
 
     Count
 };

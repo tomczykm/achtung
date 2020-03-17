@@ -98,12 +98,14 @@ void StateMenu::loadGui() {
         app_.gui.loadWidgetsFromStream(AssetManager::openResource(resName));
     }
     catch (const std::invalid_argument&) {
-        print::error("Failed to open resource {}", resName);
-        exit(-1);
+        const auto msg = fmt::format("Failed to open resource {}", resName);
+        print::error(msg);
+        throw std::runtime_error{msg};
     }
     catch (const tgui::Exception& e) {
-        print::error("Failed to create GUI from {}. {}", resName, e.what());
-        exit(-1);
+        const auto msg = fmt::format("Failed to create GUI from {}. {}", resName, e.what());
+        print::error(msg);
+        throw e;
     }
 
     app_.gui.get("AddPlayer")->connect("pressed", [this] () {

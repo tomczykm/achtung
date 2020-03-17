@@ -97,6 +97,18 @@ void PlayerThing::setRightAngleMovement(bool v) {
     recShape_.setRotation(direction_);
 }
 
+void PlayerThing::swapControls() {
+    std::swap(info_.left, info_.right);
+    if (shape_.getFillColor() == sf::Color::Blue) {
+        shape_.setFillColor(sf::Color::Yellow);
+        recShape_.setFillColor(sf::Color::Yellow);
+    } else {
+        shape_.setFillColor(sf::Color::Blue);
+        recShape_.setFillColor(sf::Color::Blue);
+    }
+
+}
+
 void PlayerThing::gapSwitch() {
     gap_ = !gap_;
     const auto gapTime = sf::seconds(6 * shape_.getRadius() / vel_);

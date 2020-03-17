@@ -19,6 +19,7 @@ public:
         SelfRightAngle,
         OpponentRightAngle,
         ClearTrails,
+        ControlSwap,
         RandomPickMeUp
     };
     using TextureSet = const std::set<AssetManager::Texture>;

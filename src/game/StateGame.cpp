@@ -25,6 +25,8 @@ const auto oppSlowDuration = sf::milliseconds(4000);
 const auto selfRightAngleMovementDuration = sf::milliseconds(8500);
 const auto oppRightAngleMovementDuration = sf::milliseconds(5500);
 
+const auto controlSwapDuration = sf::milliseconds(6500);
+
 constexpr auto scoreListEntryHeight = 30u;
 
 AssetManager::TextureSet gameTextures = {
@@ -35,6 +37,7 @@ AssetManager::TextureSet gameTextures = {
         AssetManager::Texture::SelfRightAngle,
         AssetManager::Texture::OpponentRightAngle,
         AssetManager::Texture::ClearTrails,
+        AssetManager::Texture::ControlSwap,
         AssetManager::Texture::RandomPickMeUp
 };
 
@@ -140,16 +143,18 @@ void StateGame::loadGui() {
         app_.gui.loadWidgetsFromStream(AssetManager::openResource(resName));
     }
     catch (const std::invalid_argument&) {
-        print::error("Failed to open resource {}", resName);
-        exit(-1);
+        const auto msg = fmt::format("Failed to open resource {}", resName);
+        print::error(msg);
+        throw std::runtime_error{msg};
     }
     catch (const tgui::Exception& e) {
-        print::error("Failed to create GUI from {}. {}", resName, e.what());
-        exit(-1);
+        const auto msg = fmt::format("Failed to create GUI from {}. {}", resName, e.what());
+        print::error(msg);
+        throw std::runtime_error{msg};
     }
 
     auto goalLabel = app_.getWidget<tgui::Label>("ScoreGoal");
-    goalLabel->setText(fmt::format("Goal: {}", scoreVictoryGoal_));
+    goalLabel->setText(fmt::format("Goal: {}\n2 points diff", scoreVictoryGoal_));
 }
 
 void StateGame::sortScoreList() {
@@ -289,9 +294,14 @@ std::pair<PickMeUp::OnPickUp, AssetManager::Texture> StateGame::getRandomPickMeU
         return std::make_pair(makeOpponentEffect([this] (auto player) {
             addRightAngleMovement(player, oppRightAngleMovementDuration);
         }), AssetManager::Texture::OpponentRightAngle);
+    case PickUpType::ControlSwap:
+        return std::make_pair(makeOpponentEffect([this] (auto player) {
+            addControlSwap(player, controlSwapDuration);
+        }), AssetManager::Texture::ControlSwap);
     default:
-        print::error("bad pickup type {}", type);
-        throw std::runtime_error{fmt::format("bad pickup type {}", type)};
+        const auto msg = fmt::format("bad pickup type {}", type);
+        print::error(msg);
+        throw std::runtime_error{msg};
     }
 }
 
@@ -328,6 +338,13 @@ void StateGame::addRightAngleMovement(PlayerIt player, sf::Time duration) {
     player->addTimedEffect(duration, [this, name=player->name()] {
         auto player = getPlayer(name);
         player->setRightAngleMovement(false);
+    });
+}
+
+void StateGame::addControlSwap(PlayerIt player, sf::Time duration) {
+    player->swapControls();
+    player->addTimedEffect(duration, [this, name=player->name()] {
+        getPlayer(name)->swapControls();
     });
 }
 

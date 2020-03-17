@@ -47,7 +47,8 @@ public:
 
     void changeVelocity(int d) { vel_ += d; }
     void changeTurn(int d) { turnDegrees_ += d; }
-    void setRightAngleMovement(bool v);
+    void setRightAngleMovement(bool);
+    void swapControls();
 
     template <typename... Ts>
     void addTimedEffect(Ts&&... args) {

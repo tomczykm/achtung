@@ -16,7 +16,7 @@ public:
     explicit StateMenu(const Application::Interface&);
 
     void input(const sf::Event&) override;
-    void logic() override {}
+    void tick(double) override {}
     void render() override {}
 private:
     using PlayerId = std::uint32_t;

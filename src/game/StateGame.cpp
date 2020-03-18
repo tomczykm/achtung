@@ -87,8 +87,8 @@ void StateGame::input(const sf::Event& event) {
     }
 }
 
-void StateGame::logic() {
-    state_->onTick();
+void StateGame::tick(double deltaTime) {
+    state_->onTick(deltaTime);
 }
 
 void StateGame::render() {
@@ -395,7 +395,6 @@ void StateGame::RoundBegin::onEscape() {
 
 
 void StateGame::Running::onEnterState() {
-    gs.moveTimer_.restart();
     gs.resetPickmeupSpawnTimer();
 }
 
@@ -403,11 +402,11 @@ void StateGame::Running::onSpacebar() {
     gs.changeState<Pause>();
 }
 
-void StateGame::Running::onTick() {
+void StateGame::Running::onTick(double deltaTime) {
     bool playerDied = false;
     for (auto player = gs.players_.begin() ; player != gs.lastAlive_ ; ++player) {
         player->createTrail(gs.trails_);
-        player->move(gs.moveTimer_.getElapsedTime().asMilliseconds() / 1000.f);
+        player->move(deltaTime);
 
         if (gs.checkCollisions(*player)) {
             playerDied = true;
@@ -425,8 +424,6 @@ void StateGame::Running::onTick() {
     if (gs.massPowerups_ && gs.massPowerups_->isExpired()) {
         gs.massPowerups_.reset();
     }
-
-    gs.moveTimer_.restart();
 }
 
 

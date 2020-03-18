@@ -15,7 +15,7 @@ public:
     ~StateGame();
 
     void input(const sf::Event&) override;
-    void logic() override;
+    void tick(double deltaTime) override;
     void render() override;
 
 private:
@@ -67,8 +67,6 @@ private:
 
     BorderThing border_;
 
-    sf::Clock moveTimer_; // for calculating per-pixel movement speed and turn angles
-
     std::vector<PickMeUp> pickmeups_;
     sf::Clock pickmeupSpawnTimer_;
     sf::Time timeUntilNextPickmeupSpawn_;
@@ -79,7 +77,7 @@ private:
         virtual void onEnterState() = 0;
         virtual void onSpacebar() = 0;
         virtual void onEscape() = 0;
-        virtual void onTick() = 0;
+        virtual void onTick(double deltaTime) = 0;
     protected:
         explicit RoundState(StateGame& s) : gs{s} {}
         StateGame& gs;
@@ -92,7 +90,7 @@ private:
         void onEnterState() override;
         void onSpacebar() override;
         void onEscape() override;
-        void onTick() override {}
+        void onTick(double) override {}
     };
 
     struct Running : RoundState {
@@ -100,7 +98,7 @@ private:
         void onEnterState() override;
         void onSpacebar() override;
         void onEscape() override {}
-        void onTick() override;
+        void onTick(double deltaTime) override;
     };
 
     struct Pause : RoundState {
@@ -108,7 +106,7 @@ private:
         void onEnterState() override {}
         void onSpacebar() override;
         void onEscape() override;
-        void onTick() override {};
+        void onTick(double) override {};
     };
 
     struct RoundEnd : RoundState {
@@ -116,7 +114,7 @@ private:
         void onEnterState() override {}
         void onSpacebar() override;
         void onEscape() override;
-        void onTick() override {};
+        void onTick(double) override {};
     };
 
     struct GameEnd : RoundState {
@@ -124,6 +122,6 @@ private:
         void onEnterState() override;
         void onSpacebar() override;
         void onEscape() override;
-        void onTick() override {};
+        void onTick(double) override {};
     };
 };

@@ -7,7 +7,7 @@ class Event;
 
 class IGameState {
 public:
-    virtual void logic() = 0;
+    virtual void tick(double deltaTime) = 0;
     virtual void render() = 0;
     virtual void input(const sf::Event&) = 0;
 

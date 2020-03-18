@@ -29,6 +29,8 @@ private:
     std::unique_ptr<IGameState> gameState_;
     std::function<void()> changeState_;
     bool quit_ = false;
+
+    sf::Clock deltaTimeClock_;
 };
 
 class Application::Interface

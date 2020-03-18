@@ -32,7 +32,9 @@ int Application::run() {
             gui_.handleEvent(event);
         }
 
-        gameState_->logic();
+        auto deltaTime = deltaTimeClock_.getElapsedTime().asMilliseconds();
+        gameState_->tick(deltaTime / 1000.f);
+        deltaTimeClock_.restart();
 
         if (changeState_) {
             gui_.removeAllWidgets();

@@ -250,8 +250,8 @@ void StateGame::createRandomPickMeUp() {
     auto [onPickMeUp, texture] = getRandomPickMeUpEffect();
     if (xor_rand::next(1, static_cast<int>(PickUpType::Count)) == 1) texture = AssetManager::Texture::RandomPickMeUp;
     pickmeups_.emplace_back(
-        xor_rand::next(playAreaCornerOffset_, playAreaCornerOffset_ + playAreaSideLength_ - 2*pickMeUpRadius_),
-        xor_rand::next(playAreaCornerOffset_, playAreaCornerOffset_ + playAreaSideLength_ - 2*pickMeUpRadius_),
+        xor_rand::next(playAreaCornerOffset_ + pickMeUpRadius_, playAreaCornerOffset_ + playAreaSideLength_ - pickMeUpRadius_),
+        xor_rand::next(playAreaCornerOffset_ + pickMeUpRadius_, playAreaCornerOffset_ + playAreaSideLength_ - pickMeUpRadius_),
         pickMeUpRadius_,
         app_.assets.getTexture(texture),
         onPickMeUp

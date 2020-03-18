@@ -31,6 +31,7 @@ private:
     bool quit_ = false;
 
     sf::Clock deltaTimeClock_;
+    sf::Time stepTime_;
 };
 
 class Application::Interface

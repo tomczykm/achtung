@@ -13,6 +13,10 @@ ConfigManager::ConfigManager():
 
 void ConfigManager::loadFromFile() {
     const auto parsed = toml::parse(filename_);
+
+    const auto game = toml::find(parsed, "game");
+    values_.emplace(Setting::TickRate, toml::find_or<int>(game, "tickrate", 140));
+
     const auto video = toml::find(parsed, "video");
 
     values_.emplace(Setting::ResWidth, toml::find_or<int>(video, "res_width", 1280));

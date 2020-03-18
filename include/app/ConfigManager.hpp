@@ -12,6 +12,8 @@
 enum class Setting {
     Null = 0,
 
+    TickRate,
+
     ResWidth,
     ResHeight,
     Fullscreen

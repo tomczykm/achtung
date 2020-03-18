@@ -5,7 +5,8 @@
 
 Application::Application():
     gui_{window_},
-    gameState_{std::make_unique<StateMenu>(Interface{*this})}
+    gameState_{std::make_unique<StateMenu>(Interface{*this})},
+    stepTime_{sf::milliseconds(1000/config_.get<int>(Setting::TickRate))}
 {
     sf::ContextSettings windowSettings;
     windowSettings.antialiasingLevel = 8;
@@ -20,6 +21,8 @@ Application::Application():
 }
 
 int Application::run() {
+    auto accumulator = sf::milliseconds(0);
+
     while (!quit_) {
         sf::Event event;
         while (window_.pollEvent(event))
@@ -32,8 +35,11 @@ int Application::run() {
             gui_.handleEvent(event);
         }
 
-        auto deltaTime = deltaTimeClock_.getElapsedTime().asMilliseconds();
-        gameState_->tick(deltaTime / 1000.f);
+        accumulator += deltaTimeClock_.getElapsedTime();
+        while (accumulator > stepTime_) {
+            gameState_->tick(stepTime_.asMilliseconds() / 1000.f);
+            accumulator -= stepTime_;
+        }
         deltaTimeClock_.restart();
 
         if (changeState_) {

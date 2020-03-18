@@ -1,3 +1,7 @@
+[game]
+
+tickrate = 140
+
 [video]
 
 res_width = 1280

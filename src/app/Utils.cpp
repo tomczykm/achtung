@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include <cctype>
+#include <cmath>
 
 namespace xor_rand {
 namespace {
@@ -154,4 +155,10 @@ std::string_view keycodeToStr(sf::Keyboard::Key key) {
         default: return "unhandled";
     }
     #undef CASE_ITEM
+}
+
+float distance(sf::Vector2f p1, sf::Vector2f p2) {
+    auto xs = (p2.x - p1.x);
+    auto ys = (p2.y - p2.y);
+    return std::sqrt(xs*xs+ys*ys);
 }

@@ -16,3 +16,5 @@ void discard(std::size_t n);
 std::string_view stripLeadingDigits(std::string_view s);
 
 std::string_view keycodeToStr(sf::Keyboard::Key);
+
+float distance(sf::Vector2f p1, sf::Vector2f p2);

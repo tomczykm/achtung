@@ -185,7 +185,7 @@ bool StateGame::checkCollisions(PlayerThing& player) {
     // we don't want to check if we collide with segments we just created
     // (we obviously do, they're right underneath and we don't want to die immediately)
 
-    auto toSkip = 15u;
+    auto toSkip = 45u;
     for (const auto& t: trails_) {
         if (t.getShape().getFillColor() == player.getColor() && toSkip > 0) {
             --toSkip;
@@ -405,8 +405,7 @@ void StateGame::Running::onSpacebar() {
 void StateGame::Running::onTick(double deltaTime) {
     bool playerDied = false;
     for (auto player = gs.players_.begin() ; player != gs.lastAlive_ ; ++player) {
-        player->createTrail(gs.trails_);
-        player->move(deltaTime);
+        player->tick(deltaTime, gs.trails_);
 
         if (gs.checkCollisions(*player)) {
             playerDied = true;

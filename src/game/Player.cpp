@@ -29,7 +29,7 @@ const sf::Shape& PlayerThing::getShape() const {
     }
 }
 
-void PlayerThing::move(double timeStep) {
+void PlayerThing::tick(double timeStep, std::deque<TrailThing>& trails) {
     endExpiredEffects();
 
     if (!rightAngleMovement_) {
@@ -47,11 +47,25 @@ void PlayerThing::move(double timeStep) {
         gapSwitch();
     }
 
-    auto [xPos, yPos] = shape_.getPosition();
+    move(timeStep, trails);
+}
+
+void PlayerThing::move(double timeStep, std::deque<TrailThing>& trails) {
+    auto [oldX, oldY] = shape_.getPosition();
     setPosition(
-        xPos + (timeStep * vel_ * sin(-(M_PI/180)*direction_)),
-        yPos + (timeStep * vel_ * cos(-(M_PI/180)*direction_))
+        oldX + (timeStep * vel_ * sin(-(M_PI/180)*direction_)),
+        oldY + (timeStep * vel_ * cos(-(M_PI/180)*direction_))
     );
+
+    if (!gap_) {
+        const auto newPos = shape_.getPosition();
+        const auto numSegments = distance(newPos, {oldX, oldY}) / (TrailThing::height-1);
+        for (auto i = 0u; i < numSegments; ++i) {
+            trails.emplace_front(oldX, oldY, direction_, shape_.getRadius()*2, info_.color);
+            oldX += ((TrailThing::height-1) * sin(-(M_PI/180)*direction_));
+            oldY += ((TrailThing::height-1) * cos(-(M_PI/180)*direction_));
+        }
+    }
 }
 
 void PlayerThing::input(const sf::Event& e) {
@@ -74,22 +88,7 @@ void PlayerThing::newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailTh
     gap_ = true;
     gapSwitch();
 
-    // move a little bit forward
-    for (int i = 0; i < 4; i++) {
-        createTrail(trails);
-        auto [xPos, yPos] = shape_.getPosition();
-        shape_.setPosition(
-            xPos + (2 * sin(-(M_PI/180)*direction_)),
-            yPos + (2 * cos(-(M_PI/180)*direction_))
-        );
-    }
-}
-
-void PlayerThing::createTrail(std::deque<TrailThing>& trails) const {
-    if (!gap_) {
-        auto [xPos, yPos] = shape_.getPosition();
-        trails.emplace_front(xPos, yPos, direction_, shape_.getRadius()*2, info_.color);
-    }
+    move(0.1, trails);
 }
 
 void PlayerThing::setRightAngleMovement(bool v) {
@@ -112,7 +111,7 @@ void PlayerThing::swapControls() {
 void PlayerThing::gapSwitch() {
     gap_ = !gap_;
     const auto gapTime = sf::seconds(6 * shape_.getRadius() / vel_);
-    gapSwitchDuration_ = gap_ ? gapTime : sf::milliseconds(xor_rand::next(1800, 3900));
+    gapSwitchDuration_ = gap_ ? gapTime : sf::milliseconds(xor_rand::next(1400, 7000));
     gapSwitchTimer_.restart();
 }
 

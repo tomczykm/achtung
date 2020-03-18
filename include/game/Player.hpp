@@ -23,11 +23,11 @@ public:
 
     PlayerThing(const PlayerInfo&, Labels, float radius, int vel);
 
-    void move(double timeStep);
+    void tick(double timeStep, std::deque<TrailThing>& trails);
+    void move(double timeStep, std::deque<TrailThing>& trails);
     void input(const sf::Event&);
 
     void newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailThing>&);
-    void createTrail(std::deque<TrailThing>&) const;
 
     const sf::Shape& getShape() const;
     sf::Color getColor() const { return info_.color; }

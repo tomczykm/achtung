@@ -38,6 +38,7 @@ AssetManager::TextureSet gameTextures = {
         AssetManager::Texture::OpponentRightAngle,
         AssetManager::Texture::ClearTrails,
         AssetManager::Texture::ControlSwap,
+        AssetManager::Texture::MassPowerups,
         AssetManager::Texture::RandomPickMeUp
 };
 
@@ -298,6 +299,10 @@ std::pair<PickMeUp::OnPickUp, AssetManager::Texture> StateGame::getRandomPickMeU
         return std::make_pair(makeOpponentEffect([this] (auto player) {
             addControlSwap(player, controlSwapDuration);
         }), AssetManager::Texture::ControlSwap);
+    case PickUpType::MassPowerups:
+        return std::make_pair(makeSelfEffect([this] (auto) {
+            addMassPowerups();
+        }), AssetManager::Texture::MassPowerups);
     default:
         const auto msg = fmt::format("bad pickup type {}", type);
         print::error(msg);
@@ -348,9 +353,20 @@ void StateGame::addControlSwap(PlayerIt player, sf::Time duration) {
     });
 }
 
+void StateGame::addMassPowerups() {
+    if (massPowerups_) {
+        massPowerups_->extendBy(sf::milliseconds(4000));
+    } else {
+        massPowerups_.emplace(sf::milliseconds(6000), [] () {});
+    }
+}
+
 void StateGame::resetPickmeupSpawnTimer() {
     pickmeupSpawnTimer_.restart();
-    timeUntilNextPickmeupSpawn_ = sf::milliseconds(xor_rand::next(4500, 9000));
+    timeUntilNextPickmeupSpawn_ =
+        massPowerups_ ?
+        sf::milliseconds(xor_rand::next(500, 4000)) :
+        sf::milliseconds(xor_rand::next(4500, 9000));
 }
 
 
@@ -404,6 +420,10 @@ void StateGame::Running::onTick() {
 
     if (playerDied) {
         gs.awardPoints();
+    }
+
+    if (gs.massPowerups_ && gs.massPowerups_->isExpired()) {
+        gs.massPowerups_.reset();
     }
 
     gs.moveTimer_.restart();

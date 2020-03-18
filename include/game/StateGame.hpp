@@ -44,6 +44,7 @@ private:
     void addVelocityChange(PlayerIt, int velChange, int turnAngleChange, sf::Time);
     void addRightAngleMovement(PlayerIt, sf::Time);
     void addControlSwap(PlayerIt, sf::Time);
+    void addMassPowerups();
 
     template <typename State>
     void changeState() { state_ = std::make_unique<State>(*this); }
@@ -71,6 +72,8 @@ private:
     std::vector<PickMeUp> pickmeups_;
     sf::Clock pickmeupSpawnTimer_;
     sf::Time timeUntilNextPickmeupSpawn_;
+
+    std::optional<TimedEffect> massPowerups_;
 
     struct RoundState {
         virtual void onEnterState() = 0;

@@ -20,6 +20,7 @@ public:
         OpponentRightAngle,
         ClearTrails,
         ControlSwap,
+        MassPowerups,
         RandomPickMeUp
     };
     using TextureSet = const std::set<AssetManager::Texture>;

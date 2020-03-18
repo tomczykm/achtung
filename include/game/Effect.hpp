@@ -13,6 +13,10 @@ public:
     {}
     ~TimedEffect() { onExpire_(); }
 
+    void extendBy(sf::Time time) {
+        duration_ += time;
+    }
+
     bool isExpired() const {
         return clock_.getElapsedTime() > duration_;
     }

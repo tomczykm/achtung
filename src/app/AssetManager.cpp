@@ -20,6 +20,7 @@ const std::map<AssetManager::Texture, std::string_view> texToFilename = {
     {AssetManager::Texture::OpponentRightAngle, "oppSquare.png"},
     {AssetManager::Texture::ClearTrails, "clear.png"},
     {AssetManager::Texture::ControlSwap, "swap.png"},
+    {AssetManager::Texture::MassPowerups, "massPowerups.png"},
     {AssetManager::Texture::RandomPickMeUp, "random.png"}
 };
 

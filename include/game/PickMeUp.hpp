@@ -18,6 +18,7 @@ enum class PickUpType {
     OpponentRightAngle,
     ClearTrails,
     ControlSwap,
+    MassPowerups,
 
     Count
 };

@@ -10,6 +10,7 @@
 #include "app/AssetManager.hpp"
 #include "app/ConfigManager.hpp"
 #include "app/IGameState.hpp"
+#include "app/SQLite.hpp"
 #include "app/Utils.hpp"
 
 class Application {
@@ -21,10 +22,12 @@ public:
     class Interface;
 
 private:
-    AssetManager assets_;
-    ConfigManager config_;
     sf::RenderWindow window_;
     tgui::Gui gui_;
+
+    AssetManager assets_;
+    ConfigManager config_;
+    SQLite database_;
 
     std::unique_ptr<IGameState> gameState_;
     std::function<void()> changeState_;

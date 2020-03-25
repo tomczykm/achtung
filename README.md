@@ -6,7 +6,7 @@ A C++ rewrite of [this game](https://en.wikipedia.org/wiki/Achtung,_die_Kurve!).
 
 1. Install CMake, git, build essentials and required development libraries. For example, on Ubuntu run: `sudo apt install cmake git build-essential libsfml-dev libsqlite3-dev`
 2. [Install TGUI](https://tgui.eu/tutorials/0.8/)
-3. Download sources: `git clone https://github.com/tomczykm/freeachtung.git && cd freeachtung && git submodule update --init --recursive`
+3. Download sources: `git clone https://github.com/tunczyk110/freeachtung.git && cd freeachtung && git submodule update --init --recursive`
 4. Go to `build` directory, generate Makefile and build the project: `mkdir build && cd build && cmake .. && make`
 5. Run `./freeachtung` to play the game
 

@@ -3,13 +3,12 @@
 #include "app/IGameState.hpp"
 
 #include <memory>
-#include <map>
-#include <cstdint>
-#include <optional>
+#include <array>
 #include <TGUI/TGUI.hpp>
 
+#include "menu/Panel.hpp"
+
 #include "app/Application.hpp"
-#include "game/Player.hpp"
 
 class StateMenu : public IGameState {
 public:
@@ -18,26 +17,20 @@ public:
     void input(const sf::Event&) override;
     void tick(double) override {}
     void render() override {}
+
+    void setActivePanel(int);
+
+    constexpr static auto totalPanels = 2u;
+
 private:
-    using PlayerId = std::uint32_t;
+    using Panels = std::array<std::unique_ptr<Panel>, totalPanels>;
 
-    void addPlayer();
-    std::vector<PlayerInfo> preparePlayerInfos();
     void loadGui();
-    bool canStartGame();
-    std::size_t getCurrentNumPlayers();
-    void removePlayer(PlayerId, tgui::Panel::Ptr);
-
-    void enterSetKeysMode(PlayerId);
-    void setKey(PlayerId, sf::Keyboard::Key);
-    void updateKeysLabel(PlayerId);
-
-    void recalculatePlayerListPositions();
-
-    void startGame();
+    tgui::Panel::Ptr makePanel(tgui::PanelRenderer*);
 
     Application::Interface app_;
-    std::map<PlayerId, PlayerInfo> playerInfos_;
 
-    std::optional<PlayerId> setKeysMode_;
+    Panels panels_;
+    Panels::iterator activePanel_;
+
 };

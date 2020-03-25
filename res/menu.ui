@@ -21,67 +21,32 @@ Renderer.PanelRenderer {
     borders = (2, 2, 2, 2);
 }
 
-Panel.Main {
-    Size = (&.height/4*3, 90%);
-    Position = ((&.width - width) / 2, 5%);
+Panel.Navigation {
+    Size = (&.height/4*3, 10%);
+    Position = ((&.width - width) / 2, 90%);
     Renderer = &PanelRenderer;
 
-    Label.Title {
-        Position = (30, 30);
-        Text = freeachtung;
-        TextSize = 32;
-
-        Renderer {
-            backgroundcolor = transparent;
-            textcolor = yellow;
-        }
-    }
-
-    Panel.PlayerListOuterPanel {
-        Size = (40%, 70%);
-        Position = (10%, Title.bottom + 50);
-        Renderer = &PanelRenderer;
-
-        Label {
-            Position = (30, 15);
-            Text = Players;
-            TextSize = 22;
-
-            Renderer {
-                backgroundcolor = transparent;
-                textcolor = yellow;
-            }
-        }
-
-        Panel.PlayerListInnerPanel {
-            Size = (90%, 88%);
-            Position = (5%, 10%);
-            Renderer = &PanelRenderer;
-        }
-    }
-
-    Button.AddPlayer {
-        Text = Add Player;
+    Button.Lobby {
         Size = (120, 55);
-        Position = (10%, &.bottom - height*2.5);
+        Position = (3%, (&.height - height) / 2);
+        Text = Lobby;
         TextSize = 18;
         renderer = &ButtonRenderer;
     }
 
-    Button.StartGame {
+    Button.Settings {
         Size = (120, 55);
-        Position = (AddPlayer.right + 50, AddPlayer.top);
-        Text = Start;
+        Position = (Lobby.right + 3%, ((&.height - height) / 2));
+        Text = Settings;
         TextSize = 18;
         renderer = &ButtonRenderer;
     }
 
     Button.QuitGame {
         Size = (120, 55);
-        Position = (90% - width, StartGame.top);
+        Position = (&.width - 3% - width, (&.height - height) / 2);
         Text = Quit;
         TextSize = 18;
         renderer = &ButtonRenderer;
     }
-
 }

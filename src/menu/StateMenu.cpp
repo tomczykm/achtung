@@ -3,16 +3,11 @@
 #include <algorithm>
 #include <iterator>
 
-#include "game/StateGame.hpp"
 #include "app/AssetManager.hpp"
 #include "app/Utils.hpp"
 
-namespace
-{
-
-constexpr auto PLAYER_LIST_ENTRY_HEIGHT = 60u;
-
-}
+#include "menu/LobbyPanel.hpp"
+#include "menu/SettingsPanel.hpp"
 
 StateMenu::StateMenu(const Application::Interface& app):
     app_{app}
@@ -26,70 +21,14 @@ void StateMenu::input(const sf::Event& event) {
         if (event.key.code == sf::Keyboard::Escape) {
             app_.quit();
         }
-
-        if (setKeysMode_) {
-            setKey(*setKeysMode_, event.key.code);
-        }
     }
+    (*activePanel_)->input(event);
 }
 
-void StateMenu::addPlayer() {
-    print::info(__func__);
-    auto playerListPanel = app_.getWidget<tgui::Panel>("PlayerListInnerPanel");
-
-    auto newEntryPanel = tgui::Panel::create({"100%", "60"});
-    newEntryPanel->setRenderer(playerListPanel->getSharedRenderer()->getData());
-    newEntryPanel->setPosition("0", std::to_string(getCurrentNumPlayers()*PLAYER_LIST_ENTRY_HEIGHT));
-
-    const auto playerId = PlayerId{playerInfos_.size() == 0 ? 0 : playerInfos_.rbegin()->first + 1};
-
-    const auto widgetNamePrefix = fmt::format("Player{}", playerId);
-
-    const auto color = sf::Color{xor_rand::next(0,255), xor_rand::next(0,255), xor_rand::next(0,255)};
-    const auto info = PlayerInfo{"", sf::Keyboard::Unknown, sf::Keyboard::Unknown, color};
-
-    auto removeButton = tgui::Button::create("Rem");
-    removeButton->setPosition("100% - 10 - width", "15%");
-    removeButton->setSize("30", "70%");
-    removeButton->connect("pressed", [=] () {
-        if (!setKeysMode_ || (setKeysMode_ && *setKeysMode_ != playerId))
-            removePlayer(playerId, newEntryPanel);
-    });
-    newEntryPanel->add(removeButton, fmt::format("{}Remove", widgetNamePrefix));
-
-    auto keysLabel = tgui::Label::create("_   _");
-    keysLabel->setPosition(widgetNamePrefix + "Remove.left - 5 - width", "50%-height/2");
-    keysLabel->setTextSize(17);
-    keysLabel->setSize(60, "100%");  // todo: hardcoded width bad, should be automatic
-    keysLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-    keysLabel->getRenderer()->setTextColor(info.color);
-    keysLabel->connect("clicked", [=] () {
-        enterSetKeysMode(playerId);
-    });
-    newEntryPanel->add(keysLabel, fmt::format("{}Keys", widgetNamePrefix));
-
-    auto nameEdit = tgui::EditBox::create();
-    nameEdit->setTextSize(17);
-    nameEdit->setSize(widgetNamePrefix + "Keys.left - 20", "80%");
-    nameEdit->setText(info.name);
-    nameEdit->getRenderer()->setDefaultTextColor(info.color);
-    nameEdit->setPosition("10", "50%-height/2");
-    nameEdit->getRenderer()->setTextColor(info.color);
-    nameEdit->connect("TextChanged", [=] () {
-        playerInfos_[playerId].name = nameEdit->getText();
-    });
-    newEntryPanel->add(nameEdit, fmt::format("{}Label", widgetNamePrefix));
-
-    playerListPanel->add(newEntryPanel, fmt::format("{}Panel", widgetNamePrefix));
-    playerInfos_.emplace(playerId, info);
-}
-
-std::vector<PlayerInfo> StateMenu::preparePlayerInfos() {
-    std::vector<PlayerInfo> infos(playerInfos_.size());
-    std::transform(playerInfos_.cbegin(), playerInfos_.cend(), infos.begin(), [] (const auto& kvPair) {
-        return kvPair.second;
-    });
-    return infos;
+void StateMenu::setActivePanel(int num) {
+    (*activePanel_)->deactivate();
+    activePanel_ = panels_.begin() + num;
+    (*activePanel_)->activate();
 }
 
 void StateMenu::loadGui() {
@@ -108,12 +47,25 @@ void StateMenu::loadGui() {
         throw e;
     }
 
-    app_.gui.get("AddPlayer")->connect("pressed", [this] () {
-        addPlayer();
+    const auto panelRenderer = app_.getWidget<tgui::Panel>("Navigation")->getRenderer();
+
+    auto guiPanel = makePanel(panelRenderer);
+    app_.gui.add(guiPanel);
+    panels_[0] = std::make_unique<LobbyPanel>(app_, guiPanel);
+
+    guiPanel = makePanel(panelRenderer);
+    app_.gui.add(guiPanel);
+    panels_[1] = std::make_unique<SettingsPanel>(app_, guiPanel);
+
+    activePanel_ = panels_.begin();
+    setActivePanel(0);
+
+    app_.gui.get("Lobby")->connect("pressed", [this] () {
+        setActivePanel(0);
     });
 
-    app_.gui.get("StartGame")->connect("pressed", [this] () {
-        startGame();
+    app_.gui.get("Settings")->connect("pressed", [this] () {
+        setActivePanel(1);
     });
 
     app_.gui.get("QuitGame")->connect("pressed", [this] () {
@@ -121,77 +73,11 @@ void StateMenu::loadGui() {
     });
 }
 
-bool StateMenu::canStartGame() {
-    auto playersHaveSetValues = std::all_of(playerInfos_.cbegin(), playerInfos_.cend(), [] (const auto& pair) {
-        const auto& p = pair.second;
-        return p.left != sf::Keyboard::Unknown && p.right != sf::Keyboard::Unknown && p.name != "";
-    });
-
-    std::set<std::string> names;
-    std::transform(playerInfos_.begin(), playerInfos_.end(), std::inserter(names, names.begin()), [] (auto& i) {
-        return i.second.name;
-    });
-    auto playersHaveUniqueNames = names.size() == playerInfos_.size();
-
-    return playerInfos_.size() > 1 && playersHaveSetValues && playersHaveUniqueNames;
-}
-
-std::size_t StateMenu::getCurrentNumPlayers() {
-    return std::static_pointer_cast<tgui::Panel>(app_.gui.get("PlayerListInnerPanel"))->
-        getWidgets().size();
-}
-
-void StateMenu::removePlayer(PlayerId player, tgui::Panel::Ptr panel) {
-    print::info("Remove player {}", player);
-    app_.getWidget<tgui::Panel>("PlayerListInnerPanel")->remove(panel);
-    recalculatePlayerListPositions();
-
-    playerInfos_.erase(player);
-}
-
-void StateMenu::enterSetKeysMode(PlayerId player) {
-    if (setKeysMode_) return;
-    print::info("set keys of {}", player);
-
-    setKeysMode_ = player;
-
-    playerInfos_[player].left = sf::Keyboard::Unknown;
-    playerInfos_[player].right = sf::Keyboard::Unknown;
-    updateKeysLabel(player);
-}
-
-void StateMenu::setKey(PlayerId player, sf::Keyboard::Key key) {
-    static std::set<sf::Keyboard::Key> forbidden = {
-        sf::Keyboard::Enter, sf::Keyboard::Escape, sf::Keyboard::Space
-    };
-    if (forbidden.find(key) != forbidden.end()) return;
-
-    if (playerInfos_[player].left ==  sf::Keyboard::Unknown) {
-        playerInfos_[player].left = key;
-    } else {
-        playerInfos_[player].right = key;
-        setKeysMode_ = std::nullopt;
-    }
-    updateKeysLabel(player);
-}
-
-void StateMenu::updateKeysLabel(PlayerId player) {
-    app_.getWidget<tgui::Label>(fmt::format("Player{}Keys", player))->setText(fmt::format("{}   {}",
-        keycodeToStr(playerInfos_[player].left), keycodeToStr(playerInfos_[player].right)));
-}
-
-void StateMenu::recalculatePlayerListPositions() {
-    auto playerListPanel = std::static_pointer_cast<tgui::Panel>(app_.gui.get("PlayerListInnerPanel"));
-    auto playerPanels = playerListPanel->getWidgets();
-
-    std::size_t i = 0;
-    for (auto& panel : playerPanels) {
-        panel->setPosition({0, PLAYER_LIST_ENTRY_HEIGHT*(i++)});
-    }
-}
-
-void StateMenu::startGame() {
-    if (canStartGame()) {
-        app_.enterState<StateGame>(preparePlayerInfos());
-    }
+tgui::Panel::Ptr StateMenu::makePanel(tgui::PanelRenderer* renderer) {
+    auto ret = tgui::Panel::create({"&.height/4*3", "90%"});
+    ret->setPosition("(&.width - width) / 2", "0");
+    ret->setRenderer(renderer->getData());
+    ret->setEnabled(false);
+    ret->setVisible(false);
+    return ret;
 }

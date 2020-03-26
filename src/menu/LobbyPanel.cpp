@@ -15,14 +15,9 @@ LobbyPanel::LobbyPanel(Application::Interface& i, tgui::Panel::Ptr p):
 }
 
 void LobbyPanel::loadGui() {
-    constexpr auto resName = "lobby.ui";
+    constexpr auto resName = "ui/lobby";
     try {
         panel_->loadWidgetsFromStream(AssetManager::openResource(resName));
-    }
-    catch (const std::invalid_argument&) {
-        const auto msg = fmt::format("Failed to open resource {}", resName);
-        print::error(msg);
-        throw std::runtime_error{msg};
     }
     catch (const tgui::Exception& e) {
         const auto msg = fmt::format("Failed to create GUI from {}. {}", resName, e.what());

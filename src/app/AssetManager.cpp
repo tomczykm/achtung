@@ -12,16 +12,16 @@
 namespace {
 
 const std::map<AssetManager::Texture, std::string_view> texToFilename = {
-    {AssetManager::Texture::SelfHaste, "selfHaste.png"},
-    {AssetManager::Texture::OpponentHaste, "oppHaste.png"},
-    {AssetManager::Texture::SelfSlow, "selfSlow.png"},
-    {AssetManager::Texture::OpponentSlow, "oppSlow.png"},
-    {AssetManager::Texture::SelfRightAngle, "selfSquare.png"},
-    {AssetManager::Texture::OpponentRightAngle, "oppSquare.png"},
-    {AssetManager::Texture::ClearTrails, "clear.png"},
-    {AssetManager::Texture::ControlSwap, "swap.png"},
-    {AssetManager::Texture::MassPowerups, "massPowerups.png"},
-    {AssetManager::Texture::RandomPickMeUp, "random.png"}
+    {AssetManager::Texture::SelfHaste, "sprites/selfHaste.png"},
+    {AssetManager::Texture::OpponentHaste, "sprites/oppHaste.png"},
+    {AssetManager::Texture::SelfSlow, "sprites/selfSlow.png"},
+    {AssetManager::Texture::OpponentSlow, "sprites/oppSlow.png"},
+    {AssetManager::Texture::SelfRightAngle, "sprites/selfSquare.png"},
+    {AssetManager::Texture::OpponentRightAngle, "sprites/oppSquare.png"},
+    {AssetManager::Texture::ClearTrails, "sprites/clear.png"},
+    {AssetManager::Texture::ControlSwap, "sprites/swap.png"},
+    {AssetManager::Texture::MassPowerups, "sprites/massPowerups.png"},
+    {AssetManager::Texture::RandomPickMeUp, "sprites/random.png"}
 };
 
 }  // namespace
@@ -42,7 +42,9 @@ std::string AssetManager::getActualFileName(std::string_view resourceName) {
         }
     }
 
-    throw std::invalid_argument{resourceName.data()};
+    const auto msg = fmt::format("Failed to open resource {}", resourceName);
+    print::error(msg);
+    throw std::invalid_argument{msg};
 }
 
 std::stringstream AssetManager::openResource(std::string_view resourceName) {

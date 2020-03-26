@@ -9,9 +9,10 @@
 #include "app/Log.hpp"
 #include "app/AssetManager.hpp"
 #include "app/ConfigManager.hpp"
+#include "app/ProfileManager.hpp"
 #include "app/IGameState.hpp"
-#include "app/SQLite.hpp"
 #include "app/Utils.hpp"
+#include "sql/Connection.hpp"
 
 class Application {
 public:
@@ -27,7 +28,8 @@ private:
 
     AssetManager assets_;
     ConfigManager config_;
-    SQLite database_;
+    sql::Connection database_;
+    ProfileManager profiles_;
 
     std::unique_ptr<IGameState> gameState_;
     std::function<void()> changeState_;

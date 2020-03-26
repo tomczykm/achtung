@@ -34,7 +34,7 @@ Label.Title {
 
 Panel.PlayerListOuterPanel {
     Size = (40%, 70%);
-    Position = (10%, Title.bottom + 50);
+    Position = (5%, Title.bottom + 50);
     Renderer = &PanelRenderer;
 
     Label {
@@ -55,6 +55,29 @@ Panel.PlayerListOuterPanel {
     }
 }
 
+Panel.ProfileListOuterPanel {
+    Size = (40%, 70%);
+    Position = (&.width - width - 5%, Title.bottom + 50);
+    Renderer = &PanelRenderer;
+
+    Label {
+        Position = (30, 15);
+        Text = Profiles;
+        TextSize = 22;
+
+        Renderer {
+            backgroundcolor = transparent;
+            textcolor = yellow;
+        }
+    }
+
+    Panel.ProfileListInnerPanel {
+        Size = (90%, 88%);
+        Position = (5%, 10%);
+        Renderer = &PanelRenderer;
+    }
+}
+
 Button.AddPlayer {
     Text = Add Player;
     Size = (120, 55);
@@ -63,9 +86,17 @@ Button.AddPlayer {
     renderer = &ButtonRenderer;
 }
 
+Button.CreateProfile {
+    Text = New Profile;
+    Size = (120, 55);
+    Position = (&.width - width - 3%, &.height - height - 6%);
+    TextSize = 18;
+    renderer = &ButtonRenderer;
+}
+
 Button.StartGame {
     Size = (120, 55);
-    Position = (AddPlayer.right + 50, AddPlayer.top);
+    Position = (3%, &.height - height - 6%);
     Text = Start;
     TextSize = 18;
     renderer = &ButtonRenderer;

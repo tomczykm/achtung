@@ -139,14 +139,9 @@ void StateGame::initializePlayers(const std::vector<PlayerInfo>& infos) {
 }
 
 void StateGame::loadGui() {
-    constexpr auto resName = "game.ui";
+    constexpr auto resName = "ui/game";
     try {
         app_.gui.loadWidgetsFromStream(AssetManager::openResource(resName));
-    }
-    catch (const std::invalid_argument&) {
-        const auto msg = fmt::format("Failed to open resource {}", resName);
-        print::error(msg);
-        throw std::runtime_error{msg};
     }
     catch (const tgui::Exception& e) {
         const auto msg = fmt::format("Failed to create GUI from {}. {}", resName, e.what());

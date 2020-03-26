@@ -5,6 +5,7 @@
 
 Application::Application():
     gui_{window_},
+    profiles_{database_},
     gameState_{std::make_unique<StateMenu>(Interface{*this})},
     stepTime_{sf::milliseconds(1000/config_.get<int>(Setting::TickRate))}
 {

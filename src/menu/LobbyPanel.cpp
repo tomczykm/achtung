@@ -12,6 +12,15 @@ LobbyPanel::LobbyPanel(Application::Interface& i, tgui::Panel::Ptr p):
     Panel{i, p}
 {
     loadGui();
+    loadProfiles();
+}
+
+void LobbyPanel::input(const sf::Event& event) {
+    if (event.type == sf::Event::KeyPressed) {
+        if (setKeysMode_) {
+            setKey(*setKeysMode_, event.key.code);
+        }
+    }
 }
 
 void LobbyPanel::loadGui() {
@@ -34,11 +43,25 @@ void LobbyPanel::loadGui() {
     });
 }
 
-void LobbyPanel::input(const sf::Event& event) {
-    if (event.type == sf::Event::KeyPressed) {
-        if (setKeysMode_) {
-            setKey(*setKeysMode_, event.key.code);
-        }
+void LobbyPanel::loadProfiles() {
+    print::info(__func__);
+    auto profileListPanel = app_.getWidget<tgui::Panel>("ProfileListInnerPanel");
+
+    auto i = 0u;
+    for (const auto& info: app_.profiles.profiles()) {
+        auto newEntryPanel = tgui::Panel::create({"100%", "60"});
+        newEntryPanel->setRenderer(profileListPanel->getSharedRenderer()->getData());
+        newEntryPanel->setPosition("0", std::to_string(i++*PLAYER_LIST_ENTRY_HEIGHT));
+
+        auto nameLabel = tgui::Label::create(info.second.name);
+        nameLabel->setPosition("10", "50%-height/2");
+        nameLabel->setTextSize(17);
+        nameLabel->setSize("100%", "100%");  // todo: hardcoded width bad, should be automatic
+        nameLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+        nameLabel->getRenderer()->setTextColor(info.second.color);
+        newEntryPanel->add(nameLabel);
+
+        profileListPanel->add(newEntryPanel);
     }
 }
 
@@ -61,7 +84,7 @@ void LobbyPanel::addPlayer() {
     removeButton->setPosition("100% - 10 - width", "15%");
     removeButton->setSize("30", "70%");
     removeButton->connect("pressed", [=] () {
-        if (!setKeysMode_ || (setKeysMode_ && *setKeysMode_ != playerId))
+        if (!setKeysMode_ || *setKeysMode_ != playerId)
             removePlayer(playerId, newEntryPanel);
     });
     newEntryPanel->add(removeButton, fmt::format("{}Remove", widgetNamePrefix));

@@ -14,7 +14,9 @@ c.execute("CREATE TABLE \"Players\"(\
 )")
 
 c.execute("INSERT INTO Players\
-    VALUES(1,'test',255);")
+    VALUES\
+        (1, 'test', 16777215),\
+        (2, 'another', 3881787);")
 
 conn.commit()
 conn.close()

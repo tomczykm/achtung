@@ -44,6 +44,8 @@ class Application::Interface
 public:
     AssetManager& assets;
     ConfigManager& config;
+    ProfileManager& profiles;
+
     sf::RenderWindow& window;
     tgui::Gui& gui;
 
@@ -70,6 +72,7 @@ private:
     explicit Interface(Application& app):
         assets{app.assets_},
         config{app.config_},
+        profiles(app.profiles_),
         window{app.window_},
         gui{app.gui_},
         app_{app}

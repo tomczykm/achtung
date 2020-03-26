@@ -16,7 +16,6 @@ public:
 
     virtual ~Panel() = default;
 
-    virtual void loadGui() = 0;
     virtual void input(const sf::Event&) = 0;
 
     void activate() {

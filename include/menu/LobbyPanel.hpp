@@ -14,11 +14,13 @@ class LobbyPanel : public Panel {
 public:
     explicit LobbyPanel(Application::Interface&, tgui::Panel::Ptr);
 
-    void loadGui() override;
     void input(const sf::Event&) override;
 
 private:
     using PlayerId = std::uint32_t;
+
+    void loadGui();
+    void loadProfiles();
 
     void addPlayer();
     std::vector<PlayerInfo> preparePlayerInfos();

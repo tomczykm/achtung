@@ -3,11 +3,6 @@
 SettingsPanel::SettingsPanel(Application::Interface& i, tgui::Panel::Ptr p):
     Panel{i, p}
 {
-    loadGui();
-}
-
-
-void SettingsPanel::loadGui() {
 
 }
 

@@ -16,17 +16,19 @@ struct ProfileInfo {
 class ProfileManager {
 public:
     using ProfileId = std::uint32_t;
+    using Map = std::map<ProfileId, ProfileInfo>;
 
     explicit ProfileManager(sql::Connection& sql);
 
-    ProfileInfo& operator[](ProfileId id) {
-        return profiles_[id];
+    Map& profiles() {
+        return profiles_;
     }
 
 private:
     void loadProfiles();
+    sf::Color decode(int);
 
     sql::Connection& db_;
 
-    std::map<ProfileId, ProfileInfo> profiles_;
+    Map profiles_;
 };

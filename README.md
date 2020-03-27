@@ -12,7 +12,11 @@ A C++ rewrite of [this game](https://en.wikipedia.org/wiki/Achtung,_die_Kurve!).
 
 ### Building on Windows
 
-Building the game on Windows is likely possible as-is, but you're going to have to figure this out yourself (for now).
+The easiest way to build on Windows seems to be with vcpkg, CMake and MSVC.
+
+1. Install required libraries: `vcpkg install sfml tgui sqlite3`
+2. Generate Visual Studio solution: `cmake -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake -G "Visual Studio 16 2019"`
+3. Open the solution in Visual Studio and build the project
 
 ### Planned features
 

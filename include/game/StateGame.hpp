@@ -6,8 +6,9 @@
 #include "game/BorderThing.hpp"
 #include "game/PickMeUp.hpp"
 
-#include <vector>
 #include <deque>
+#include <optional>
+#include <vector>
 
 class StateGame: public IGameState {
 public:

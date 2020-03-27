@@ -1,10 +1,13 @@
 #include "game/Player.hpp"
 
-#include <cmath>
 #include <algorithm>
 
 #include "app/Log.hpp"
 #include "app/Utils.hpp"
+
+namespace {
+constexpr auto pi = 355.f / 113.f;
+}
 
 PlayerThing::PlayerThing(const PlayerInfo& info, Labels labels, float radius, int vel):
     info_{info},
@@ -53,8 +56,8 @@ void PlayerThing::tick(double timeStep, std::deque<TrailThing>& trails) {
 void PlayerThing::move(double timeStep, std::deque<TrailThing>& trails) {
     auto [oldX, oldY] = shape_.getPosition();
     setPosition(
-        oldX + (timeStep * vel_ * sin(-(M_PI/180)*direction_)),
-        oldY + (timeStep * vel_ * cos(-(M_PI/180)*direction_))
+        oldX + (timeStep * vel_ * sin(-(pi/180)*direction_)),
+        oldY + (timeStep * vel_ * cos(-(pi/180)*direction_))
     );
 
     if (!gap_) {
@@ -62,8 +65,8 @@ void PlayerThing::move(double timeStep, std::deque<TrailThing>& trails) {
         const auto numSegments = distance(newPos, {oldX, oldY}) / (TrailThing::height-1);
         for (auto i = 0u; i < numSegments; ++i) {
             trails.emplace_front(oldX, oldY, direction_, shape_.getRadius()*2, info_.color);
-            oldX += ((TrailThing::height-1) * sin(-(M_PI/180)*direction_));
-            oldY += ((TrailThing::height-1) * cos(-(M_PI/180)*direction_));
+            oldX += ((TrailThing::height-1) * sin(-(pi/180)*direction_));
+            oldY += ((TrailThing::height-1) * cos(-(pi/180)*direction_));
         }
     }
 }

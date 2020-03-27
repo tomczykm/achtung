@@ -77,7 +77,7 @@ void LobbyPanel::addPlayer() {
 
     const auto widgetNamePrefix = fmt::format("Player{}", playerId);
 
-    const auto color = sf::Color{xor_rand::next(0,255), xor_rand::next(0,255), xor_rand::next(0,255)};
+    const auto color = sf::Color::White;
     const auto info = PlayerInfo{"", sf::Keyboard::Unknown, sf::Keyboard::Unknown, color};
 
     auto removeButton = tgui::Button::create("Rem");

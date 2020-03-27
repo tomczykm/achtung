@@ -23,8 +23,8 @@ void ProfileManager::loadProfiles() {
 }
 
 sf::Color ProfileManager::decode(int color) {
-    auto blue = color & 0xff;
-    auto green = (color >> 8) & 0xff;
-    auto red = (color >> 16) & 0xff;
+    uint8_t blue = color & 0xff;
+    uint8_t green = (color >> 8) & 0xff;
+    uint8_t red = (color >> 16) & 0xff;
     return sf::Color{red, green, blue};
 }

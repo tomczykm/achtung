@@ -46,10 +46,10 @@ AssetManager::TextureSet gameTextures = {
 
 StateGame::StateGame(const Application::Interface& ctx, const std::vector<PlayerInfo>& infos):
     app_{ctx},
-    playAreaCornerOffset_{0.05 * app_.config.get<int>(Setting::ResHeight)},
-    playAreaSideLength_{0.9 * app_.config.get<int>(Setting::ResHeight)},
+    playAreaCornerOffset_{static_cast<int>(0.05 * app_.config.get<int>(Setting::ResHeight))},
+    playAreaSideLength_{static_cast<int>(0.9 * app_.config.get<int>(Setting::ResHeight))},
     pickMeUpRadius_{playAreaSideLength_ / pickMeUpToGameAreaSizeRatio},
-    scoreVictoryGoal_{(infos.size()-1)*10},
+    scoreVictoryGoal_{static_cast<uint32_t>((infos.size()-1)*10)},
     border_{playAreaCornerOffset_, playAreaSideLength_}
 {
     app_.window.setMouseCursorVisible(false);

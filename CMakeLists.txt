@@ -8,7 +8,7 @@ find_package(TGUI 0.8 REQUIRED)
 if(MSVC)
 	# for some reason, on ubuntu with sqlite3 installed from distro repositories,
 	# find_package does not find findsqlite3.cmake, but still builds and links just fine
-	find_package(sqlite3 REQUIRED)
+	find_package(sqlite3 CONFIG REQUIRED)
 endif(MSVC)
 
 add_executable(${PROJECT_NAME})

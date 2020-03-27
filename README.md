@@ -12,11 +12,11 @@ A C++ rewrite of [this game](https://en.wikipedia.org/wiki/Achtung,_die_Kurve!).
 
 ### Building on Windows
 
-The easiest way to build on Windows seems to be with vcpkg, CMake and MSVC.
+The easiest way to build on Windows seems to be with vcpkg, CMake and MSBuild. Tested with MSBuild included with Visual Studio 2019.
 
 1. Install required libraries: `vcpkg install sfml tgui sqlite3`
 2. Generate Visual Studio solution: `cmake -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake -G "Visual Studio 16 2019"`
-3. Open the solution in Visual Studio and build the project
+3. Build the generated ALL_BUILD project `MSBuild ALL_BUILD.vcxproj -property:Configuration=Release`
 
 ### Planned features
 

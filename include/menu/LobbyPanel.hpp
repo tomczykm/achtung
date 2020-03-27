@@ -17,25 +17,24 @@ public:
     void input(const sf::Event&) override;
 
 private:
-    using PlayerId = std::uint32_t;
-
     void loadGui();
     void loadProfiles();
 
-    void addPlayer();
+    void addProfileEntry(ProfileId);
+    void addPlayerEntry(ProfileId);
     std::vector<PlayerInfo> preparePlayerInfos();
     bool canStartGame();
     std::size_t getCurrentNumPlayers();
-    void removePlayer(PlayerId, tgui::Panel::Ptr);
+    void removePlayerEntry(ProfileId, tgui::Panel::Ptr);
 
-    void enterSetKeysMode(PlayerId);
-    void setKey(PlayerId, sf::Keyboard::Key);
-    void updateKeysLabel(PlayerId);
+    void enterSetKeysMode(ProfileId);
+    void setKey(ProfileId, sf::Keyboard::Key);
+    void updateKeysLabel(ProfileId);
 
-    void recalculatePlayerListPositions();
+    void recalculateListPositions();
 
     void startGame();
 
-    std::map<PlayerId, PlayerInfo> playerInfos_;
-    std::optional<PlayerId> setKeysMode_;
+    std::map<ProfileId, PlayerInfo> playerInfos_;
+    std::optional<ProfileId> setKeysMode_;
 };

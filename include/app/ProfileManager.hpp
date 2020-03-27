@@ -8,6 +8,8 @@
 
 #include "sql/Connection.hpp"
 
+using ProfileId = std::uint32_t;
+
 struct ProfileInfo {
     std::string name;
     sf::Color color;
@@ -15,7 +17,6 @@ struct ProfileInfo {
 
 class ProfileManager {
 public:
-    using ProfileId = std::uint32_t;
     using Map = std::map<ProfileId, ProfileInfo>;
 
     explicit ProfileManager(sql::Connection& sql);

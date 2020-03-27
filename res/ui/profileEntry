@@ -1,0 +1,12 @@
+Label.Name {
+    Position = (50, 50%-height/2);
+    Size = (100% - 50, 100%);
+    TextSize = 17;
+    VerticalAlignment = Center;
+}
+
+Button.Add {
+    Position = (10, 15%);
+    Size = (30, 70%);
+    Text = <;
+}

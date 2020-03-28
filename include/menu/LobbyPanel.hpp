@@ -12,7 +12,7 @@
 
 class LobbyPanel : public Panel {
 public:
-    explicit LobbyPanel(Application::Interface&, tgui::Panel::Ptr);
+    LobbyPanel(Application::Interface&, StateMenu&, tgui::Panel::Ptr);
 
     void input(const sf::Event&) override;
 

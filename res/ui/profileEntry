@@ -10,3 +10,9 @@ Button.Add {
     Size = (30, 70%);
     Text = <;
 }
+
+Button.Edit {
+    Position = (&.width - width - 10, 15%);
+    Size = (30, 70%);
+    Text = Ed;
+}

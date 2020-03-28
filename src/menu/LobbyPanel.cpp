@@ -3,13 +3,15 @@
 #include "app/Log.hpp"
 #include "app/Utils.hpp"
 #include "game/StateGame.hpp"
+#include "menu/StateMenu.hpp"
+#include "menu/ProfilePanel.hpp"
 
 namespace {
 constexpr auto PLAYER_LIST_ENTRY_HEIGHT = 60u;
 }
 
-LobbyPanel::LobbyPanel(Application::Interface& i, tgui::Panel::Ptr p):
-    Panel{i, p}
+LobbyPanel::LobbyPanel(Application::Interface& i, StateMenu& gs, tgui::Panel::Ptr p):
+    Panel{i, gs, p}
 {
     loadGui();
     loadProfiles();
@@ -36,6 +38,11 @@ void LobbyPanel::loadGui() {
 
     panel_->get("StartGame")->connect("pressed", [this] () {
         startGame();
+    });
+
+    panel_->get("CreateProfile")->connect("pressed", [this] () {
+        auto& profilePanel = gs_.setActivePanel<ProfilePanel>(PanelType::Profile);
+        profilePanel.loadProfile({});
     });
 }
 
@@ -65,6 +72,12 @@ void LobbyPanel::addProfileEntry(ProfileId id) {
         addPlayerEntry(id);
         profileListPanel->remove(newEntryPanel);
         recalculateListPositions();
+    });
+
+    auto editButton = newEntryPanel->get("Edit");
+    editButton->connect("pressed", [=] () {
+        auto& profilePanel = gs_.setActivePanel<ProfilePanel>(PanelType::Profile);
+        profilePanel.loadProfile(id);
     });
 
     profileListPanel->add(newEntryPanel);

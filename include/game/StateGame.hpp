@@ -33,10 +33,8 @@ private:
     std::pair<PickMeUp::OnPickUp, AssetManager::Texture> getRandomPickMeUpEffect();
     void resetPickmeupSpawnTimer();
 
-    template <typename PlayerUnaryOp>
-    PickMeUp::OnPickUp makeSelfEffect(PlayerUnaryOp);
-    template <typename PlayerUnaryOp>
-    PickMeUp::OnPickUp makeOpponentEffect(PlayerUnaryOp);
+    template <typename PlayerUnaryOp> PickMeUp::OnPickUp makeSelfEffect(PlayerUnaryOp);
+    template <typename PlayerUnaryOp> PickMeUp::OnPickUp makeOpponentEffect(PlayerUnaryOp);
 
     void addVelocityChange(PlayerThing&, int velChange, int turnAngleChange, sf::Time);
     void addRightAngleMovement(PlayerThing&, sf::Time);

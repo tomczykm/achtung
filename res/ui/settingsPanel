@@ -1,0 +1,10 @@
+Label.Title {
+    Position = (30, 30);
+    Text = Settings;
+    TextSize = 32;
+
+    Renderer {
+        backgroundcolor = transparent;
+        textcolor = yellow;
+    }
+}

@@ -1,0 +1,50 @@
+Renderer.ButtonRenderer {
+    backgroundcolor = #F5F5F5;
+    backgroundcolordisabled = #E6E6E6;
+    backgroundcolordown = #EBEBEB;
+    backgroundcolorhover = white;
+    bordercolor = #3C3C3C;
+    bordercolordisabled = #7D7D7D;
+    bordercolordown = black;
+    bordercolorfocused = #1E1EB4;
+    bordercolorhover = black;
+    borders = (1, 1, 1, 1);
+    textcolor = #3C3C3C;
+    textcolordisabled = #7D7D7D;
+    textcolordown = black;
+    textcolorhover = black;
+}
+
+Label.Title {
+    Position = (30, 30);
+    TextSize = 32;
+
+    Renderer {
+        backgroundcolor = transparent;
+        textcolor = yellow;
+    }
+}
+
+Button.Save {
+    Text = Save;
+    Size = (120, 55);
+    Position = (3%, &.height - height - 6%);
+    TextSize = 18;
+    renderer = &ButtonRenderer;
+}
+
+Button.Back {
+    Text = Back;
+    Size = (120, 55);
+    Position = (6% + width, &.height - height - 6%);
+    TextSize = 18;
+    renderer = &ButtonRenderer;
+}
+
+Button.Delete {
+    Text = Delete;
+    Size = (120, 55);
+    Position = (&.width - width - 3%, &.height - height - 6%);
+    TextSize = 18;
+    renderer = &ButtonRenderer;
+}

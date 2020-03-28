@@ -7,10 +7,21 @@
 
 #include "app/Application.hpp"
 
+enum PanelType {
+    Lobby = 0,
+    Settings,
+    Profile,
+
+    Count
+};
+
+class StateMenu;
+
 class Panel {
 public:
-    Panel(Application::Interface& i, tgui::Panel::Ptr p):
+    Panel(Application::Interface& i, StateMenu& gs, tgui::Panel::Ptr p):
         app_{i},
+        gs_{gs},
         panel_{p}
     {}
 
@@ -30,6 +41,7 @@ public:
 
 protected:
     Application::Interface& app_;
+    StateMenu& gs_;
 
     tgui::Panel::Ptr panel_;
 };

@@ -1,0 +1,13 @@
+Label.Name {
+    Position = (0, 0);
+    Size = (100%, 100%);
+    TextSize = 24;
+}
+
+Label.Score {
+    Position = (0, 0);
+    Size = (100%, 100%);
+    Text = 0;
+    TextSize = 24;
+    HorizontalAlignment = Right;
+}

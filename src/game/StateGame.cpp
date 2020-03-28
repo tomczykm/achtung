@@ -44,7 +44,7 @@ AssetManager::TextureSet gameTextures = {
 
 }  // namespace
 
-StateGame::StateGame(const Application::Interface& ctx, const std::vector<PlayerInfo>& infos):
+StateGame::StateGame(const Application::Interface& ctx, const PlayerInfos& infos):
     app_{ctx},
     playAreaCornerOffset_{0.05 * app_.config.get<int>(Setting::ResHeight)},
     playAreaSideLength_{0.9 * app_.config.get<int>(Setting::ResHeight)},
@@ -81,8 +81,9 @@ void StateGame::input(const sf::Event& event) {
         default: break;
         }
 
-        for (auto p = players_.begin(); p != lastAlive_; ++p) {
-            p->input(event);
+        for (auto& [id, player]: players_) {
+            if (player.isDead()) continue;
+            player.input(event);
         }
     }
 }
@@ -104,38 +105,34 @@ void StateGame::render() {
         app_.window.draw(shape);
     }
 
-    for (const auto& p: players_) {
-        app_.window.draw(p.getShape());
+    for (const auto& [id, player]: players_) {
+        app_.window.draw(player.getShape());
     }
 }
 
-void StateGame::initializePlayers(const std::vector<PlayerInfo>& infos) {
+void StateGame::initializePlayers(const PlayerInfos& infos) {
     const auto radius = playAreaSideLength_ / playerToGameAreaSizeRatio;
     const auto velocity = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
     auto scoresPanel = app_.getWidget<tgui::Panel>("Scores");
     auto i = 0u;
-    for (const auto& info : infos) {
-        constexpr auto textSize = 24u;
+    for (const auto& [id, info] : infos) {
+        auto scoreListEntryPanel = tgui::Panel::create({"100%", scoreListEntryHeight});
+        scoreListEntryPanel->loadWidgetsFromStream(AssetManager::openResource("ui/scoresEntry"));
+        scoreListEntryPanel->setRenderer(scoresPanel->getSharedRenderer()->getData());
 
-        auto nameLabel = tgui::Label::create(info.name);
+        auto nameLabel = std::static_pointer_cast<tgui::Label>(scoreListEntryPanel->get("Name"));
         nameLabel->getRenderer()->setTextColor(info.color);
-        nameLabel->setSize("100%", scoreListEntryHeight);
-        nameLabel->setPosition(0, i*scoreListEntryHeight);
-        nameLabel->setTextSize(textSize);
-        scoresPanel->add(nameLabel);
+        nameLabel->setText(info.name);
 
-        auto scoreLabel = tgui::Label::create("0");
+        auto scoreLabel = std::static_pointer_cast<tgui::Label>(scoreListEntryPanel->get("Score"));
         scoreLabel->getRenderer()->setTextColor(info.color);
-        scoreLabel->setSize("100%", scoreListEntryHeight);
-        scoreLabel->setPosition(0, i*scoreListEntryHeight);
-        scoreLabel->setTextSize(textSize);
-        scoreLabel->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Right);
-        scoresPanel->add(scoreLabel);
 
-        players_.emplace_back(info, std::make_pair(nameLabel, scoreLabel), radius, velocity);
+        scoresPanel->add(scoreListEntryPanel);
+        players_.emplace(id, PlayerThing{info, scoreListEntryPanel, radius, velocity});
 
         ++i;
     }
+    sortScoreList();
 }
 
 void StateGame::loadGui() {
@@ -154,16 +151,14 @@ void StateGame::loadGui() {
 }
 
 void StateGame::sortScoreList() {
-    std::multimap<PlayerThing::Score, PlayerThing::Labels> labelsByScore;
-    std::transform(players_.cbegin(), players_.cend(), std::inserter(labelsByScore, labelsByScore.begin()),
-        [] (const auto& player) {
-            return std::make_pair(player.getScore(), player.getLabels());
-        });
+    std::multimap<PlayerThing::Score, tgui::Panel::Ptr, std::greater<PlayerThing::Score>> labelsByScore;
+    for (const auto& [id, player]: players_) {
+        labelsByScore.emplace(player.getScore(), player.getLabels());
+    }
 
     auto i = 0u;
-    for (auto it = labelsByScore.rbegin(); it != labelsByScore.rend(); ++it, ++i) {
-        it->second.first->setPosition(0, i*scoreListEntryHeight);
-        it->second.second->setPosition(0, i*scoreListEntryHeight);
+    for (auto& [score, labels]: labelsByScore) {
+        labels->setPosition(0, (i++)*scoreListEntryHeight);
     }
 }
 
@@ -195,8 +190,7 @@ bool StateGame::checkCollisions(PlayerThing& player) {
     auto pickmeup = pickmeups_.begin();
     while (pickmeup != pickmeups_.end()) {
         if (player.checkCollision(pickmeup->getShape())) {
-            print::info("{} got a pickmeup", player.name());
-            pickmeup->onPickUp(player.name());
+            pickmeup->onPickUp(player);
             pickmeup = pickmeups_.erase(pickmeup);
         } else {
             ++pickmeup;
@@ -207,15 +201,16 @@ bool StateGame::checkCollisions(PlayerThing& player) {
 }
 
 void StateGame::awardPoints() {
-    lastAlive_ = std::partition(players_.begin(), players_.end(),
-        [] (auto& p) { return !p.isDead(); });
-
-    for (auto player = players_.begin() ; player != lastAlive_ ; ++player) {
-        player->addPoint();
+    for (auto& [id, player]: players_) {
+        if (player.isDead()) continue;
+        player.addPoint();
     }
     sortScoreList();
 
-    if (lastAlive_ - players_.begin() == 1) {
+    const auto aliveCount = std::count_if(players_.begin(), players_.end(), [] (auto& kv) {
+            return not kv.second.isDead();
+        });
+    if (aliveCount <= 1) {
         if (victoryGoalAchieved()) {
             changeState<GameEnd>();
         } else {
@@ -225,20 +220,14 @@ void StateGame::awardPoints() {
 }
 
 bool StateGame::victoryGoalAchieved() {
-    std::vector<uint32_t> scores;
-    std::transform(players_.cbegin(), players_.cend(), std::back_inserter(scores), [] (const auto& p) {
-        return p.getScore();
-    });
-    std::sort(scores.begin(), scores.end(), std::greater<uint32_t>{});
+    std::vector<PlayerThing::Score> scores;
+    for (const auto&[id, player]: players_) {
+        scores.push_back(player.getScore());
+    }
+    std::sort(scores.begin(), scores.end(), std::greater<PlayerThing::Score>{});
 
     return scores.front() >= scoreVictoryGoal_
         && scores.front() - *(scores.begin()+1) >= 2; // first place needs to be at least two points ahead
-}
-
-StateGame::PlayerIt StateGame::getPlayer(std::string_view name) {
-    return std::find_if(players_.begin(), players_.end(), [name] (const auto& p) {
-        return p.name() == name;
-    });
 }
 
 void StateGame::createRandomPickMeUp() {
@@ -259,43 +248,43 @@ std::pair<PickMeUp::OnPickUp, AssetManager::Texture> StateGame::getRandomPickMeU
 
     switch(static_cast<PickUpType>(type)) {
     case PickUpType::SelfHaste:
-        return std::make_pair(makeSelfEffect([this] (auto player) {
+        return std::make_pair(makeSelfEffect([this] (auto& player) {
             const auto velChange = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
             addVelocityChange(player, velChange, hasteTurnAngleChange, selfHasteDuration);
         }), AssetManager::Texture::SelfHaste);
     case PickUpType::OpponentHaste:
-        return std::make_pair(makeOpponentEffect([this] (auto player) {
+        return std::make_pair(makeOpponentEffect([this] (auto& player) {
             const auto velChange = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
             addVelocityChange(player, velChange, hasteTurnAngleChange, oppHasteDuration);
         }), AssetManager::Texture::OpponentHaste);
     case PickUpType::SelfSlow:
-        return std::make_pair(makeSelfEffect([this] (auto player) {
-            const auto velChange = -(player->getVelocity() / 2);
+        return std::make_pair(makeSelfEffect([this] (auto& player) {
+            const auto velChange = -(player.getVelocity() / 2);
             addVelocityChange(player, velChange, selfSlowTurnAngleChange, selfSlowDuration);
         }), AssetManager::Texture::SelfSlow);
     case PickUpType::OpponentSlow:
-        return std::make_pair(makeOpponentEffect([this] (auto player) {
-            const auto velChange = -(player->getVelocity() / 2);
+        return std::make_pair(makeOpponentEffect([this] (auto& player) {
+            const auto velChange = -(player.getVelocity() / 2);
             addVelocityChange(player, velChange, oppSlowTurnAngleChange, oppSlowDuration);
         }), AssetManager::Texture::OpponentSlow);
     case PickUpType::ClearTrails:
-        return std::make_pair(makeSelfEffect([this] (auto) {
+        return std::make_pair(makeSelfEffect([this] (auto&) {
             trails_.clear();
         }), AssetManager::Texture::ClearTrails);
     case PickUpType::SelfRightAngle:
-        return std::make_pair(makeSelfEffect([this] (auto player) {
+        return std::make_pair(makeSelfEffect([this] (auto& player) {
             addRightAngleMovement(player, selfRightAngleMovementDuration);
         }), AssetManager::Texture::SelfRightAngle);
     case PickUpType::OpponentRightAngle:
-        return std::make_pair(makeOpponentEffect([this] (auto player) {
+        return std::make_pair(makeOpponentEffect([this] (auto& player) {
             addRightAngleMovement(player, oppRightAngleMovementDuration);
         }), AssetManager::Texture::OpponentRightAngle);
     case PickUpType::ControlSwap:
-        return std::make_pair(makeOpponentEffect([this] (auto player) {
+        return std::make_pair(makeOpponentEffect([this] (auto& player) {
             addControlSwap(player, controlSwapDuration);
         }), AssetManager::Texture::ControlSwap);
     case PickUpType::MassPowerups:
-        return std::make_pair(makeSelfEffect([this] (auto) {
+        return std::make_pair(makeSelfEffect([this] (auto&) {
             addMassPowerups();
         }), AssetManager::Texture::MassPowerups);
     default:
@@ -305,46 +294,43 @@ std::pair<PickMeUp::OnPickUp, AssetManager::Texture> StateGame::getRandomPickMeU
     }
 }
 
-template <typename OnPickUp>
-PickMeUp::OnPickUp StateGame::makeSelfEffect(OnPickUp onPickUp) {
-    return [this, onPickUp] (auto name) {
-        onPickUp(getPlayer(name));
+template <typename PlayerUnaryOp>
+PickMeUp::OnPickUp StateGame::makeSelfEffect(PlayerUnaryOp effect) {
+    return [this, effect] (PlayerThing& pickedBy) {
+        effect(pickedBy);
     };
 }
 
-template <typename OnPickUp>
-PickMeUp::OnPickUp StateGame::makeOpponentEffect(OnPickUp onPickUp) {
-    return [this, onPickUp] (auto name) {
-        auto pickedBy = getPlayer(name);
-        for (auto player = players_.begin(); player != players_.end(); ++player) {
-            if (player == pickedBy) continue;
-            onPickUp(player);
+template <typename PlayerUnaryOp>
+PickMeUp::OnPickUp StateGame::makeOpponentEffect(PlayerUnaryOp effect) {
+    return [this, effect] (PlayerThing& pickedBy) {
+        for (auto& [id, player]: players_) {
+            if (player.name() == pickedBy.name()) continue;
+            effect(player);
         }
     };
 }
 
-void StateGame::addVelocityChange(PlayerIt player, int velChange, int turnAngleChange, sf::Time duration) {
-    player->changeVelocity(velChange);
-    player->changeTurn(turnAngleChange);
-    player->addTimedEffect(duration, [=, name=player->name()] () {
-        auto player = getPlayer(name);
-        player->changeVelocity(-velChange);
-        player->changeTurn(-turnAngleChange);
+void StateGame::addVelocityChange(PlayerThing& player, int velChange, int turnAngleChange, sf::Time duration) {
+    player.changeVelocity(velChange);
+    player.changeTurn(turnAngleChange);
+    player.addTimedEffect(duration, [&] () {
+        player.changeVelocity(-velChange);
+        player.changeTurn(-turnAngleChange);
     });
 }
 
-void StateGame::addRightAngleMovement(PlayerIt player, sf::Time duration) {
-    player->setRightAngleMovement(true);
-    player->addTimedEffect(duration, [this, name=player->name()] {
-        auto player = getPlayer(name);
-        player->setRightAngleMovement(false);
+void StateGame::addRightAngleMovement(PlayerThing& player, sf::Time duration) {
+    player.setRightAngleMovement(true);
+    player.addTimedEffect(duration, [&] {
+        player.setRightAngleMovement(false);
     });
 }
 
-void StateGame::addControlSwap(PlayerIt player, sf::Time duration) {
-    player->swapControls();
-    player->addTimedEffect(duration, [this, name=player->name()] {
-        getPlayer(name)->swapControls();
+void StateGame::addControlSwap(PlayerThing& player, sf::Time duration) {
+    player.swapControls();
+    player.addTimedEffect(duration, [&] {
+        player.swapControls();
     });
 }
 
@@ -368,7 +354,7 @@ void StateGame::resetPickmeupSpawnTimer() {
 void StateGame::RoundBegin::onEnterState() {
     gs.trails_.clear();
     gs.pickmeups_.clear();
-    for (auto& player : gs.players_) {
+    for (auto& [id, player] : gs.players_) {
         player.newRoundSetup(
             xor_rand::next(gs.playAreaCornerOffset_ + 0.15 * gs.playAreaSideLength_,
                 gs.playAreaCornerOffset_ + 0.85 * gs.playAreaSideLength_),
@@ -377,7 +363,6 @@ void StateGame::RoundBegin::onEnterState() {
             gs.trails_
         );
     }
-    gs.lastAlive_ = gs.players_.end();
 }
 
 void StateGame::RoundBegin::onSpacebar() {
@@ -399,10 +384,11 @@ void StateGame::Running::onSpacebar() {
 
 void StateGame::Running::onTick(double deltaTime) {
     bool playerDied = false;
-    for (auto player = gs.players_.begin() ; player != gs.lastAlive_ ; ++player) {
-        player->tick(deltaTime, gs.trails_);
+    for (auto& [id, player]: gs.players_) {
+        if (player.isDead()) continue;
+        player.tick(deltaTime, gs.trails_);
 
-        if (gs.checkCollisions(*player)) {
+        if (gs.checkCollisions(player)) {
             playerDied = true;
         }
     }

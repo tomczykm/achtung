@@ -11,7 +11,7 @@
 
 class StateGame: public IGameState {
 public:
-    StateGame(const Application::Interface&, const std::vector<PlayerInfo>&);
+    StateGame(const Application::Interface&, const PlayerInfos&);
     ~StateGame();
 
     void input(const sf::Event&) override;
@@ -20,9 +20,8 @@ public:
 
 private:
     class RoundState;
-    using PlayerIt = std::vector<PlayerThing>::iterator;
 
-    void initializePlayers(const std::vector<PlayerInfo>&);
+    void initializePlayers(const PlayerInfos&);
     void loadGui();
     void sortScoreList();
 
@@ -30,20 +29,18 @@ private:
     void awardPoints();
     bool victoryGoalAchieved();
 
-    PlayerIt getPlayer(std::string_view);
-
     void createRandomPickMeUp();
     std::pair<PickMeUp::OnPickUp, AssetManager::Texture> getRandomPickMeUpEffect();
     void resetPickmeupSpawnTimer();
 
-    template <typename OnPickUp>
-    PickMeUp::OnPickUp makeSelfEffect(OnPickUp);
-    template <typename OnPickUp>
-    PickMeUp::OnPickUp makeOpponentEffect(OnPickUp);
+    template <typename PlayerUnaryOp>
+    PickMeUp::OnPickUp makeSelfEffect(PlayerUnaryOp);
+    template <typename PlayerUnaryOp>
+    PickMeUp::OnPickUp makeOpponentEffect(PlayerUnaryOp);
 
-    void addVelocityChange(PlayerIt, int velChange, int turnAngleChange, sf::Time);
-    void addRightAngleMovement(PlayerIt, sf::Time);
-    void addControlSwap(PlayerIt, sf::Time);
+    void addVelocityChange(PlayerThing&, int velChange, int turnAngleChange, sf::Time);
+    void addRightAngleMovement(PlayerThing&, sf::Time);
+    void addControlSwap(PlayerThing&, sf::Time);
     void addMassPowerups();
 
     template <typename State>
@@ -60,8 +57,7 @@ private:
 
     std::deque<TrailThing> trails_;
 
-    std::vector<PlayerThing> players_;
-    PlayerIt lastAlive_;
+    std::map<ProfileId, PlayerThing> players_;
 
     uint32_t scoreVictoryGoal_;
 

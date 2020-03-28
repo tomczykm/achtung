@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <TGUI/TGUI.hpp>
 
+#include "app/ProfileManager.hpp"
 #include "game/TrailThing.hpp"
 #include "game/Effect.hpp"
 
@@ -16,12 +17,13 @@ struct PlayerInfo {
     sf::Color color;
 };
 
+using PlayerInfos = std::map<ProfileId, PlayerInfo>;
+
 class PlayerThing {
 public:
     using Score = uint32_t;
-    using Labels = std::pair<tgui::Label::Ptr, tgui::Label::Ptr>;
 
-    PlayerThing(const PlayerInfo&, Labels, float radius, int vel);
+    PlayerThing(const PlayerInfo&, tgui::Panel::Ptr labels, float radius, int vel);
 
     void tick(double timeStep, std::deque<TrailThing>& trails);
     void move(double timeStep, std::deque<TrailThing>& trails);
@@ -37,7 +39,7 @@ public:
 
     void addPoint();
     Score getScore() const { return score_; }
-    Labels getLabels() const { return {nameLabel_, scoreLabel_}; }
+    tgui::Panel::Ptr getLabels() const { return scoreLabels_; }
 
     void kill();
     bool isDead() const { return dead_; }
@@ -73,8 +75,7 @@ private:
 
     Score score_ = 0;
 
-    tgui::Label::Ptr nameLabel_;
-    tgui::Label::Ptr scoreLabel_;
+    tgui::Panel::Ptr scoreLabels_;
 
     bool dead_ = false;
 

@@ -6,13 +6,12 @@
 #include "app/Log.hpp"
 #include "app/Utils.hpp"
 
-PlayerThing::PlayerThing(const PlayerInfo& info, Labels labels, float radius, int vel):
+PlayerThing::PlayerThing(const PlayerInfo& info, tgui::Panel::Ptr labels, float radius, int vel):
     info_{info},
     shape_{radius},
     recShape_{{radius*2, radius*2}},
     vel_{vel},
-    nameLabel_{labels.first},
-    scoreLabel_{labels.second}
+    scoreLabels_{labels}
 {
     shape_.setOrigin(radius, radius);
     shape_.setFillColor(sf::Color::Yellow);
@@ -121,9 +120,8 @@ bool PlayerThing::checkCollision(const sf::Shape &o) const {
 
 void PlayerThing::addPoint() {
     score_ += 1;
-    if (scoreLabel_) {
-        scoreLabel_->setText(std::to_string(score_));
-    }
+    std::static_pointer_cast<tgui::Label>(scoreLabels_->get("Score"))
+        ->setText(std::to_string(score_));
 }
 
 void PlayerThing::kill() {

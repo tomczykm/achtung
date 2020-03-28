@@ -102,14 +102,6 @@ void LobbyPanel::addPlayerEntry(ProfileId id) {
     playerInfos_.emplace(id, info);
 }
 
-std::vector<PlayerInfo> LobbyPanel::preparePlayerInfos() {
-    std::vector<PlayerInfo> infos(playerInfos_.size());
-    std::transform(playerInfos_.cbegin(), playerInfos_.cend(), infos.begin(), [] (const auto& kvPair) {
-        return kvPair.second;
-    });
-    return infos;
-}
-
 bool LobbyPanel::canStartGame() {
     auto playersHaveSetValues = std::all_of(playerInfos_.cbegin(), playerInfos_.cend(), [] (const auto& pair) {
         const auto& p = pair.second;
@@ -186,6 +178,6 @@ void LobbyPanel::recalculateListPositions() {
 
 void LobbyPanel::startGame() {
     if (canStartGame()) {
-        app_.enterState<StateGame>(preparePlayerInfos());
+        app_.enterState<StateGame>(playerInfos_);
     }
 }

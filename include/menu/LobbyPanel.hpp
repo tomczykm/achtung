@@ -22,7 +22,6 @@ private:
 
     void addProfileEntry(ProfileId);
     void addPlayerEntry(ProfileId);
-    std::vector<PlayerInfo> preparePlayerInfos();
     bool canStartGame();
     std::size_t getCurrentNumPlayers();
     void removePlayerEntry(ProfileId, tgui::Panel::Ptr);
@@ -35,6 +34,6 @@ private:
 
     void startGame();
 
-    std::map<ProfileId, PlayerInfo> playerInfos_;
+    PlayerInfos playerInfos_;
     std::optional<ProfileId> setKeysMode_;
 };

@@ -18,6 +18,5 @@ Building the game on Windows is likely possible as-is, but you're going to have 
 
 1. Feature parity with [this version of the game](http://www.cda.pl/gry-online/6431c8/Uwaga-zakret-Achtung-Die-Kurve)
 2. Publishing Windows binaries
-3. Recording and viewing replay files (with backwards compatibility, if possible)
-4. Local player profiles with statistics
-5. Several small QoL features (custom player names, custom colors, etc.)
+3. Recording and viewing replay files
+4. Statistics for player profiles

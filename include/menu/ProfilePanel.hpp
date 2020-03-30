@@ -2,6 +2,8 @@
 
 #include <optional>
 
+#include <SFML/Graphics.hpp>
+
 #include "app/ProfileManager.hpp"
 #include "menu/Panel.hpp"
 
@@ -14,4 +16,12 @@ public:
     void loadProfile(std::optional<ProfileId>);
 private:
     void loadGui();
+
+    void saveProfile();
+    void deleteProfile();
+
+    sf::Color decodeColor(const std::string&);
+    std::string encodeColor(sf::Color);
+
+    std::optional<ProfileId> loadedProfile_;
 };

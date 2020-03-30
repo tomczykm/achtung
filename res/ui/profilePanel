@@ -48,3 +48,15 @@ Button.Delete {
     TextSize = 18;
     renderer = &ButtonRenderer;
 }
+
+EditBox.NameEdit {
+    Position = (9%, 30%);
+    Size = (25%, 45);
+    TextSize = 17;
+}
+
+EditBox.ColorEdit {
+    Position = (9%, 50%);
+    Size = (25%, 45);
+    TextSize = 17;
+}

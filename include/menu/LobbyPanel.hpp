@@ -17,8 +17,10 @@ public:
     void input(const sf::Event&) override;
 
 private:
+    void onActivate() override;
+    void updateProfileEntries();
+
     void loadGui();
-    void loadProfiles();
 
     void addProfileEntry(ProfileId);
     void addPlayerEntry(ProfileId);

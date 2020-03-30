@@ -14,7 +14,6 @@ LobbyPanel::LobbyPanel(Application::Interface& i, StateMenu& gs, tgui::Panel::Pt
     Panel{i, gs, p}
 {
     loadGui();
-    loadProfiles();
 }
 
 void LobbyPanel::input(const sf::Event& event) {
@@ -23,6 +22,10 @@ void LobbyPanel::input(const sf::Event& event) {
             setKey(*setKeysMode_, event.key.code);
         }
     }
+}
+
+void LobbyPanel::onActivate() {
+    updateProfileEntries();
 }
 
 void LobbyPanel::loadGui() {
@@ -46,17 +49,50 @@ void LobbyPanel::loadGui() {
     });
 }
 
-void LobbyPanel::loadProfiles() {
-    print::info(__func__);
+void LobbyPanel::updateProfileEntries() {
+    auto profilePanels = app_.getWidget<tgui::Panel>("ProfileListInnerPanel")->getWidgets();
+    auto playerPanels = app_.getWidget<tgui::Panel>("PlayerListInnerPanel")->getWidgets();
 
-    for (const auto& info: app_.profiles.profiles()) {
-        addProfileEntry(info.first);
+    // updated & created
+    for (const auto&[id, profile]: app_.profiles.profiles()) {
+        for (const auto& p: profilePanels) {
+            const ProfileId panelId = std::stoi(p->getWidgetName().toAnsiString());
+            if (id == panelId) {
+                auto panel = static_cast<tgui::Panel*>(p.get());
+                auto nameLabel = static_cast<tgui::Label*>(panel->get("Name").get());
+                nameLabel->getRenderer()->setTextColor(profile.color);
+                nameLabel->setText(profile.name);
+                goto cont;
+            }
+        }
+
+        // the reason we update only entries in profile list is that
+        // there's no way to edit profiles that are added to the game lobby
+        for (const auto& p: playerPanels) {
+            const ProfileId panelId = std::stoi(p->getWidgetName().toAnsiString());
+            if (id == panelId) goto cont;
+        }
+
+        addProfileEntry(id);
+
+        cont:;
     }
+
+    // deleted
+    auto containerPanel = app_.getWidget<tgui::Panel>("ProfileListInnerPanel");
+    for (const auto& p: profilePanels) {
+        const ProfileId panelId = std::stoi(p->getWidgetName().toAnsiString());
+        if (app_.profiles.profiles().find(panelId) == app_.profiles.profiles().end()) {
+            print::info("panel {} had profile deleted", panelId);
+            containerPanel->remove(p);
+        }
+    }
+
     recalculateListPositions();
 }
 
 void LobbyPanel::addProfileEntry(ProfileId id) {
-    const auto& profile = app_.profiles.profiles()[id];
+    const auto& profile = app_.profiles[id];
     auto profileListPanel = app_.getWidget<tgui::Panel>("ProfileListInnerPanel");
 
     auto newEntryPanel = tgui::Panel::create({"100%", PLAYER_LIST_ENTRY_HEIGHT});
@@ -80,12 +116,12 @@ void LobbyPanel::addProfileEntry(ProfileId id) {
         profilePanel.loadProfile(id);
     });
 
-    profileListPanel->add(newEntryPanel);
+    profileListPanel->add(newEntryPanel, fmt::format("{}", id));
 }
 
 void LobbyPanel::addPlayerEntry(ProfileId id) {
     print::info("{}: id {}", __func__, id);
-    const auto& profile = app_.profiles.profiles()[id];
+    const auto& profile = app_.profiles[id];
     const auto info = PlayerInfo{profile.name, sf::Keyboard::Unknown, sf::Keyboard::Unknown, profile.color};
 
     auto playerListPanel = app_.getWidget<tgui::Panel>("PlayerListInnerPanel");
@@ -111,7 +147,7 @@ void LobbyPanel::addPlayerEntry(ProfileId id) {
     nameLabel->setText(info.name);
     nameLabel->getRenderer()->setTextColor(info.color);
 
-    playerListPanel->add(newEntryPanel);
+    playerListPanel->add(newEntryPanel, fmt::format("{}", id));
     playerInfos_.emplace(id, info);
 }
 

@@ -17,6 +17,7 @@ bool Statement::next() {
     auto result = sqlite3_step(statement_);
     if (result == SQLITE_DONE) return false;
     if (result == SQLITE_ROW) return true;
+    print::error("bad result {}", result);
     return false;  // todo throw
 }
 

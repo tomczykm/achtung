@@ -32,6 +32,7 @@ public:
     void activate() {
         panel_->setEnabled(true);
         panel_->setVisible(true);
+        onActivate();
     };
 
     void deactivate() {
@@ -40,6 +41,8 @@ public:
     };
 
 protected:
+    virtual void onActivate() {}
+
     Application::Interface& app_;
     StateMenu& gs_;
 

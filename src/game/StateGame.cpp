@@ -244,7 +244,7 @@ void StateGame::createRandomPickMeUp() {
 }
 
 std::pair<PickMeUp::OnPickUp, AssetManager::Texture> StateGame::getRandomPickMeUpEffect() {
-    const auto type = xor_rand::next(1, static_cast<int>(PickUpType::Count)-1);
+    const auto type = xor_rand::next(5, static_cast<int>(PickUpType::Count)-1);
 
     switch(static_cast<PickUpType>(type)) {
     case PickUpType::SelfHaste:

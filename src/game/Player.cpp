@@ -6,12 +6,11 @@
 #include "app/Log.hpp"
 #include "app/Utils.hpp"
 
-PlayerThing::PlayerThing(const PlayerInfo& info, tgui::Panel::Ptr labels, float radius, int vel):
+PlayerThing::PlayerThing(const PlayerInfo& info, float radius, int vel):
     info_{info},
     shape_{radius},
     recShape_{{radius*2, radius*2}},
-    vel_{vel},
-    scoreLabels_{labels}
+    vel_{vel}
 {
     shape_.setOrigin(radius, radius);
     shape_.setFillColor(sf::Color::Yellow);
@@ -28,7 +27,7 @@ const sf::Shape& PlayerThing::getShape() const {
     }
 }
 
-void PlayerThing::tick(double timeStep, std::deque<TrailThing>& trails) {
+void PlayerThing::step(double timeStep, std::deque<TrailThing>& trails) {
     endExpiredEffects();
 
     if (!rightAngleMovement_) {
@@ -120,13 +119,10 @@ bool PlayerThing::checkCollision(const sf::Shape &o) const {
 
 void PlayerThing::addPoint() {
     score_ += 1;
-    std::static_pointer_cast<tgui::Label>(scoreLabels_->get("Score"))
-        ->setText(std::to_string(score_));
 }
 
 void PlayerThing::kill() {
     if (!dead_) {
-        print::info("kill {}", info_.name);
         dead_ = true;
     }
 }

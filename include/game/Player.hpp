@@ -23,10 +23,9 @@ class PlayerThing {
 public:
     using Score = uint32_t;
 
-    PlayerThing(const PlayerInfo&, tgui::Panel::Ptr labels, float radius, int vel);
+    PlayerThing(const PlayerInfo&, float radius, int vel);
 
-    void tick(double timeStep, std::deque<TrailThing>& trails);
-    void move(double timeStep, std::deque<TrailThing>& trails);
+    void step(double timeStep, std::deque<TrailThing>& trails);
     void input(const sf::Event&);
 
     void newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailThing>&);
@@ -39,7 +38,6 @@ public:
 
     void addPoint();
     Score getScore() const { return score_; }
-    tgui::Panel::Ptr getLabels() const { return scoreLabels_; }
 
     void kill();
     bool isDead() const { return dead_; }
@@ -61,6 +59,8 @@ private:
     void gapSwitch();
     void endExpiredEffects();
 
+    void move(double timeStep, std::deque<TrailThing>& trails);
+
     void setPosition(float x, float y);
 
     PlayerInfo info_;
@@ -75,11 +75,8 @@ private:
 
     Score score_ = 0;
 
-    tgui::Panel::Ptr scoreLabels_;
-
     bool dead_ = false;
 
-    // gap logic
     bool gap_ = false;
     sf::Clock gapSwitchTimer_;
     sf::Time gapSwitchDuration_;

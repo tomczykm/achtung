@@ -1,6 +1,6 @@
-#include "game/PickMeUp.hpp"
+#include "engine/PickMeUp.hpp"
 
-#include "game/StateGame.hpp"
+// #include "game/StateGame.hpp"
 
 PickMeUp::PickMeUp(uint32_t xPos, uint32_t yPos, float radius, const sf::Texture& texture, OnPickUp f):
     shape_{radius},

@@ -8,8 +8,8 @@
 #include <TGUI/TGUI.hpp>
 
 #include "app/ProfileManager.hpp"
-#include "game/TrailThing.hpp"
-#include "game/Effect.hpp"
+#include "engine/TrailThing.hpp"
+#include "engine/Effect.hpp"
 
 struct PlayerInfo {
     std::string name;
@@ -23,10 +23,10 @@ class PlayerThing {
 public:
     using Score = uint32_t;
 
-    PlayerThing(const PlayerInfo&, tgui::Panel::Ptr labels, float radius, int vel);
+    PlayerThing(const PlayerInfo&, float radius, int vel, Timer::Ptr gapSwitchTimer);
+    virtual ~PlayerThing() = default;
 
-    void tick(double timeStep, std::deque<TrailThing>& trails);
-    void move(double timeStep, std::deque<TrailThing>& trails);
+    void step(double timeStep, std::deque<TrailThing>& trails);
     void input(const sf::Event&);
 
     void newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailThing>&);
@@ -39,7 +39,6 @@ public:
 
     void addPoint();
     Score getScore() const { return score_; }
-    tgui::Panel::Ptr getLabels() const { return scoreLabels_; }
 
     void kill();
     bool isDead() const { return dead_; }
@@ -57,9 +56,14 @@ public:
         effects_.emplace_back(std::forward<Ts>(args)...);
     }
 
-private:
+protected:
     void gapSwitch();
     void endExpiredEffects();
+
+    void move(double timeStep, std::deque<TrailThing>& trails);
+    virtual bool isKeyPressed(sf::Keyboard::Key k) {
+        return sf::Keyboard::isKeyPressed(k);
+    }
 
     void setPosition(float x, float y);
 
@@ -75,14 +79,10 @@ private:
 
     Score score_ = 0;
 
-    tgui::Panel::Ptr scoreLabels_;
-
     bool dead_ = false;
 
-    // gap logic
     bool gap_ = false;
-    sf::Clock gapSwitchTimer_;
-    sf::Time gapSwitchDuration_;
+    Timer::Ptr gapSwitchTimer_;
 
     std::vector<TimedEffect> effects_;
 };

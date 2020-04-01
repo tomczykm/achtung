@@ -1,4 +1,4 @@
-target_sources(${PROJECT_NAME} PRIVATE
+target_sources(freeachtung_app PRIVATE
     Connection.cpp
     Statement.cpp
 )

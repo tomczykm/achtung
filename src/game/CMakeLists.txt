@@ -1,7 +1,3 @@
-target_sources(${PROJECT_NAME} PUBLIC
-    BorderThing.cpp
-    Player.cpp
-    PickMeUp.cpp
+target_sources(freeachtung_app PRIVATE
     StateGame.cpp
-    TrailThing.cpp
 )

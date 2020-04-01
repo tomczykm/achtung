@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "app/Application.hpp"
-#include "game/Player.hpp"
+#include "engine/Player.hpp"
 
 class LobbyPanel : public Panel {
 public:

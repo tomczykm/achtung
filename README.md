@@ -10,6 +10,8 @@ A C++ rewrite of [this game](https://en.wikipedia.org/wiki/Achtung,_die_Kurve!).
 4. Go to `build` directory, generate Makefile and build the project: `mkdir build && cd build && cmake .. && make`
 5. Run `./freeachtung` to play the game
 
+You may also run `make all test` to run automated tests.
+
 ### Building on Windows
 
 Building the game on Windows is likely possible as-is, but you're going to have to figure this out yourself (for now).

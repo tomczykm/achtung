@@ -1,4 +1,4 @@
-target_sources(${PROJECT_NAME} PUBLIC
+target_sources(freeachtung_app PRIVATE
     LobbyPanel.cpp
     ProfilePanel.cpp
     SettingsPanel.cpp

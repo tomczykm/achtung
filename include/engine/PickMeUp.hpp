@@ -6,7 +6,7 @@
 
 #include "app/ProfileManager.hpp"
 #include "app/Log.hpp"
-#include "game/Player.hpp"
+#include "engine/Player.hpp"
 
 enum class PickUpType {
     Null = 0,

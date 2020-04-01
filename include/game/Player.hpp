@@ -23,7 +23,7 @@ class PlayerThing {
 public:
     using Score = uint32_t;
 
-    PlayerThing(const PlayerInfo&, float radius, int vel);
+    PlayerThing(const PlayerInfo&, float radius, int vel, Timer::Ptr gapSwitchTimer);
 
     void step(double timeStep, std::deque<TrailThing>& trails);
     void input(const sf::Event&);
@@ -78,8 +78,7 @@ private:
     bool dead_ = false;
 
     bool gap_ = false;
-    sf::Clock gapSwitchTimer_;
-    sf::Time gapSwitchDuration_;
+    Timer::Ptr gapSwitchTimer_;
 
     std::vector<TimedEffect> effects_;
 };

@@ -6,6 +6,7 @@
 #include "game/Player.hpp"
 #include "game/BorderThing.hpp"
 #include "game/PickMeUp.hpp"
+#include "game/TimerService.hpp"
 #include "framework/Observer.hpp"
 
 #include <cstdint>
@@ -18,7 +19,7 @@ class Engine : public framework::Observable {
 public:
     using Players = std::map<ProfileId, PlayerThing>;
 
-    Engine(AssetManager&, const PlayerInfos&, int playAreaCorner, int playAreaSide);
+    Engine(AssetManager&, const PlayerInfos&, int tickrate, int playAreaCorner, int playAreaSide);
 
     void input(const sf::Event&);
     void step(double deltaTime);
@@ -47,6 +48,7 @@ private:
     void addMassPowerups();
 
     AssetManager& assets_;
+    TimerService timerService_;
 
     int playAreaCornerOffset_;
     int playAreaSideLength_;
@@ -62,8 +64,7 @@ private:
     BorderThing border_;
 
     std::vector<PickMeUp> pickmeups_;
-    sf::Clock pickmeupSpawnTimer_;
-    sf::Time timeUntilNextPickmeupSpawn_;
+    Timer::Ptr pickmeupSpawnTimer_;
 
     std::optional<TimedEffect> massPowerups_;
 };

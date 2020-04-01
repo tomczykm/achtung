@@ -33,6 +33,7 @@ StateGame::StateGame(const Application::Interface& ctx, const PlayerInfos& infos
     engine_{
         app_.assets,
         infos,
+        app_.config.get<int>(Setting::TickRate),
         0.05 * app_.config.get<int>(Setting::ResHeight),
         0.9 * app_.config.get<int>(Setting::ResHeight)
     }

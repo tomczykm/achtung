@@ -1,27 +1,27 @@
 #pragma once
 
 #include <functional>
-#include <SFML/System/Clock.hpp>
+
+#include "game/Timer.hpp"
 
 class TimedEffect {
 public:
     using Action = std::function<void()>;
 
-    TimedEffect(sf::Time duration, const Action& onExpire):
-        duration_{duration},
+    TimedEffect(Timer::Ptr timer, const Action& onExpire):
+        timer_{timer},
         onExpire_{onExpire}
     {}
     ~TimedEffect() { onExpire_(); }
 
-    void extendBy(sf::Time time) {
-        duration_ += time;
+    void extendBy(Ticks t) {
+        timer_->extend(t);
     }
 
     bool isExpired() const {
-        return clock_.getElapsedTime() > duration_;
+        return timer_->isExpired();
     }
 private:
-    sf::Clock clock_;
-    sf::Time duration_;
+    Timer::Ptr timer_;
     Action onExpire_;
 };

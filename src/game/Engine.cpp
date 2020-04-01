@@ -26,15 +26,18 @@ const auto controlSwapDuration = sf::milliseconds(6500);
 
 }  // namespace
 
-Engine::Engine(AssetManager& a, const PlayerInfos& infos, int playAreaCorner, int playAreaSide):
+Engine::Engine(AssetManager& a, const PlayerInfos& infos, int tickrate, int playAreaCorner, int playAreaSide):
     assets_{a},
+    timerService_{tickrate},
     playAreaCornerOffset_{playAreaCorner},
     playAreaSideLength_{playAreaSide},
     pickMeUpRadius_{playAreaSideLength_ / pickMeUpToGameAreaSizeRatio},
     scoreVictoryGoal_{(infos.size()-1)*10},
-    border_{playAreaCornerOffset_, playAreaSideLength_}
+    border_{playAreaCornerOffset_, playAreaSideLength_},
+    pickmeupSpawnTimer_{timerService_.makeTimer(sf::milliseconds(0))}
 {
     initializePlayers(infos);
+    resetPickmeupSpawnTimer();
 }
 
 void Engine::input(const sf::Event& event) {
@@ -47,6 +50,8 @@ void Engine::input(const sf::Event& event) {
 }
 
 void Engine::step(double deltaTime) {
+    timerService_.advanceAll();
+
     bool playerDied = false;
     for (auto& [id, player]: players_) {
         if (player.isDead()) continue;
@@ -57,8 +62,9 @@ void Engine::step(double deltaTime) {
         }
     }
 
-    if (pickmeupSpawnTimer_.getElapsedTime() > timeUntilNextPickmeupSpawn_) {
+    if (pickmeupSpawnTimer_->isExpired()) {
         createRandomPickMeUp();
+        resetPickmeupSpawnTimer();
     }
 
     if (playerDied) {
@@ -73,6 +79,7 @@ void Engine::step(double deltaTime) {
 void Engine::resetRound() {
     trails_.clear();
     pickmeups_.clear();
+    massPowerups_.reset();
     for (auto& [id, player] : players_) {
         player.newRoundSetup(
             xor_rand::next(playAreaCornerOffset_ + 0.15 * playAreaSideLength_,
@@ -108,7 +115,7 @@ void Engine::initializePlayers(const PlayerInfos& infos) {
     const auto radius = playAreaSideLength_ / playerToGameAreaSizeRatio;
     const auto velocity = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
     for (const auto& [id, info] : infos) {
-        players_.emplace(id, PlayerThing{info, radius, velocity});
+        players_.emplace(id, PlayerThing{info, radius, velocity, timerService_.makeTimer(sf::milliseconds(400))});
     }
 }
 
@@ -181,7 +188,6 @@ bool Engine::victoryGoalAchieved() {
 }
 
 void Engine::createRandomPickMeUp() {
-    resetPickmeupSpawnTimer();
     auto [onPickMeUp, texture] = getRandomPickMeUpEffect();
     if (xor_rand::next(1, static_cast<int>(PickUpType::Count)) == 1) texture = AssetManager::Texture::RandomPickMeUp;
     pickmeups_.emplace_back(
@@ -236,6 +242,7 @@ std::pair<PickMeUp::OnPickUp, AssetManager::Texture> Engine::getRandomPickMeUpEf
     case PickUpType::MassPowerups:
         return std::make_pair(makeSelfEffect([this] (auto&) {
             addMassPowerups();
+            resetPickmeupSpawnTimer();
         }), AssetManager::Texture::MassPowerups);
     default:
         const auto msg = fmt::format("bad pickup type {}", type);
@@ -264,7 +271,7 @@ PickMeUp::OnPickUp Engine::makeOpponentEffect(PlayerUnaryOp effect) {
 void Engine::addVelocityChange(PlayerThing& player, int velChange, int turnAngleChange, sf::Time duration) {
     player.changeVelocity(velChange);
     player.changeTurn(turnAngleChange);
-    player.addTimedEffect(duration, [&] () {
+    player.addTimedEffect(timerService_.makeTimer(duration), [&] () {
         player.changeVelocity(-velChange);
         player.changeTurn(-turnAngleChange);
     });
@@ -272,30 +279,30 @@ void Engine::addVelocityChange(PlayerThing& player, int velChange, int turnAngle
 
 void Engine::addRightAngleMovement(PlayerThing& player, sf::Time duration) {
     player.setRightAngleMovement(true);
-    player.addTimedEffect(duration, [&] {
+    player.addTimedEffect(timerService_.makeTimer(duration), [&] {
         player.setRightAngleMovement(false);
     });
 }
 
 void Engine::addControlSwap(PlayerThing& player, sf::Time duration) {
     player.swapControls();
-    player.addTimedEffect(duration, [&] {
+    player.addTimedEffect(timerService_.makeTimer(duration), [&] {
         player.swapControls();
     });
 }
 
 void Engine::addMassPowerups() {
     if (massPowerups_) {
-        massPowerups_->extendBy(sf::milliseconds(4000));
+        massPowerups_->extendBy(timerService_.timeToTicks(sf::milliseconds(8000)));
     } else {
-        massPowerups_.emplace(sf::milliseconds(6000), [] () {});
+        massPowerups_.emplace(timerService_.makeTimer(sf::milliseconds(12000)), [] () {});
     }
 }
 
 void Engine::resetPickmeupSpawnTimer() {
-    pickmeupSpawnTimer_.restart();
-    timeUntilNextPickmeupSpawn_ =
+    const auto timeUntilNextPickmeupSpawn =
         massPowerups_ ?
-        sf::milliseconds(xor_rand::next(500, 4000)) :
+        sf::milliseconds(xor_rand::next(300, 1500)) :
         sf::milliseconds(xor_rand::next(4500, 9000));
+    pickmeupSpawnTimer_->reset(timerService_.timeToTicks(timeUntilNextPickmeupSpawn));
 }

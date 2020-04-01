@@ -4,5 +4,6 @@ target_sources(${PROJECT_NAME} PUBLIC
     Player.cpp
     PickMeUp.cpp
     StateGame.cpp
+    TimerService.cpp
     TrailThing.cpp
 )

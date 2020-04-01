@@ -1,11 +1,10 @@
-#include "testcase_preview/StateViewer.hpp"
+#include "preview_test/StateViewer.hpp"
+#include "EngineTestParams.hpp"
 
 namespace {
 
 constexpr static auto tickrate = 140;
 const auto stepTime = sf::milliseconds(1000/tickrate).asMilliseconds() / 1000.f;
-
-constexpr Ticks ticksToRun = 450;
 
 IAssetManager::TextureSet gameTextures = {
         TextureType::SelfHaste,
@@ -35,7 +34,7 @@ auto printPosition = [] (PlayerTestable& player, Engine::Pickmeups&, Engine::Tra
 
 }
 
-StateViewer::StateViewer(const Application::Interface& a):
+StateViewer::StateViewer(const Application::Interface& a, int testcaseIndex):
     app_{a},
     engine_{
         app_.assets,
@@ -47,7 +46,8 @@ StateViewer::StateViewer(const Application::Interface& a):
 {
     app_.assets.loadTextures(gameTextures);
 
-    setupState();
+    setupAndTicks[testcaseIndex].first(engine_, inputs_);
+    ticksToRun_ = setupAndTicks[testcaseIndex].second;
 }
 
 StateViewer::~StateViewer() {
@@ -78,7 +78,7 @@ void StateViewer::input(const sf::Event& event) {
 
 void StateViewer::tick(double timeStep) {
     if (!started_) return;
-    if (currentTick_ < ticksToRun) {
+    if (currentTick_ < ticksToRun_) {
         sf::Event event;
         while (inputs_.pollEvent(event)) {
             engine_.input(event);
@@ -88,7 +88,7 @@ void StateViewer::tick(double timeStep) {
         inputs_.advance();
     }
 
-    if (currentTick_ == ticksToRun) {
+    if (currentTick_ == ticksToRun_) {
         onFinished();
         ++currentTick_;
     }

@@ -7,7 +7,7 @@
 
 class StateViewer : public IGameState {
 public:
-    StateViewer(const Application::Interface&);
+    StateViewer(const Application::Interface&, int testcaseIndex);
     ~StateViewer();
 
     void input(const sf::Event&) override;
@@ -22,6 +22,7 @@ private:
     EngineTestable engine_;
 
     Ticks currentTick_ = 0;
+    Ticks ticksToRun_;
     bool started_ = false;
 
     InputSequence inputs_;

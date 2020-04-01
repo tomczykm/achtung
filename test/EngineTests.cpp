@@ -1,8 +1,9 @@
+#include <functional>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include "EngineTestParams.hpp"
 #include "testable/EngineTestable.hpp"
-
 #include "mock/AssetManager.hpp"
 
 namespace print::detail {
@@ -15,14 +16,6 @@ constexpr static auto tickrate = 140;
 const auto stepTime = sf::milliseconds(1000/tickrate).asMilliseconds() / 1000.f;
 
 constexpr auto boxSize = 0.9 * 1080;
-
-const auto resetState = [] (PlayerTestable& player, Engine::Pickmeups& pickups, Engine::Trails& t) {
-    player.setDead(false);
-    player.setPosition(100, 900);
-    player.setDirection(270);
-    t.clear();
-    pickups.clear();
-};
 
 auto assertIsPlayerDead(bool dead) {
     return [dead] (auto& player, auto&, auto&) {
@@ -40,7 +33,7 @@ const auto assertPlayerInBoxBounds = [] (auto& player, auto&, auto&) {
 
 using namespace ::testing;
 
-struct EngineTests : Test {
+struct EngineTests : TestWithParam<EngineTestParam> {
 
     EngineTests():
         engine_{
@@ -52,7 +45,6 @@ struct EngineTests : Test {
         }
     {
         print::detail::logFile.reset(std::fopen(fmt::format("{}Test.log", UnitTest::GetInstance()->current_test_info()->name()).c_str(), "w"));
-        engine_.accessState(resetState);
         engine_.enablePowerups(false);
 
         ON_CALL(assetManager_, getTexture(_))
@@ -77,45 +69,33 @@ struct EngineTests : Test {
     sf::Texture defaultTex_;
 };
 
-TEST_F(EngineTests, DieOnCollisionWithTrail) {
-    auto resetState = [] (PlayerTestable& player, Engine::Pickmeups& pickups, Engine::Trails& t) {
-        ::resetState(player, pickups, t);
-        for (int y = 850; y < 950; y+=2)
-            t.emplace_back(150, y, 0, player.getRadius(), sf::Color::Red);
-    };
+TEST_P(EngineTests, TestEngine) {
+    const auto [setup, asserts, ticks] = GetParam();
 
-    engine_.accessState(resetState);
-    stepEngine(140);
-    engine_.accessState(assertIsPlayerDead(true));
+    setup(engine_, inputs_);
+    stepEngine(ticks);
+    asserts(engine_);
 }
 
-TEST_F(EngineTests, ShouldntDieOnEndOfHaste) {
-    // tests for a bug where end of haste
-    // does weird thing with player position
-    // and creates a long straight trails
-    // sometimes catapults player outside the bounds
+INSTANTIATE_TEST_SUITE_P(Tests, EngineTests, Values(
+    // 0 - ShouldDieOnCollisionWithTrail
+    std::make_tuple(setupAndTicks[0].first, [] (auto& engine) {
+        engine.accessState(assertIsPlayerDead(true));
+    }, setupAndTicks[0].second),
 
-    engine_.accessState(resetState);
+    // 1 - ShouldntDieOnEndOfHaste
+    std::make_tuple(setupAndTicks[1].first, [] (auto& engine) {
+        engine.accessState(assertIsPlayerDead(false));
+        engine.accessState(assertPlayerInBoxBounds);
+    }, setupAndTicks[1].second),
 
-    engine_.createPickMeUp(PickUpType::SelfHaste, 150, 900);
-    inputs_.addKeyHold(sf::Keyboard::Q, 30, 120);
-    inputs_.addKeyHold(sf::Keyboard::W, 140, 280);
-    inputs_.addKeyHold(sf::Keyboard::Q, 310, 500);
-    stepEngine(700);
-    engine_.accessState(assertIsPlayerDead(false));
-    engine_.accessState(assertPlayerInBoxBounds);
-}
-
-TEST_F(EngineTests, PickupsShouldNotCancelEachOtherOut) {
-    engine_.accessState(resetState);
-
-    engine_.createPickMeUp(PickUpType::SelfRightAngle, 200, 900);
-    engine_.createPickMeUp(PickUpType::SelfRightAngle, 400, 900);
-    stepEngine(450);
-    engine_.accessState([] (auto& p, auto&, auto&) {
-        EXPECT_EQ(p.getEffects().size(), 2);
-    });
-    engine_.accessState([] (auto& p, auto&, auto&) {
-        EXPECT_TRUE(p.isRightAngled());
-    });
-}
+    // 2 - PickupsShouldNotCancelEachOtherOut
+    std::make_tuple(setupAndTicks[2].first, [] (auto& engine) {
+        engine.accessState([] (auto& p, auto&, auto&) {
+            EXPECT_EQ(p.getEffects().size(), 2);
+        });
+        engine.accessState([] (auto& p, auto&, auto&) {
+            EXPECT_TRUE(p.isRightAngled());
+        });
+    }, setupAndTicks[2].second)
+));

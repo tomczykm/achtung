@@ -1,4 +1,4 @@
-#include "game/Player.hpp"
+#include "engine/Player.hpp"
 
 #include <algorithm>
 
@@ -9,13 +9,12 @@ namespace {
 constexpr auto pi = 355.f / 113.f;
 }
 
-PlayerThing::PlayerThing(const PlayerInfo& info, Labels labels, float radius, int vel):
+PlayerThing::PlayerThing(const PlayerInfo& info, float radius, int vel, Timer::Ptr gapSwitchTimer):
     info_{info},
     shape_{radius},
     recShape_{{radius*2, radius*2}},
     vel_{vel},
-    nameLabel_{labels.first},
-    scoreLabel_{labels.second}
+    gapSwitchTimer_{gapSwitchTimer}
 {
     shape_.setOrigin(radius, radius);
     shape_.setFillColor(sf::Color::Yellow);
@@ -32,13 +31,13 @@ const sf::Shape& PlayerThing::getShape() const {
     }
 }
 
-void PlayerThing::tick(double timeStep, std::deque<TrailThing>& trails) {
+void PlayerThing::step(double timeStep, std::deque<TrailThing>& trails) {
     endExpiredEffects();
 
     if (!rightAngleMovement_) {
-        if (sf::Keyboard::isKeyPressed(info_.right)) {
+        if (isKeyPressed(info_.right)) {
             direction_ += timeStep * turnDegrees_;
-        } else if (sf::Keyboard::isKeyPressed(info_.left)) {
+        } else if (isKeyPressed(info_.left)) {
             direction_ -= timeStep * turnDegrees_;
         }
     }
@@ -46,7 +45,7 @@ void PlayerThing::tick(double timeStep, std::deque<TrailThing>& trails) {
     if (direction_ < 0) direction_ += 360;
     else if (direction_ >= 360) direction_ -= 360;
 
-    if (gapSwitchTimer_.getElapsedTime() >= gapSwitchDuration_) {
+    if (gapSwitchTimer_->isExpired()) {
         gapSwitch();
     }
 
@@ -114,8 +113,8 @@ void PlayerThing::swapControls() {
 void PlayerThing::gapSwitch() {
     gap_ = !gap_;
     const auto gapTime = sf::seconds(6 * shape_.getRadius() / vel_);
-    gapSwitchDuration_ = gap_ ? gapTime : sf::milliseconds(xor_rand::next(1400, 7000));
-    gapSwitchTimer_.restart();
+    const auto gapSwitchDuration = gap_ ? gapTime : sf::milliseconds(xor_rand::next(1400, 7000));
+    gapSwitchTimer_->reset(gapSwitchDuration.asMilliseconds() / 1000.f * 140); // todo: hardcoded 140 tickrate
 }
 
 bool PlayerThing::checkCollision(const sf::Shape &o) const {
@@ -124,14 +123,10 @@ bool PlayerThing::checkCollision(const sf::Shape &o) const {
 
 void PlayerThing::addPoint() {
     score_ += 1;
-    if (scoreLabel_) {
-        scoreLabel_->setText(std::to_string(score_));
-    }
 }
 
 void PlayerThing::kill() {
     if (!dead_) {
-        print::info("kill {}", info_.name);
         dead_ = true;
     }
 }

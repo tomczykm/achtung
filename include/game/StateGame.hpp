@@ -2,17 +2,11 @@
 
 #include "app/Application.hpp"
 #include "app/IGameState.hpp"
-#include "game/Player.hpp"
-#include "game/BorderThing.hpp"
-#include "game/PickMeUp.hpp"
-
-#include <deque>
-#include <optional>
-#include <vector>
+#include "engine/Engine.hpp"
 
 class StateGame: public IGameState {
 public:
-    StateGame(const Application::Interface&, const std::vector<PlayerInfo>&);
+    StateGame(const Application::Interface&, const PlayerInfos&);
     ~StateGame();
 
     void input(const sf::Event&) override;
@@ -21,58 +15,21 @@ public:
 
 private:
     class RoundState;
-    using PlayerIt = std::vector<PlayerThing>::iterator;
 
-    void initializePlayers(const std::vector<PlayerInfo>&);
-    void loadGui();
-    void sortScoreList();
+    void loadGui(const PlayerInfos& infos);
+    void prepareScoreLabels(const PlayerInfos&) ;
+    void attachObservers();
 
-    bool checkCollisions(PlayerThing& player);  // returns true if they died
-    void awardPoints();
-    bool victoryGoalAchieved();
-
-    PlayerIt getPlayer(std::string_view);
-
-    void createRandomPickMeUp();
-    std::pair<PickMeUp::OnPickUp, AssetManager::Texture> getRandomPickMeUpEffect();
-    void resetPickmeupSpawnTimer();
-
-    template <typename OnPickUp>
-    PickMeUp::OnPickUp makeSelfEffect(OnPickUp);
-    template <typename OnPickUp>
-    PickMeUp::OnPickUp makeOpponentEffect(OnPickUp);
-
-    void addVelocityChange(PlayerIt, int velChange, int turnAngleChange, sf::Time);
-    void addRightAngleMovement(PlayerIt, sf::Time);
-    void addControlSwap(PlayerIt, sf::Time);
-    void addMassPowerups();
+    void updateScoreLabels(const Engine::Players&);
 
     template <typename State>
     void changeState() { state_ = std::make_unique<State>(*this); }
 
     Application::Interface app_;
 
-    int playAreaCornerOffset_;
-    int playAreaSideLength_;
-
-    float pickMeUpRadius_;
-
     std::unique_ptr<RoundState> state_;
 
-    std::deque<TrailThing> trails_;
-
-    std::vector<PlayerThing> players_;
-    PlayerIt lastAlive_;
-
-    uint32_t scoreVictoryGoal_;
-
-    BorderThing border_;
-
-    std::vector<PickMeUp> pickmeups_;
-    sf::Clock pickmeupSpawnTimer_;
-    sf::Time timeUntilNextPickmeupSpawn_;
-
-    std::optional<TimedEffect> massPowerups_;
+    Engine engine_;
 
     struct RoundState {
         virtual void onEnterState() = 0;
@@ -96,7 +53,7 @@ private:
 
     struct Running : RoundState {
         Running(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
-        void onEnterState() override;
+        void onEnterState() override {}
         void onSpacebar() override;
         void onEscape() override {}
         void onTick(double deltaTime) override;
@@ -118,8 +75,8 @@ private:
         void onTick(double) override {};
     };
 
-    struct GameEnd : RoundState {
-        GameEnd(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
+    struct MatchEnd : RoundState {
+        MatchEnd(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
         void onEnterState() override;
         void onSpacebar() override;
         void onEscape() override;

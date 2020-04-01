@@ -7,10 +7,21 @@
 
 #include "app/Application.hpp"
 
+enum PanelType {
+    Lobby = 0,
+    Settings,
+    Profile,
+
+    Count
+};
+
+class StateMenu;
+
 class Panel {
 public:
-    Panel(Application::Interface& i, tgui::Panel::Ptr p):
+    Panel(Application::Interface& i, StateMenu& gs, tgui::Panel::Ptr p):
         app_{i},
+        gs_{gs},
         panel_{p}
     {}
 
@@ -21,6 +32,7 @@ public:
     void activate() {
         panel_->setEnabled(true);
         panel_->setVisible(true);
+        onActivate();
     };
 
     void deactivate() {
@@ -29,7 +41,10 @@ public:
     };
 
 protected:
+    virtual void onActivate() {}
+
     Application::Interface& app_;
+    StateMenu& gs_;
 
     tgui::Panel::Ptr panel_;
 };

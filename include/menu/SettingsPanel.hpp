@@ -6,10 +6,10 @@
 
 class SettingsPanel : public Panel {
 public:
-    explicit SettingsPanel(Application::Interface&, tgui::Panel::Ptr);
+    SettingsPanel(Application::Interface&, StateMenu&, tgui::Panel::Ptr);
 
     void input(const sf::Event&) override;
 
 private:
-
+    void loadGui();
 };

@@ -11,8 +11,16 @@ if(MSVC)
 	find_package(sqlite3 CONFIG REQUIRED)
 endif(MSVC)
 
+enable_testing()
+
 add_executable(${PROJECT_NAME})
-target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics tgui fmt toml11 sqlite3)
+add_executable(preview_test)
+
+add_subdirectory(src)
+add_subdirectory(test)
+add_subdirectory(include/app)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE freeachtung_app)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/generated_include include)
 if(MSVC)
 	target_compile_options(${PROJECT_NAME} PRIVATE /W4)
@@ -20,6 +28,3 @@ else(MSVC)
 	target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wpedantic -Wextra -Werror -Wno-narrowing)
 endif(MSVC)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
-
-add_subdirectory(src)
-add_subdirectory(include/app)

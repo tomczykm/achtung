@@ -9,6 +9,7 @@
 #include "menu/Panel.hpp"
 
 #include "app/Application.hpp"
+#include "app/Utils.hpp"
 
 class StateMenu : public IGameState {
 public:
@@ -18,15 +19,21 @@ public:
     void tick(double) override {}
     void render() override {}
 
-    void setActivePanel(int);
+    void setActivePanel(PanelType);
 
-    constexpr static auto totalPanels = 2u;
+    template <typename T>
+    [[nodiscard]] T& setActivePanel(PanelType t) {
+        setActivePanel(t);
+        return dynamic_cast<T&>(**activePanel_);
+    }
 
 private:
-    using Panels = std::array<std::unique_ptr<Panel>, totalPanels>;
+    using Panels = std::array<std::unique_ptr<Panel>, PanelType::Count>;
 
     void loadGui();
-    tgui::Panel::Ptr makePanel(tgui::PanelRenderer*);
+
+    template <typename T> void makePanel(PanelType p);
+    tgui::Panel::Ptr makeGuiPanel();
 
     Application::Interface app_;
 

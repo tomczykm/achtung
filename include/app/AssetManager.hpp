@@ -8,32 +8,41 @@
 
 #include <SFML/Graphics.hpp>
 
-class AssetManager {
-public:
-    enum class Texture {
-        Null = 0,
-        SelfHaste,
-        OpponentHaste,
-        SelfSlow,
-        OpponentSlow,
-        SelfRightAngle,
-        OpponentRightAngle,
-        ClearTrails,
-        ControlSwap,
-        MassPowerups,
-        RandomPickMeUp
-    };
-    using TextureSet = const std::set<AssetManager::Texture>;
+enum class TextureType {
+    Null = 0,
+    SelfHaste,
+    OpponentHaste,
+    SelfSlow,
+    OpponentSlow,
+    SelfRightAngle,
+    OpponentRightAngle,
+    ClearTrails,
+    ControlSwap,
+    MassPowerups,
+    RandomPickMeUp
+};
 
+class IAssetManager {
+public:
+    using TextureSet = const std::set<TextureType>;
+
+    virtual void loadTextures(TextureSet&) = 0;
+    virtual void releaseTextures(TextureSet&) = 0;
+
+    virtual const sf::Texture& getTexture(TextureType) = 0;
+};
+
+class AssetManager : public IAssetManager {
+public: 
     static std::string getActualFileName(std::string_view resourceName);
     static std::stringstream openResource(std::string_view resourceName);
 
     void loadTextures(TextureSet&);
     void releaseTextures(TextureSet&);
 
-    const sf::Texture& getTexture(Texture);
+    const sf::Texture& getTexture(TextureType);
 
 private:
-    std::map<Texture, sf::Texture> textures_;
+    std::map<TextureType, sf::Texture> textures_;
 
 };

@@ -18,6 +18,9 @@ class Application {
 public:
     Application();
 
+    template <typename InitState, typename... Args>
+    static inline std::unique_ptr<Application> makeApplication(Args&&...);
+
     int run();
 
     class Interface;
@@ -80,3 +83,11 @@ private:
 
     Application& app_;
 };
+
+
+template <typename InitState, typename... Args>
+inline std::unique_ptr<Application> Application::makeApplication(Args&&... args) {
+    auto app = std::make_unique<Application>();
+    app->gameState_ = std::make_unique<InitState>(Interface{*app}, std::forward<Args>(args)...);
+    return app;
+}

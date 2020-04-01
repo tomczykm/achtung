@@ -10,6 +10,8 @@ A C++ rewrite of [this game](https://en.wikipedia.org/wiki/Achtung,_die_Kurve!).
 4. Go to `build` directory, generate Makefile and build the project: `mkdir build && cd build && cmake .. && make`
 5. Run `./freeachtung` to play the game
 
+You may also run `make all test` to run automated tests.
+
 ### Building on Windows
 
 The easiest way to build on Windows seems to be with vcpkg, CMake and MSBuild. Tested with MSBuild included with Visual Studio 2019.
@@ -22,6 +24,5 @@ The easiest way to build on Windows seems to be with vcpkg, CMake and MSBuild. T
 
 1. Feature parity with [this version of the game](http://www.cda.pl/gry-online/6431c8/Uwaga-zakret-Achtung-Die-Kurve)
 2. Publishing Windows binaries
-3. Recording and viewing replay files (with backwards compatibility, if possible)
-4. Local player profiles with statistics
-5. Several small QoL features (custom player names, custom colors, etc.)
+3. Recording and viewing replay files
+4. Statistics for player profiles

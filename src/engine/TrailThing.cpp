@@ -1,4 +1,4 @@
-#include "game/TrailThing.hpp"
+#include "engine/TrailThing.hpp"
 
 TrailThing::TrailThing(float x, float y, float ang, float rad, sf::Color c):
     shape_({rad, height})

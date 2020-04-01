@@ -1,0 +1,20 @@
+Button.Remove {
+    Position = (100% - 10 - width, 15%);
+    Size = (30, 70%);
+    Text = >;
+}
+
+Label.Keys {
+    Text = "_   _";
+    Position = (Remove.left - 5 - width, 50% - height/2);
+    TextSize = 17;
+    Size = (60, 100%);
+    VerticalAlignment = Center;
+}
+
+Label.Name {
+    TextSize = 17;
+    Size = (Keys.left - 20, 100%);
+    VerticalAlignment = Center;
+    Position = (10, 50%-height/2);
+}

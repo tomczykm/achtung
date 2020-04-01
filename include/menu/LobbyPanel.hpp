@@ -8,34 +8,34 @@
 #include <vector>
 
 #include "app/Application.hpp"
-#include "game/Player.hpp"
+#include "engine/Player.hpp"
 
 class LobbyPanel : public Panel {
 public:
-    explicit LobbyPanel(Application::Interface&, tgui::Panel::Ptr);
+    LobbyPanel(Application::Interface&, StateMenu&, tgui::Panel::Ptr);
 
     void input(const sf::Event&) override;
 
 private:
-    using PlayerId = std::uint32_t;
+    void onActivate() override;
+    void updateProfileEntries();
 
     void loadGui();
-    void loadProfiles();
 
-    void addPlayer();
-    std::vector<PlayerInfo> preparePlayerInfos();
+    void addProfileEntry(ProfileId);
+    void addPlayerEntry(ProfileId);
     bool canStartGame();
     std::size_t getCurrentNumPlayers();
-    void removePlayer(PlayerId, tgui::Panel::Ptr);
+    void removePlayerEntry(ProfileId, tgui::Panel::Ptr);
 
-    void enterSetKeysMode(PlayerId);
-    void setKey(PlayerId, sf::Keyboard::Key);
-    void updateKeysLabel(PlayerId);
+    void enterSetKeysMode(ProfileId);
+    void setKey(ProfileId, sf::Keyboard::Key);
+    void updateKeysLabel(ProfileId);
 
-    void recalculatePlayerListPositions();
+    void recalculateListPositions();
 
     void startGame();
 
-    std::map<PlayerId, PlayerInfo> playerInfos_;
-    std::optional<PlayerId> setKeysMode_;
+    PlayerInfos playerInfos_;
+    std::optional<ProfileId> setKeysMode_;
 };

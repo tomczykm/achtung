@@ -78,14 +78,6 @@ Panel.ProfileListOuterPanel {
     }
 }
 
-Button.AddPlayer {
-    Text = Add Player;
-    Size = (120, 55);
-    Position = (10%, &.bottom - height*2.5);
-    TextSize = 18;
-    renderer = &ButtonRenderer;
-}
-
 Button.CreateProfile {
     Text = New Profile;
     Size = (120, 55);

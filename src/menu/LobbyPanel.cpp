@@ -3,16 +3,17 @@
 #include "app/Log.hpp"
 #include "app/Utils.hpp"
 #include "game/StateGame.hpp"
+#include "menu/StateMenu.hpp"
+#include "menu/ProfilePanel.hpp"
 
 namespace {
 constexpr auto PLAYER_LIST_ENTRY_HEIGHT = 60u;
 }
 
-LobbyPanel::LobbyPanel(Application::Interface& i, tgui::Panel::Ptr p):
-    Panel{i, p}
+LobbyPanel::LobbyPanel(Application::Interface& i, StateMenu& gs, tgui::Panel::Ptr p):
+    Panel{i, gs, p}
 {
     loadGui();
-    loadProfiles();
 }
 
 void LobbyPanel::input(const sf::Event& event) {
@@ -21,6 +22,10 @@ void LobbyPanel::input(const sf::Event& event) {
             setKey(*setKeysMode_, event.key.code);
         }
     }
+}
+
+void LobbyPanel::onActivate() {
+    updateProfileEntries();
 }
 
 void LobbyPanel::loadGui() {
@@ -34,94 +39,116 @@ void LobbyPanel::loadGui() {
         throw e;
     }
 
-    panel_->get("AddPlayer")->connect("pressed", [this] () {
-        addPlayer();
-    });
-
     panel_->get("StartGame")->connect("pressed", [this] () {
         startGame();
     });
+
+    panel_->get("CreateProfile")->connect("pressed", [this] () {
+        auto& profilePanel = gs_.setActivePanel<ProfilePanel>(PanelType::Profile);
+        profilePanel.loadProfile({});
+    });
 }
 
-void LobbyPanel::loadProfiles() {
-    print::info(__func__);
+void LobbyPanel::updateProfileEntries() {
+    auto profilePanels = app_.getWidget<tgui::Panel>("ProfileListInnerPanel")->getWidgets();
+    auto playerPanels = app_.getWidget<tgui::Panel>("PlayerListInnerPanel")->getWidgets();
+
+    // updated & created
+    for (const auto&[id, profile]: app_.profiles.profiles()) {
+        for (const auto& p: profilePanels) {
+            const ProfileId panelId = std::stoi(p->getWidgetName().toAnsiString());
+            if (id == panelId) {
+                auto panel = static_cast<tgui::Panel*>(p.get());
+                auto nameLabel = static_cast<tgui::Label*>(panel->get("Name").get());
+                nameLabel->getRenderer()->setTextColor(profile.color);
+                nameLabel->setText(profile.name);
+                goto cont;
+            }
+        }
+
+        // the reason we update only entries in profile list is that
+        // there's no way to edit profiles that are added to the game lobby
+        for (const auto& p: playerPanels) {
+            const ProfileId panelId = std::stoi(p->getWidgetName().toAnsiString());
+            if (id == panelId) goto cont;
+        }
+
+        addProfileEntry(id);
+
+        cont:;
+    }
+
+    // deleted
+    auto containerPanel = app_.getWidget<tgui::Panel>("ProfileListInnerPanel");
+    for (const auto& p: profilePanels) {
+        const ProfileId panelId = std::stoi(p->getWidgetName().toAnsiString());
+        if (app_.profiles.profiles().find(panelId) == app_.profiles.profiles().end()) {
+            print::info("panel {} had profile deleted", panelId);
+            containerPanel->remove(p);
+        }
+    }
+
+    recalculateListPositions();
+}
+
+void LobbyPanel::addProfileEntry(ProfileId id) {
+    const auto& profile = app_.profiles[id];
     auto profileListPanel = app_.getWidget<tgui::Panel>("ProfileListInnerPanel");
 
-    auto i = 0u;
-    for (const auto& info: app_.profiles.profiles()) {
-        auto newEntryPanel = tgui::Panel::create({"100%", "60"});
-        newEntryPanel->setRenderer(profileListPanel->getSharedRenderer()->getData());
-        newEntryPanel->setPosition("0", std::to_string(i++*PLAYER_LIST_ENTRY_HEIGHT));
+    auto newEntryPanel = tgui::Panel::create({"100%", PLAYER_LIST_ENTRY_HEIGHT});
+    newEntryPanel->loadWidgetsFromStream(AssetManager::openResource("ui/profileEntry"));
+    newEntryPanel->setRenderer(profileListPanel->getSharedRenderer()->getData());
 
-        auto nameLabel = tgui::Label::create(info.second.name);
-        nameLabel->setPosition("10", "50%-height/2");
-        nameLabel->setTextSize(17);
-        nameLabel->setSize("100%", "100%");  // todo: hardcoded width bad, should be automatic
-        nameLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-        nameLabel->getRenderer()->setTextColor(info.second.color);
-        newEntryPanel->add(nameLabel);
+    auto nameLabel = std::static_pointer_cast<tgui::Label>(newEntryPanel->get("Name"));
+    nameLabel->getRenderer()->setTextColor(profile.color);
+    nameLabel->setText(profile.name);
 
-        profileListPanel->add(newEntryPanel);
-    }
+    auto addButton = newEntryPanel->get("Add");
+    addButton->connect("pressed", [=] () {
+        addPlayerEntry(id);
+        profileListPanel->remove(newEntryPanel);
+        recalculateListPositions();
+    });
+
+    auto editButton = newEntryPanel->get("Edit");
+    editButton->connect("pressed", [=] () {
+        auto& profilePanel = gs_.setActivePanel<ProfilePanel>(PanelType::Profile);
+        profilePanel.loadProfile(id);
+    });
+
+    profileListPanel->add(newEntryPanel, fmt::format("{}", id));
 }
 
-void LobbyPanel::addPlayer() {
-    print::info(__func__);
+void LobbyPanel::addPlayerEntry(ProfileId id) {
+    print::info("{}: id {}", __func__, id);
+    const auto& profile = app_.profiles[id];
+    const auto info = PlayerInfo{profile.name, sf::Keyboard::Unknown, sf::Keyboard::Unknown, profile.color};
+
     auto playerListPanel = app_.getWidget<tgui::Panel>("PlayerListInnerPanel");
 
-    auto newEntryPanel = tgui::Panel::create({"100%", "60"});
+    auto newEntryPanel = tgui::Panel::create({"100%", PLAYER_LIST_ENTRY_HEIGHT});
+    newEntryPanel->loadWidgetsFromStream(AssetManager::openResource("ui/playerEntry"));
     newEntryPanel->setRenderer(playerListPanel->getSharedRenderer()->getData());
-    newEntryPanel->setPosition("0", std::to_string(getCurrentNumPlayers()*PLAYER_LIST_ENTRY_HEIGHT));
 
-    const auto playerId = PlayerId{playerInfos_.size() == 0 ? 0 : playerInfos_.rbegin()->first + 1};
-
-    const auto widgetNamePrefix = fmt::format("Player{}", playerId);
-
-    const auto color = sf::Color::White;
-    const auto info = PlayerInfo{"", sf::Keyboard::Unknown, sf::Keyboard::Unknown, color};
-
-    auto removeButton = tgui::Button::create("Rem");
-    removeButton->setPosition("100% - 10 - width", "15%");
-    removeButton->setSize("30", "70%");
+    auto removeButton = newEntryPanel->get("Remove");
     removeButton->connect("pressed", [=] () {
-        if (!setKeysMode_ || *setKeysMode_ != playerId)
-            removePlayer(playerId, newEntryPanel);
+        if (!setKeysMode_ || *setKeysMode_ != id)
+            removePlayerEntry(id, newEntryPanel);
     });
-    newEntryPanel->add(removeButton, fmt::format("{}Remove", widgetNamePrefix));
 
-    auto keysLabel = tgui::Label::create("_   _");
-    keysLabel->setPosition(widgetNamePrefix + "Remove.left - 5 - width", "50%-height/2");
-    keysLabel->setTextSize(17);
-    keysLabel->setSize(60, "100%");  // todo: hardcoded width bad, should be automatic
-    keysLabel->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+    auto keysLabel = std::static_pointer_cast<tgui::Label>(newEntryPanel->get("Keys"));
     keysLabel->getRenderer()->setTextColor(info.color);
     keysLabel->connect("clicked", [=] () {
-        enterSetKeysMode(playerId);
+        enterSetKeysMode(id);
     });
-    newEntryPanel->add(keysLabel, fmt::format("{}Keys", widgetNamePrefix));
+    keysLabel->setWidgetName(fmt::format("Player{}Keys", id));
 
-    auto nameEdit = tgui::EditBox::create();
-    nameEdit->setTextSize(17);
-    nameEdit->setSize(widgetNamePrefix + "Keys.left - 20", "80%");
-    nameEdit->setText(info.name);
-    nameEdit->getRenderer()->setDefaultTextColor(info.color);
-    nameEdit->setPosition("10", "50%-height/2");
-    nameEdit->getRenderer()->setTextColor(info.color);
-    nameEdit->connect("TextChanged", [=] () {
-        playerInfos_[playerId].name = nameEdit->getText();
-    });
-    newEntryPanel->add(nameEdit, fmt::format("{}Label", widgetNamePrefix));
+    auto nameLabel = std::static_pointer_cast<tgui::Label>(newEntryPanel->get("Name"));
+    nameLabel->setText(info.name);
+    nameLabel->getRenderer()->setTextColor(info.color);
 
-    playerListPanel->add(newEntryPanel, fmt::format("{}Panel", widgetNamePrefix));
-    playerInfos_.emplace(playerId, info);
-}
-
-std::vector<PlayerInfo> LobbyPanel::preparePlayerInfos() {
-    std::vector<PlayerInfo> infos(playerInfos_.size());
-    std::transform(playerInfos_.cbegin(), playerInfos_.cend(), infos.begin(), [] (const auto& kvPair) {
-        return kvPair.second;
-    });
-    return infos;
+    playerListPanel->add(newEntryPanel, fmt::format("{}", id));
+    playerInfos_.emplace(id, info);
 }
 
 bool LobbyPanel::canStartGame() {
@@ -144,15 +171,16 @@ std::size_t LobbyPanel::getCurrentNumPlayers() {
         getWidgets().size();
 }
 
-void LobbyPanel::removePlayer(PlayerId player, tgui::Panel::Ptr panel) {
-    print::info("Remove player {}", player);
+void LobbyPanel::removePlayerEntry(ProfileId id, tgui::Panel::Ptr panel) {
+    print::info("Remove player {}", id);
     app_.getWidget<tgui::Panel>("PlayerListInnerPanel")->remove(panel);
-    recalculatePlayerListPositions();
+    addProfileEntry(id);
+    recalculateListPositions();
 
-    playerInfos_.erase(player);
+    playerInfos_.erase(id);
 }
 
-void LobbyPanel::enterSetKeysMode(PlayerId player) {
+void LobbyPanel::enterSetKeysMode(ProfileId player) {
     if (setKeysMode_) return;
     print::info("set keys of {}", player);
 
@@ -163,7 +191,7 @@ void LobbyPanel::enterSetKeysMode(PlayerId player) {
     updateKeysLabel(player);
 }
 
-void LobbyPanel::setKey(PlayerId player, sf::Keyboard::Key key) {
+void LobbyPanel::setKey(ProfileId player, sf::Keyboard::Key key) {
     static std::set<sf::Keyboard::Key> forbidden = {
         sf::Keyboard::Enter, sf::Keyboard::Escape, sf::Keyboard::Space
     };
@@ -178,23 +206,27 @@ void LobbyPanel::setKey(PlayerId player, sf::Keyboard::Key key) {
     updateKeysLabel(player);
 }
 
-void LobbyPanel::updateKeysLabel(PlayerId player) {
+void LobbyPanel::updateKeysLabel(ProfileId player) {
     app_.getWidget<tgui::Label>(fmt::format("Player{}Keys", player))->setText(fmt::format("{}   {}",
         keycodeToStr(playerInfos_[player].left), keycodeToStr(playerInfos_[player].right)));
 }
 
-void LobbyPanel::recalculatePlayerListPositions() {
-    auto playerListPanel = std::static_pointer_cast<tgui::Panel>(app_.gui.get("PlayerListInnerPanel"));
-    auto playerPanels = playerListPanel->getWidgets();
-
+void LobbyPanel::recalculateListPositions() {
+    auto playerPanels = app_.getWidget<tgui::Panel>("PlayerListInnerPanel")->getWidgets();
     std::size_t i = 0;
     for (auto& panel : playerPanels) {
+        panel->setPosition({0, PLAYER_LIST_ENTRY_HEIGHT*(i++)});
+    }
+
+    auto profilePanels = app_.getWidget<tgui::Panel>("ProfileListInnerPanel")->getWidgets();
+    i = 0;
+    for (auto& panel : profilePanels) {
         panel->setPosition({0, PLAYER_LIST_ENTRY_HEIGHT*(i++)});
     }
 }
 
 void LobbyPanel::startGame() {
     if (canStartGame()) {
-        app_.enterState<StateGame>(preparePlayerInfos());
+        app_.enterState<StateGame>(playerInfos_);
     }
 }

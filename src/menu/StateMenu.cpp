@@ -7,6 +7,7 @@
 #include "app/Utils.hpp"
 
 #include "menu/LobbyPanel.hpp"
+#include "menu/ProfilePanel.hpp"
 #include "menu/SettingsPanel.hpp"
 
 StateMenu::StateMenu(const Application::Interface& app):
@@ -25,9 +26,10 @@ void StateMenu::input(const sf::Event& event) {
     (*activePanel_)->input(event);
 }
 
-void StateMenu::setActivePanel(int num) {
+void StateMenu::setActivePanel(PanelType t) {
+    print::info("{}: {}", __func__, t);
     (*activePanel_)->deactivate();
-    activePanel_ = panels_.begin() + num;
+    activePanel_ = panels_.begin() + t;
     (*activePanel_)->activate();
 }
 
@@ -42,25 +44,19 @@ void StateMenu::loadGui() {
         throw e;
     }
 
-    const auto panelRenderer = app_.getWidget<tgui::Panel>("Navigation")->getRenderer();
-
-    auto guiPanel = makePanel(panelRenderer);
-    app_.gui.add(guiPanel);
-    panels_[0] = std::make_unique<LobbyPanel>(app_, guiPanel);
-
-    guiPanel = makePanel(panelRenderer);
-    app_.gui.add(guiPanel);
-    panels_[1] = std::make_unique<SettingsPanel>(app_, guiPanel);
+    makePanel<LobbyPanel>(PanelType::Lobby);
+    makePanel<SettingsPanel>(PanelType::Settings);
+    makePanel<ProfilePanel>(PanelType::Profile);
 
     activePanel_ = panels_.begin();
-    setActivePanel(0);
+    setActivePanel(PanelType::Lobby);
 
     app_.gui.get("Lobby")->connect("pressed", [this] () {
-        setActivePanel(0);
+        setActivePanel(PanelType::Lobby);
     });
 
     app_.gui.get("Settings")->connect("pressed", [this] () {
-        setActivePanel(1);
+        setActivePanel(PanelType::Settings);
     });
 
     app_.gui.get("QuitGame")->connect("pressed", [this] () {
@@ -68,7 +64,15 @@ void StateMenu::loadGui() {
     });
 }
 
-tgui::Panel::Ptr StateMenu::makePanel(tgui::PanelRenderer* renderer) {
+template <typename T>
+void StateMenu::makePanel(PanelType p) {
+    auto guiPanel = makeGuiPanel();
+    app_.gui.add(guiPanel);
+    panels_[p] = std::make_unique<T>(app_, *this, guiPanel);
+}
+
+tgui::Panel::Ptr StateMenu::makeGuiPanel() {
+    const auto renderer = app_.getWidget<tgui::Panel>("Navigation")->getRenderer();
     auto ret = tgui::Panel::create({"&.height/4*3", "90%"});
     ret->setPosition("(&.width - width) / 2", "0");
     ret->setRenderer(renderer->getData());

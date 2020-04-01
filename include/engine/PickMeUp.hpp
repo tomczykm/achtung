@@ -4,8 +4,9 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "app/ProfileManager.hpp"
 #include "app/Log.hpp"
-#include "game/Player.hpp"
+#include "engine/Player.hpp"
 
 enum class PickUpType {
     Null = 0,
@@ -25,16 +26,15 @@ enum class PickUpType {
 
 class PickMeUp {
 public:
-    using OnPickUp = std::function<void(std::string pName)>;
+    using OnPickUp = std::function<void(PlayerThing&)>;
 
     PickMeUp(uint32_t xPos, uint32_t yPos, float radius, const sf::Texture&, OnPickUp);
 
     const sf::CircleShape& getShape() const { return shape_; }
     const sf::Sprite& getSprite() const { return sprite_; }
 
-    void onPickUp(std::string pName) {
-        print::info("{}: {} got something", __func__, pName);
-        onPickUp_(pName);
+    void onPickUp(PlayerThing& player) {
+        onPickUp_(player);
     }
 
 private:

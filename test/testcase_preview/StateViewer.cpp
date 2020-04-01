@@ -5,7 +5,7 @@ namespace {
 constexpr static auto tickrate = 140;
 const auto stepTime = sf::milliseconds(1000/tickrate).asMilliseconds() / 1000.f;
 
-constexpr Ticks ticksToRun = 700;
+constexpr Ticks ticksToRun = 450;
 
 IAssetManager::TextureSet gameTextures = {
         TextureType::SelfHaste,
@@ -58,10 +58,8 @@ void StateViewer::setupState() {
     engine_.enablePowerups(false);
     engine_.accessState(resetState);
 
-    engine_.createPickMeUp(PickUpType::SelfHaste, 150, 900);
-    inputs_.addKeyHold(sf::Keyboard::Q, 30, 120);
-    inputs_.addKeyHold(sf::Keyboard::W, 140, 280);
-    inputs_.addKeyHold(sf::Keyboard::Q, 310, 500);
+    engine_.createPickMeUp(PickUpType::SelfRightAngle, 200, 900);
+    engine_.createPickMeUp(PickUpType::SelfRightAngle, 400, 900);
 }
 
 void StateViewer::onFinished() {

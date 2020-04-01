@@ -24,13 +24,11 @@ const auto resetState = [] (PlayerTestable& player, Engine::Pickmeups& pickups, 
     pickups.clear();
 };
 
-const auto assertPlayerDead = [] (auto& player, auto&, auto&) {
-    EXPECT_TRUE(player.isDead());
-};
-
-const auto assertPlayerNotDead = [] (auto& player, auto&, auto&) {
-    EXPECT_FALSE(player.isDead());
-};
+auto assertIsPlayerDead(bool dead) {
+    return [dead] (auto& player, auto&, auto&) {
+        EXPECT_EQ(player.isDead(), dead);
+    };
+}
 
 const auto assertPlayerInBoxBounds = [] (auto& player, auto&, auto&) {
     auto [x, y] = player.getPosition();
@@ -88,7 +86,7 @@ TEST_F(EngineTests, DieOnCollisionWithTrail) {
 
     engine_.accessState(resetState);
     stepEngine(140);
-    engine_.accessState(assertPlayerDead);
+    engine_.accessState(assertIsPlayerDead(true));
 }
 
 TEST_F(EngineTests, ShouldntDieOnEndOfHaste) {
@@ -104,6 +102,20 @@ TEST_F(EngineTests, ShouldntDieOnEndOfHaste) {
     inputs_.addKeyHold(sf::Keyboard::W, 140, 280);
     inputs_.addKeyHold(sf::Keyboard::Q, 310, 500);
     stepEngine(700);
-    engine_.accessState(assertPlayerNotDead);
+    engine_.accessState(assertIsPlayerDead(false));
     engine_.accessState(assertPlayerInBoxBounds);
+}
+
+TEST_F(EngineTests, PickupsShouldNotCancelEachOtherOut) {
+    engine_.accessState(resetState);
+
+    engine_.createPickMeUp(PickUpType::SelfRightAngle, 200, 900);
+    engine_.createPickMeUp(PickUpType::SelfRightAngle, 400, 900);
+    stepEngine(450);
+    engine_.accessState([] (auto& p, auto&, auto&) {
+        EXPECT_EQ(p.getEffects().size(), 2);
+    });
+    engine_.accessState([] (auto& p, auto&, auto&) {
+        EXPECT_TRUE(p.isRightAngled());
+    });
 }

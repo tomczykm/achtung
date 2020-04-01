@@ -26,6 +26,10 @@ public:
     float getRadius() { return shape_.getRadius(); }
     void setDead(bool dead) { dead_ = dead; }
 
+    std::vector<TimedEffect>& getEffects() { return effects_; }
+
+    bool isRightAngled() { return rightAngleMovement_; }
+
 private:
     const InputSequence& inputs_;
 };

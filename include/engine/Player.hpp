@@ -8,8 +8,8 @@
 #include <TGUI/TGUI.hpp>
 
 #include "app/ProfileManager.hpp"
-#include "game/TrailThing.hpp"
-#include "game/Effect.hpp"
+#include "engine/TrailThing.hpp"
+#include "engine/Effect.hpp"
 
 struct PlayerInfo {
     std::string name;
@@ -24,6 +24,7 @@ public:
     using Score = uint32_t;
 
     PlayerThing(const PlayerInfo&, float radius, int vel, Timer::Ptr gapSwitchTimer);
+    virtual ~PlayerThing() = default;
 
     void step(double timeStep, std::deque<TrailThing>& trails);
     void input(const sf::Event&);
@@ -55,7 +56,7 @@ public:
         effects_.emplace_back(std::forward<Ts>(args)...);
     }
 
-private:
+protected:
     void gapSwitch();
     void endExpiredEffects();
 
@@ -81,4 +82,22 @@ private:
     Timer::Ptr gapSwitchTimer_;
 
     std::vector<TimedEffect> effects_;
+};
+
+class PlayerTestable : public PlayerThing {
+public:
+    PlayerTestable(float radius, int vel, Timer::Ptr gapSwitchTimer):
+        PlayerThing{
+            PlayerInfo{"test", sf::Keyboard::Unknown, sf::Keyboard::Unknown, sf::Color::White},
+            radius, vel, gapSwitchTimer
+        }
+    {}
+
+    void setPosition(float x, float y) {
+        PlayerThing::setPosition(x, y);
+    }
+
+    sf::Vector2f getPosition() { return shape_.getPosition(); }
+    void setDirection(double deg) { direction_ = deg; }
+    float getRadius() { return shape_.getRadius(); }
 };

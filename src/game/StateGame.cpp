@@ -69,8 +69,8 @@ void StateGame::attachObservers() {
     });
 
     engine_.attach([this] (const auto& e) {
-        if (auto event = dynamic_cast<const GameEndEvent*>(&e); event) {
-            changeState<GameEnd>();
+        if (auto event = dynamic_cast<const MatchEndEvent*>(&e); event) {
+            changeState<MatchEnd>();
         }
     });
 }
@@ -140,7 +140,7 @@ void StateGame::prepareScoreLabels(const PlayerInfos& infos) {
 void StateGame::updateScoreLabels(const Engine::Players& players) {
     std::multimap<PlayerThing::Score, ProfileId, std::greater<PlayerThing::Score>> playersByScore;
     for (const auto& [id, player]: players) {
-        playersByScore.emplace(player.getScore(), id);
+        playersByScore.emplace(player->getScore(), id);
     }
 
     auto i = 0u;
@@ -191,14 +191,14 @@ void StateGame::RoundEnd::onEscape() {
 }
 
 
-void StateGame::GameEnd::onEnterState() {
-    // todo: show end of game splash screen
+void StateGame::MatchEnd::onEnterState() {
+    // todo: show end of match splash screen
 }
 
-void StateGame::GameEnd::onSpacebar() {
+void StateGame::MatchEnd::onSpacebar() {
     gs.app_.enterState<StateMenu>();
 }
 
-void StateGame::GameEnd::onEscape() {
+void StateGame::MatchEnd::onEscape() {
     gs.app_.enterState<StateMenu>();
 }

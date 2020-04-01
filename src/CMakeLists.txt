@@ -3,6 +3,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 )
 
 add_subdirectory(app)
+add_subdirectory(engine)
 add_subdirectory(game)
 add_subdirectory(menu)
 add_subdirectory(sql)

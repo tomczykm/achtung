@@ -2,7 +2,7 @@
 
 #include "app/Application.hpp"
 #include "app/IGameState.hpp"
-#include "game/Engine.hpp"
+#include "engine/Engine.hpp"
 
 class StateGame: public IGameState {
 public:
@@ -75,8 +75,8 @@ private:
         void onTick(double) override {};
     };
 
-    struct GameEnd : RoundState {
-        GameEnd(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
+    struct MatchEnd : RoundState {
+        MatchEnd(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
         void onEnterState() override;
         void onSpacebar() override;
         void onEscape() override;

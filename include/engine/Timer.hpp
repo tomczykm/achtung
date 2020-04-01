@@ -9,10 +9,10 @@ class Timer {
 public:
     using Ptr = std::shared_ptr<Timer>;
 
-    void start() { paused_ = false; }
-    void pause() { paused_ = true; }
+    void pause(bool p = true) { paused_ = p; }
 
-    bool isExpired() { return remaining_ <= 0; }
+    bool isExpired() const { return remaining_ <= 0; }
+    bool isPaused() const { return paused_; }
 
     void advance() { if (!paused_) --remaining_; }
 

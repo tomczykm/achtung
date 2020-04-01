@@ -60,15 +60,16 @@ std::stringstream AssetManager::openResource(std::string_view resourceName) {
 void AssetManager::loadTextures(TextureSet& toLoad) {
     print::info("Loading {} textures", toLoad.size());
     for (const auto t: toLoad) {
-        textures_.emplace(t, sf::Texture{});
+        auto [it, emplaced] = textures_.emplace(t, sf::Texture{});
+        if (!emplaced) continue;
         const auto filename = texToFilename.find(t);
         if (filename == texToFilename.end()) {
             const auto msg = fmt::format("Texture {} does not have an associated resource name.", t);
             print::error(msg);
             throw std::invalid_argument{msg};
         }
-        textures_[t].loadFromFile(getActualFileName(filename->second));
-        textures_[t].setSmooth(true);
+        it->second.loadFromFile(getActualFileName(filename->second));
+        it->second.setSmooth(true);
     }
 }
 

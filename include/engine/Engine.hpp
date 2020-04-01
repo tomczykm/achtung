@@ -1,12 +1,13 @@
 #pragma once
 
+#include <memory>
 #include <SFML/Graphics.hpp>
 
 #include "app/AssetManager.hpp"
-#include "game/Player.hpp"
-#include "game/BorderThing.hpp"
-#include "game/PickMeUp.hpp"
-#include "game/TimerService.hpp"
+#include "engine/Player.hpp"
+#include "engine/BorderThing.hpp"
+#include "engine/PickMeUp.hpp"
+#include "engine/TimerService.hpp"
 #include "framework/Observer.hpp"
 
 #include <cstdint>
@@ -17,7 +18,9 @@
 
 class Engine : public framework::Observable {
 public:
-    using Players = std::map<ProfileId, PlayerThing>;
+    using Players = std::map<ProfileId, std::unique_ptr<PlayerThing>>;
+    using Pickmeups = std::vector<PickMeUp>;
+    using Trails = std::deque<TrailThing>;
 
     Engine(AssetManager&, const PlayerInfos&, int tickrate, int playAreaCorner, int playAreaSide);
 
@@ -28,7 +31,7 @@ public:
     bool checkVictoryGoal();
     std::vector<const sf::Drawable*> getDrawables();
 
-private:
+protected:
     void initializePlayers(const PlayerInfos&);
 
     bool checkCollisions(PlayerThing&);  // returns true if they died
@@ -36,7 +39,7 @@ private:
     bool victoryGoalAchieved();
 
     void createRandomPickMeUp();
-    std::pair<PickMeUp::OnPickUp, AssetManager::Texture> getRandomPickMeUpEffect();
+    std::pair<PickMeUp::OnPickUp, AssetManager::Texture> makePickMeUpEffectAndTexture(PickUpType);
     void resetPickmeupSpawnTimer();
 
     template <typename PlayerUnaryOp> PickMeUp::OnPickUp makeSelfEffect(PlayerUnaryOp);
@@ -55,7 +58,7 @@ private:
 
     float pickMeUpRadius_;
 
-    std::deque<TrailThing> trails_;
+    Trails trails_;
 
     Players players_;
 
@@ -63,7 +66,7 @@ private:
 
     BorderThing border_;
 
-    std::vector<PickMeUp> pickmeups_;
+    Pickmeups pickmeups_;
     Timer::Ptr pickmeupSpawnTimer_;
 
     std::optional<TimedEffect> massPowerups_;
@@ -71,7 +74,7 @@ private:
 
 struct RoundEndEvent : framework::IEvent {};
 
-struct GameEndEvent : framework::IEvent {};
+struct MatchEndEvent : framework::IEvent {};
 
 struct PointsAwardedEvent : framework::IEvent {
     PointsAwardedEvent(const Engine::Players&p): players{p} {}

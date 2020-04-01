@@ -10,6 +10,8 @@
 #include "menu/ProfilePanel.hpp"
 #include "menu/SettingsPanel.hpp"
 
+#include "game/StateSandbox.hpp"
+
 StateMenu::StateMenu(const Application::Interface& app):
     app_{app}
 {
@@ -21,6 +23,8 @@ void StateMenu::input(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
         if (event.key.code == sf::Keyboard::Escape) {
             app_.quit();
+        } else if (event.key.code == sf::Keyboard::F12) {
+            app_.enterState<StateSandbox>();
         }
     }
     (*activePanel_)->input(event);

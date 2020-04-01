@@ -1,4 +1,4 @@
-#include "game/Engine.hpp"
+#include "engine/Engine.hpp"
 
 #include <TGUI/TGUI.hpp>
 
@@ -43,8 +43,8 @@ Engine::Engine(AssetManager& a, const PlayerInfos& infos, int tickrate, int play
 void Engine::input(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
         for (auto& [id, player]: players_) {
-            if (player.isDead()) continue;
-            player.input(event);
+            if (player->isDead()) continue;
+            player->input(event);
         }
     }
 }
@@ -54,10 +54,10 @@ void Engine::step(double deltaTime) {
 
     bool playerDied = false;
     for (auto& [id, player]: players_) {
-        if (player.isDead()) continue;
-        player.step(deltaTime, trails_);
+        if (player->isDead()) continue;
+        player->step(deltaTime, trails_);
 
-        if (checkCollisions(player)) {
+        if (checkCollisions(*player)) {
             playerDied = true;
         }
     }
@@ -81,7 +81,7 @@ void Engine::resetRound() {
     pickmeups_.clear();
     massPowerups_.reset();
     for (auto& [id, player] : players_) {
-        player.newRoundSetup(
+        player->newRoundSetup(
             xor_rand::next(playAreaCornerOffset_ + 0.15 * playAreaSideLength_,
                 playAreaCornerOffset_ + 0.85 * playAreaSideLength_),
             xor_rand::next(playAreaCornerOffset_ + 0.15 * playAreaSideLength_,
@@ -106,7 +106,7 @@ std::vector<const sf::Drawable*> Engine::getDrawables() {
     }
 
     for (const auto& [id, player]: players_) {
-        drawables.push_back(&player.getShape());
+        drawables.push_back(&player->getShape());
     }
     return drawables;
 }
@@ -115,7 +115,7 @@ void Engine::initializePlayers(const PlayerInfos& infos) {
     const auto radius = playAreaSideLength_ / playerToGameAreaSizeRatio;
     const auto velocity = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
     for (const auto& [id, info] : infos) {
-        players_.emplace(id, PlayerThing{info, radius, velocity, timerService_.makeTimer(sf::milliseconds(400))});
+        players_.emplace(id, std::make_unique<PlayerThing>(info, radius, velocity, timerService_.makeTimer(sf::milliseconds(400))));
     }
 }
 
@@ -159,17 +159,17 @@ bool Engine::checkCollisions(PlayerThing& player) {
 
 void Engine::awardPoints() {
     for (auto& [id, player]: players_) {
-        if (player.isDead()) continue;
-        player.addPoint();
+        if (player->isDead()) continue;
+        player->addPoint();
     }
     notifyAll(PointsAwardedEvent{players_});
 
     const auto aliveCount = std::count_if(players_.begin(), players_.end(), [] (const auto& kv) {
-            return not kv.second.isDead();
+            return not kv.second->isDead();
         });
     if (aliveCount <= 1) {
         if (victoryGoalAchieved()) {
-            notifyAll(GameEndEvent{});
+            notifyAll(MatchEndEvent{});
         } else {
             notifyAll(RoundEndEvent{});
         }
@@ -179,7 +179,7 @@ void Engine::awardPoints() {
 bool Engine::victoryGoalAchieved() {
     std::vector<PlayerThing::Score> scores;
     for (const auto&[id, player]: players_) {
-        scores.push_back(player.getScore());
+        scores.push_back(player->getScore());
     }
     std::sort(scores.begin(), scores.end(), std::greater<PlayerThing::Score>{});
 
@@ -188,7 +188,8 @@ bool Engine::victoryGoalAchieved() {
 }
 
 void Engine::createRandomPickMeUp() {
-    auto [onPickMeUp, texture] = getRandomPickMeUpEffect();
+    const auto type = static_cast<PickUpType>(xor_rand::next(5, static_cast<int>(PickUpType::Count)-1));
+    auto [onPickMeUp, texture] = makePickMeUpEffectAndTexture(type);
     if (xor_rand::next(1, static_cast<int>(PickUpType::Count)) == 1) texture = AssetManager::Texture::RandomPickMeUp;
     pickmeups_.emplace_back(
         xor_rand::next(playAreaCornerOffset_ + pickMeUpRadius_, playAreaCornerOffset_ + playAreaSideLength_ - pickMeUpRadius_),
@@ -199,10 +200,8 @@ void Engine::createRandomPickMeUp() {
     );
 }
 
-std::pair<PickMeUp::OnPickUp, AssetManager::Texture> Engine::getRandomPickMeUpEffect() {
-    const auto type = xor_rand::next(5, static_cast<int>(PickUpType::Count)-1);
-
-    switch(static_cast<PickUpType>(type)) {
+std::pair<PickMeUp::OnPickUp, AssetManager::Texture> Engine::makePickMeUpEffectAndTexture(PickUpType type) {
+    switch (type) {
     case PickUpType::SelfHaste:
         return std::make_pair(makeSelfEffect([this] (auto& player) {
             const auto velChange = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
@@ -262,8 +261,8 @@ template <typename PlayerUnaryOp>
 PickMeUp::OnPickUp Engine::makeOpponentEffect(PlayerUnaryOp effect) {
     return [this, effect] (PlayerThing& pickedBy) {
         for (auto& [id, player]: players_) {
-            if (player.name() == pickedBy.name()) continue;
-            effect(player);
+            if (player->name() == pickedBy.name()) continue;
+            effect(*player);
         }
     };
 }

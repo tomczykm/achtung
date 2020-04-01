@@ -4,7 +4,7 @@
 
 #include "app/Application.hpp"
 #include "app/Log.hpp"
-#include "menu/StateMenu.hpp"
+#include "testcase_preview/StateViewer.hpp"
 
 namespace print::detail
 {
@@ -18,5 +18,5 @@ int main() {
         xor_rand::seed(time, time >> 8, time << 8, time >> 16);
     }
 
-    return Application::makeApplication<StateMenu>()->run();
+    return Application::makeApplication<StateViewer>()->run();
 }

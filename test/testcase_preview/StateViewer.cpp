@@ -1,6 +1,4 @@
-#include "game/StateSandbox.hpp"
-
-#include "menu/StateMenu.hpp"
+#include "testcase_preview/StateViewer.hpp"
 
 namespace {
 
@@ -37,7 +35,7 @@ auto printPosition = [] (PlayerTestable& player, Engine::Pickmeups&, Engine::Tra
 
 }
 
-StateSandbox::StateSandbox(Application::Interface& a):
+StateViewer::StateViewer(const Application::Interface& a):
     app_{a},
     engine_{
         app_.assets,
@@ -52,11 +50,11 @@ StateSandbox::StateSandbox(Application::Interface& a):
     setupState();
 }
 
-StateSandbox::~StateSandbox() {
+StateViewer::~StateViewer() {
     app_.assets.releaseTextures(gameTextures);
 }
 
-void StateSandbox::setupState() {
+void StateViewer::setupState() {
     engine_.enablePowerups(false);
     engine_.accessState(resetState);
 
@@ -66,21 +64,21 @@ void StateSandbox::setupState() {
     inputs_.addKeyHold(sf::Keyboard::Q, 310, 500);
 }
 
-void StateSandbox::onFinished() {
+void StateViewer::onFinished() {
     engine_.accessState(printPosition);
 }
 
-void StateSandbox::input(const sf::Event& event) {
+void StateViewer::input(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
         if (event.key.code == sf::Keyboard::Escape) {
-            app_.enterState<StateMenu>();
+            app_.quit();
         } else if (event.key.code == sf::Keyboard::Space) {
             started_ = true;
         }
     }
 }
 
-void StateSandbox::tick(double timeStep) {
+void StateViewer::tick(double timeStep) {
     if (!started_) return;
     if (currentTick_ < ticksToRun) {
         sf::Event event;
@@ -98,7 +96,7 @@ void StateSandbox::tick(double timeStep) {
     }
 }
 
-void StateSandbox::render() {
+void StateViewer::render() {
     for (auto d: engine_.getDrawables()) {
         app_.window.draw(*d);
     }

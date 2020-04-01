@@ -2,13 +2,13 @@
 
 #include "app/Application.hpp"
 #include "app/IGameState.hpp"
-#include "engine/EngineTestable.hpp"
-#include "engine/InputSequence.hpp"
+#include "testable/EngineTestable.hpp"
+#include "testable/InputSequence.hpp"
 
-class StateSandbox : public IGameState {
+class StateViewer : public IGameState {
 public:
-    StateSandbox(Application::Interface&);
-    ~StateSandbox();
+    StateViewer(const Application::Interface&);
+    ~StateViewer();
 
     void input(const sf::Event&) override;
     void tick(double deltaTime) override;

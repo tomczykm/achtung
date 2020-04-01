@@ -1,4 +1,3 @@
-target_sources(achtung_app PRIVATE
+target_sources(freeachtung_app PRIVATE
     StateGame.cpp
-    StateSandbox.cpp
 )

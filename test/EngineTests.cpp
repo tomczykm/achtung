@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "engine/EngineTestable.hpp"
+#include "testable/EngineTestable.hpp"
 
 #include "mock/AssetManager.hpp"
 

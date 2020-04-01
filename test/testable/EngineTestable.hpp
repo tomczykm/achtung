@@ -1,7 +1,8 @@
 #pragma once
 
 #include "engine/Engine.hpp"
-#include "engine/InputSequence.hpp"
+#include "testable/InputSequence.hpp"
+#include "testable/PlayerTestable.hpp"
 
 class EngineTestable : public Engine {
 public:

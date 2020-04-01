@@ -1,4 +1,4 @@
-#include "engine/InputSequence.hpp"
+#include "testable/InputSequence.hpp"
 
 bool InputSequence::pollEvent(sf::Event& event) const {
     const auto it = eventQueues_.find(currentTick_);

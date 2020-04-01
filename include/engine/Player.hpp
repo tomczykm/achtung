@@ -10,7 +10,6 @@
 #include "app/ProfileManager.hpp"
 #include "engine/TrailThing.hpp"
 #include "engine/Effect.hpp"
-#include "engine/InputSequence.hpp"
 
 struct PlayerInfo {
     std::string name;
@@ -86,30 +85,4 @@ protected:
     Timer::Ptr gapSwitchTimer_;
 
     std::vector<TimedEffect> effects_;
-};
-
-class PlayerTestable : public PlayerThing {
-public:
-    PlayerTestable(const InputSequence& inputs, float radius, int vel, Timer::Ptr gapSwitchTimer):
-        PlayerThing{
-            PlayerInfo{"test", sf::Keyboard::Q, sf::Keyboard::W, sf::Color::White},
-            radius, vel, gapSwitchTimer
-        },
-        inputs_{inputs}
-    {}
-
-    void setPosition(float x, float y) {
-        PlayerThing::setPosition(x, y);
-    }
-
-    bool isKeyPressed(sf::Keyboard::Key k) override {
-        return inputs_.isKeyPressed(k);
-    }
-
-    const InputSequence& inputs_;
-
-    sf::Vector2f getPosition() { return shape_.getPosition(); }
-    void setDirection(double deg) { direction_ = deg; }
-    float getRadius() { return shape_.getRadius(); }
-    void setDead(bool dead) { dead_ = dead; }
 };

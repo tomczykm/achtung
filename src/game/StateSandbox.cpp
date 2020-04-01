@@ -41,6 +41,7 @@ StateSandbox::StateSandbox(Application::Interface& a):
     app_{a},
     engine_{
         app_.assets,
+        inputs_,
         tickrate,
         0,
         0.9 * app_.config.get<int>(Setting::ResHeight)
@@ -52,7 +53,6 @@ StateSandbox::StateSandbox(Application::Interface& a):
 }
 
 StateSandbox::~StateSandbox() {
-    print::info("destroy {}", __func__);
     app_.assets.releaseTextures(gameTextures);
 }
 
@@ -61,7 +61,9 @@ void StateSandbox::setupState() {
     engine_.accessState(resetState);
 
     engine_.createPickMeUp(PickUpType::SelfHaste, 150, 900);
-    // engine_.createPickMeUp(PickUpType::SelfHaste, 550, 900);
+    inputs_.addKeyHold(sf::Keyboard::Q, 30, 120);
+    inputs_.addKeyHold(sf::Keyboard::W, 140, 280);
+    inputs_.addKeyHold(sf::Keyboard::Q, 310, 500);
 }
 
 void StateSandbox::onFinished() {
@@ -81,8 +83,13 @@ void StateSandbox::input(const sf::Event& event) {
 void StateSandbox::tick(double timeStep) {
     if (!started_) return;
     if (currentTick_ < ticksToRun) {
+        sf::Event event;
+        while (inputs_.pollEvent(event)) {
+            engine_.input(event);
+        }
         engine_.step(timeStep);
         ++currentTick_;
+        inputs_.advance();
     }
 
     if (currentTick_ == ticksToRun) {

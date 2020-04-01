@@ -32,9 +32,9 @@ void PlayerThing::step(double timeStep, std::deque<TrailThing>& trails) {
     endExpiredEffects();
 
     if (!rightAngleMovement_) {
-        if (sf::Keyboard::isKeyPressed(info_.right)) {
+        if (isKeyPressed(info_.right)) {
             direction_ += timeStep * turnDegrees_;
-        } else if (sf::Keyboard::isKeyPressed(info_.left)) {
+        } else if (isKeyPressed(info_.left)) {
             direction_ -= timeStep * turnDegrees_;
         }
     }

@@ -3,6 +3,7 @@
 #include "app/Application.hpp"
 #include "app/IGameState.hpp"
 #include "engine/EngineTestable.hpp"
+#include "engine/InputSequence.hpp"
 
 class StateSandbox : public IGameState {
 public:
@@ -22,4 +23,6 @@ private:
 
     Ticks currentTick_ = 0;
     bool started_ = false;
+
+    InputSequence inputs_;
 };

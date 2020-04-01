@@ -7,8 +7,9 @@ constexpr auto playerSpeedToGameAreaSizeRatio = 7.6f;
 
 }
 
-EngineTestable::EngineTestable(IAssetManager& a, int tickrate, int playAreaCorner, int playAreaSide):
-    Engine{a, {}, tickrate, playAreaCorner, playAreaSide}
+EngineTestable::EngineTestable(IAssetManager& a, const InputSequence& in, int tickrate, int playAreaCorner, int playAreaSide):
+    Engine{a, {}, tickrate, playAreaCorner, playAreaSide},
+    inputs_{in}
 {
     prepareTestPlayer();
 }
@@ -20,7 +21,7 @@ void EngineTestable::prepareTestPlayer() {
     auto timer = timerService_.makeTimer(sf::milliseconds(200));
     timer->pause();
 
-    players_.emplace(0, std::make_unique<PlayerTestable>(radius, velocity, timer));
+    players_.emplace(0, std::make_unique<PlayerTestable>(inputs_, radius, velocity, timer));
 }
 
 void EngineTestable::createPickMeUp(PickUpType type, int x, int y) {

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "engine/Engine.hpp"
+#include "engine/InputSequence.hpp"
 
 class EngineTestable : public Engine {
 public:
-    EngineTestable(IAssetManager&, int tickrate, int playAreaCorner, int playAreaSide);
+    EngineTestable(IAssetManager&, const InputSequence&, int tickrate, int playAreaCorner, int playAreaSide);
 
     void enablePowerups(bool enabled) {
         pickmeupSpawnTimer_->pause(!enabled);
@@ -19,4 +20,6 @@ public:
 
 private:
     void prepareTestPlayer();
+
+    const InputSequence& inputs_;
 };

@@ -10,6 +10,7 @@
 #include "app/ProfileManager.hpp"
 #include "engine/TrailThing.hpp"
 #include "engine/Effect.hpp"
+#include "engine/InputSequence.hpp"
 
 struct PlayerInfo {
     std::string name;
@@ -61,6 +62,9 @@ protected:
     void endExpiredEffects();
 
     void move(double timeStep, std::deque<TrailThing>& trails);
+    virtual bool isKeyPressed(sf::Keyboard::Key k) {
+        return sf::Keyboard::isKeyPressed(k);
+    }
 
     void setPosition(float x, float y);
 
@@ -86,16 +90,23 @@ protected:
 
 class PlayerTestable : public PlayerThing {
 public:
-    PlayerTestable(float radius, int vel, Timer::Ptr gapSwitchTimer):
+    PlayerTestable(const InputSequence& inputs, float radius, int vel, Timer::Ptr gapSwitchTimer):
         PlayerThing{
             PlayerInfo{"test", sf::Keyboard::Q, sf::Keyboard::W, sf::Color::White},
             radius, vel, gapSwitchTimer
-        }
+        },
+        inputs_{inputs}
     {}
 
     void setPosition(float x, float y) {
         PlayerThing::setPosition(x, y);
     }
+
+    bool isKeyPressed(sf::Keyboard::Key k) override {
+        return inputs_.isKeyPressed(k);
+    }
+
+    const InputSequence& inputs_;
 
     sf::Vector2f getPosition() { return shape_.getPosition(); }
     void setDirection(double deg) { direction_ = deg; }

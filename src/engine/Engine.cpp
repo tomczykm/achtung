@@ -26,7 +26,7 @@ const auto controlSwapDuration = sf::milliseconds(6500);
 
 }  // namespace
 
-Engine::Engine(AssetManager& a, const PlayerInfos& infos, int tickrate, int playAreaCorner, int playAreaSide):
+Engine::Engine(IAssetManager& a, const PlayerInfos& infos, int tickrate, int playAreaCorner, int playAreaSide):
     assets_{a},
     timerService_{tickrate},
     playAreaCornerOffset_{playAreaCorner},
@@ -190,7 +190,7 @@ bool Engine::victoryGoalAchieved() {
 void Engine::createRandomPickMeUp() {
     const auto type = static_cast<PickUpType>(xor_rand::next(5, static_cast<int>(PickUpType::Count)-1));
     auto [onPickMeUp, texture] = makePickMeUpEffectAndTexture(type);
-    if (xor_rand::next(1, static_cast<int>(PickUpType::Count)) == 1) texture = AssetManager::Texture::RandomPickMeUp;
+    if (xor_rand::next(1, static_cast<int>(PickUpType::Count)) == 1) texture = TextureType::RandomPickMeUp;
     pickmeups_.emplace_back(
         xor_rand::next(playAreaCornerOffset_ + pickMeUpRadius_, playAreaCornerOffset_ + playAreaSideLength_ - pickMeUpRadius_),
         xor_rand::next(playAreaCornerOffset_ + pickMeUpRadius_, playAreaCornerOffset_ + playAreaSideLength_ - pickMeUpRadius_),
@@ -200,49 +200,49 @@ void Engine::createRandomPickMeUp() {
     );
 }
 
-std::pair<PickMeUp::OnPickUp, AssetManager::Texture> Engine::makePickMeUpEffectAndTexture(PickUpType type) {
+std::pair<PickMeUp::OnPickUp, TextureType> Engine::makePickMeUpEffectAndTexture(PickUpType type) {
     switch (type) {
     case PickUpType::SelfHaste:
         return std::make_pair(makeSelfEffect([this] (auto& player) {
             const auto velChange = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
             addVelocityChange(player, velChange, hasteTurnAngleChange, selfHasteDuration);
-        }), AssetManager::Texture::SelfHaste);
+        }), TextureType::SelfHaste);
     case PickUpType::OpponentHaste:
         return std::make_pair(makeOpponentEffect([this] (auto& player) {
             const auto velChange = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
             addVelocityChange(player, velChange, hasteTurnAngleChange, oppHasteDuration);
-        }), AssetManager::Texture::OpponentHaste);
+        }), TextureType::OpponentHaste);
     case PickUpType::SelfSlow:
         return std::make_pair(makeSelfEffect([this] (auto& player) {
             const auto velChange = -(player.getVelocity() / 2);
             addVelocityChange(player, velChange, selfSlowTurnAngleChange, selfSlowDuration);
-        }), AssetManager::Texture::SelfSlow);
+        }), TextureType::SelfSlow);
     case PickUpType::OpponentSlow:
         return std::make_pair(makeOpponentEffect([this] (auto& player) {
             const auto velChange = -(player.getVelocity() / 2);
             addVelocityChange(player, velChange, oppSlowTurnAngleChange, oppSlowDuration);
-        }), AssetManager::Texture::OpponentSlow);
+        }), TextureType::OpponentSlow);
     case PickUpType::ClearTrails:
         return std::make_pair(makeSelfEffect([this] (auto&) {
             trails_.clear();
-        }), AssetManager::Texture::ClearTrails);
+        }), TextureType::ClearTrails);
     case PickUpType::SelfRightAngle:
         return std::make_pair(makeSelfEffect([this] (auto& player) {
             addRightAngleMovement(player, selfRightAngleMovementDuration);
-        }), AssetManager::Texture::SelfRightAngle);
+        }), TextureType::SelfRightAngle);
     case PickUpType::OpponentRightAngle:
         return std::make_pair(makeOpponentEffect([this] (auto& player) {
             addRightAngleMovement(player, oppRightAngleMovementDuration);
-        }), AssetManager::Texture::OpponentRightAngle);
+        }), TextureType::OpponentRightAngle);
     case PickUpType::ControlSwap:
         return std::make_pair(makeOpponentEffect([this] (auto& player) {
             addControlSwap(player, controlSwapDuration);
-        }), AssetManager::Texture::ControlSwap);
+        }), TextureType::ControlSwap);
     case PickUpType::MassPowerups:
         return std::make_pair(makeSelfEffect([this] (auto&) {
             addMassPowerups();
             resetPickmeupSpawnTimer();
-        }), AssetManager::Texture::MassPowerups);
+        }), TextureType::MassPowerups);
     default:
         const auto msg = fmt::format("bad pickup type {}", type);
         print::error(msg);

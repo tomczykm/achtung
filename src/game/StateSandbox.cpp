@@ -7,25 +7,27 @@ namespace {
 constexpr static auto tickrate = 140;
 const auto stepTime = sf::milliseconds(1000/tickrate).asMilliseconds() / 1000.f;
 
-AssetManager::TextureSet gameTextures = {
-        AssetManager::Texture::SelfHaste,
-        AssetManager::Texture::OpponentHaste,
-        AssetManager::Texture::SelfSlow,
-        AssetManager::Texture::OpponentSlow,
-        AssetManager::Texture::SelfRightAngle,
-        AssetManager::Texture::OpponentRightAngle,
-        AssetManager::Texture::ClearTrails,
-        AssetManager::Texture::ControlSwap,
-        AssetManager::Texture::MassPowerups,
-        AssetManager::Texture::RandomPickMeUp
+constexpr Ticks ticksToRun = 700;
+
+IAssetManager::TextureSet gameTextures = {
+        TextureType::SelfHaste,
+        TextureType::OpponentHaste,
+        TextureType::SelfSlow,
+        TextureType::OpponentSlow,
+        TextureType::SelfRightAngle,
+        TextureType::OpponentRightAngle,
+        TextureType::ClearTrails,
+        TextureType::ControlSwap,
+        TextureType::MassPowerups,
+        TextureType::RandomPickMeUp
 };
 
-auto resetState = [] (PlayerTestable& player, Engine::Pickmeups&, Engine::Trails& t) {
-    player.newRoundSetup(100, 900, t);
+auto resetState = [] (PlayerTestable& player, Engine::Pickmeups& pickups, Engine::Trails& t) {
+    player.setDead(false);
+    player.setPosition(100, 900);
     player.setDirection(270);
     t.clear();
-    for (int y = 850; y < 950; y+=2)
-        t.emplace_back(150, y, 0, player.getRadius(), sf::Color::Red);
+    pickups.clear();
 };
 
 auto printPosition = [] (PlayerTestable& player, Engine::Pickmeups&, Engine::Trails&) {
@@ -45,17 +47,8 @@ StateSandbox::StateSandbox(Application::Interface& a):
     }
 {
     app_.assets.loadTextures(gameTextures);
-    engine_.enablePowerups(false);
-    engine_.createPickMeUp(PickUpType::ClearTrails, 100, 100);
 
-    for (auto i = 0u; i < 10; ++i) {
-        print::info("Run {}", i+1);
-        engine_.accessState(resetState);
-        for (auto tick = 0u; tick < 140; ++tick) {
-            engine_.step(stepTime);
-        }
-        engine_.accessState(printPosition);
-    }
+    setupState();
 }
 
 StateSandbox::~StateSandbox() {
@@ -63,14 +56,39 @@ StateSandbox::~StateSandbox() {
     app_.assets.releaseTextures(gameTextures);
 }
 
+void StateSandbox::setupState() {
+    engine_.enablePowerups(false);
+    engine_.accessState(resetState);
+
+    engine_.createPickMeUp(PickUpType::SelfHaste, 150, 900);
+    // engine_.createPickMeUp(PickUpType::SelfHaste, 550, 900);
+}
+
+void StateSandbox::onFinished() {
+    engine_.accessState(printPosition);
+}
+
 void StateSandbox::input(const sf::Event& event) {
-    if (event.key.code == sf::Keyboard::Escape) {
-        app_.enterState<StateMenu>();
+    if (event.type == sf::Event::KeyPressed) {
+        if (event.key.code == sf::Keyboard::Escape) {
+            app_.enterState<StateMenu>();
+        } else if (event.key.code == sf::Keyboard::Space) {
+            started_ = true;
+        }
     }
 }
 
-void StateSandbox::tick(double) {
+void StateSandbox::tick(double timeStep) {
+    if (!started_) return;
+    if (currentTick_ < ticksToRun) {
+        engine_.step(timeStep);
+        ++currentTick_;
+    }
 
+    if (currentTick_ == ticksToRun) {
+        onFinished();
+        ++currentTick_;
+    }
 }
 
 void StateSandbox::render() {

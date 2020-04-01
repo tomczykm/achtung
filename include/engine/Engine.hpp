@@ -22,7 +22,7 @@ public:
     using Pickmeups = std::vector<PickMeUp>;
     using Trails = std::deque<TrailThing>;
 
-    Engine(AssetManager&, const PlayerInfos&, int tickrate, int playAreaCorner, int playAreaSide);
+    Engine(IAssetManager&, const PlayerInfos&, int tickrate, int playAreaCorner, int playAreaSide);
 
     void input(const sf::Event&);
     void step(double deltaTime);
@@ -39,7 +39,7 @@ protected:
     bool victoryGoalAchieved();
 
     void createRandomPickMeUp();
-    std::pair<PickMeUp::OnPickUp, AssetManager::Texture> makePickMeUpEffectAndTexture(PickUpType);
+    std::pair<PickMeUp::OnPickUp, TextureType> makePickMeUpEffectAndTexture(PickUpType);
     void resetPickmeupSpawnTimer();
 
     template <typename PlayerUnaryOp> PickMeUp::OnPickUp makeSelfEffect(PlayerUnaryOp);
@@ -50,7 +50,7 @@ protected:
     void addControlSwap(PlayerThing&, sf::Time);
     void addMassPowerups();
 
-    AssetManager& assets_;
+    IAssetManager& assets_;
     TimerService timerService_;
 
     int playAreaCornerOffset_;

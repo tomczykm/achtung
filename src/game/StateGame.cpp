@@ -13,17 +13,17 @@ namespace {
 
 constexpr auto scoreListEntryHeight = 30u;
 
-AssetManager::TextureSet gameTextures = {
-        AssetManager::Texture::SelfHaste,
-        AssetManager::Texture::OpponentHaste,
-        AssetManager::Texture::SelfSlow,
-        AssetManager::Texture::OpponentSlow,
-        AssetManager::Texture::SelfRightAngle,
-        AssetManager::Texture::OpponentRightAngle,
-        AssetManager::Texture::ClearTrails,
-        AssetManager::Texture::ControlSwap,
-        AssetManager::Texture::MassPowerups,
-        AssetManager::Texture::RandomPickMeUp
+IAssetManager::TextureSet gameTextures = {
+        TextureType::SelfHaste,
+        TextureType::OpponentHaste,
+        TextureType::SelfSlow,
+        TextureType::OpponentSlow,
+        TextureType::SelfRightAngle,
+        TextureType::OpponentRightAngle,
+        TextureType::ClearTrails,
+        TextureType::ControlSwap,
+        TextureType::MassPowerups,
+        TextureType::RandomPickMeUp
 };
 
 }  // namespace

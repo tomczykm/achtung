@@ -4,7 +4,7 @@
 
 class EngineTestable : public Engine {
 public:
-    EngineTestable(AssetManager&, int tickrate, int playAreaCorner, int playAreaSide);
+    EngineTestable(IAssetManager&, int tickrate, int playAreaCorner, int playAreaSide);
 
     void enablePowerups(bool enabled) {
         pickmeupSpawnTimer_->pause(!enabled);

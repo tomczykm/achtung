@@ -1,4 +1,4 @@
-target_sources(${PROJECT_NAME} PUBLIC
+target_sources(achtung_app PRIVATE
     BorderThing.cpp
     Engine.cpp
     EngineTestable.cpp

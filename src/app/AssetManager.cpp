@@ -11,17 +11,17 @@
 
 namespace {
 
-const std::map<AssetManager::Texture, std::string_view> texToFilename = {
-    {AssetManager::Texture::SelfHaste, "sprites/selfHaste.png"},
-    {AssetManager::Texture::OpponentHaste, "sprites/oppHaste.png"},
-    {AssetManager::Texture::SelfSlow, "sprites/selfSlow.png"},
-    {AssetManager::Texture::OpponentSlow, "sprites/oppSlow.png"},
-    {AssetManager::Texture::SelfRightAngle, "sprites/selfSquare.png"},
-    {AssetManager::Texture::OpponentRightAngle, "sprites/oppSquare.png"},
-    {AssetManager::Texture::ClearTrails, "sprites/clear.png"},
-    {AssetManager::Texture::ControlSwap, "sprites/swap.png"},
-    {AssetManager::Texture::MassPowerups, "sprites/massPowerups.png"},
-    {AssetManager::Texture::RandomPickMeUp, "sprites/random.png"}
+const std::map<TextureType, std::string_view> texToFilename = {
+    {TextureType::SelfHaste, "sprites/selfHaste.png"},
+    {TextureType::OpponentHaste, "sprites/oppHaste.png"},
+    {TextureType::SelfSlow, "sprites/selfSlow.png"},
+    {TextureType::OpponentSlow, "sprites/oppSlow.png"},
+    {TextureType::SelfRightAngle, "sprites/selfSquare.png"},
+    {TextureType::OpponentRightAngle, "sprites/oppSquare.png"},
+    {TextureType::ClearTrails, "sprites/clear.png"},
+    {TextureType::ControlSwap, "sprites/swap.png"},
+    {TextureType::MassPowerups, "sprites/massPowerups.png"},
+    {TextureType::RandomPickMeUp, "sprites/random.png"}
 };
 
 }  // namespace
@@ -80,7 +80,7 @@ void AssetManager::releaseTextures(TextureSet& toRelease) {
     }
 }
 
-const sf::Texture& AssetManager::getTexture(Texture t) {
+const sf::Texture& AssetManager::getTexture(TextureType t) {
     const auto kvPair = textures_.find(t);
     if (kvPair == textures_.end()) {
         const auto msg = fmt::format("Texture {} not loaded.", t);

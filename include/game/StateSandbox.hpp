@@ -14,6 +14,12 @@ public:
     void render() override;
 
 private:
+    void setupState();
+    void onFinished();
+
     Application::Interface app_;
     EngineTestable engine_;
+
+    Ticks currentTick_ = 0;
+    bool started_ = false;
 };

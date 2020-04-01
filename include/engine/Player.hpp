@@ -88,7 +88,7 @@ class PlayerTestable : public PlayerThing {
 public:
     PlayerTestable(float radius, int vel, Timer::Ptr gapSwitchTimer):
         PlayerThing{
-            PlayerInfo{"test", sf::Keyboard::Unknown, sf::Keyboard::Unknown, sf::Color::White},
+            PlayerInfo{"test", sf::Keyboard::Q, sf::Keyboard::W, sf::Color::White},
             radius, vel, gapSwitchTimer
         }
     {}
@@ -100,4 +100,5 @@ public:
     sf::Vector2f getPosition() { return shape_.getPosition(); }
     void setDirection(double deg) { direction_ = deg; }
     float getRadius() { return shape_.getRadius(); }
+    void setDead(bool dead) { dead_ = dead; }
 };

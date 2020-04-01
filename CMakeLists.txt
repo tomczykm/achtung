@@ -9,7 +9,7 @@ find_package(TGUI 0.8 REQUIRED)
 enable_testing()
 
 add_executable(${PROJECT_NAME})
-add_executable(testcase_preview)
+add_executable(preview_test)
 
 add_subdirectory(src)
 add_subdirectory(test)

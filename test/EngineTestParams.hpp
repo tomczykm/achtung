@@ -13,6 +13,6 @@ using AssertFunctor = std::function<void(EngineTestable&)>;
 using EngineTestParam = std::tuple<SetupFunctor, AssertFunctor, Ticks>;
 using TestPreviewParam = std::pair<SetupFunctor, Ticks>;
 
-constexpr std::size_t totalTestcases = 3;
+constexpr std::size_t totalTestcases = 7;
 
 extern const std::array<TestPreviewParam, totalTestcases> setupAndTicks;

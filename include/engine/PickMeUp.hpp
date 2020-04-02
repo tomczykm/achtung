@@ -26,15 +26,15 @@ enum class PickUpType {
 
 class PickMeUp {
 public:
-    using OnPickUp = std::function<void(PlayerThing&)>;
+    using OnPickUp = std::function<void(ProfileId, PlayerThing&)>;
 
     PickMeUp(uint32_t xPos, uint32_t yPos, float radius, const sf::Texture&, OnPickUp);
 
     const sf::CircleShape& getShape() const { return shape_; }
     const sf::Sprite& getSprite() const { return sprite_; }
 
-    void onPickUp(PlayerThing& player) {
-        onPickUp_(player);
+    void onPickUp(ProfileId id, PlayerThing& player) {
+        onPickUp_(id, player);
     }
 
 private:

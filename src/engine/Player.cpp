@@ -6,11 +6,24 @@
 #include "app/Log.hpp"
 #include "app/Utils.hpp"
 
+namespace {
+
+std::set<PlayerEffect> appliedOnEveryStack = {
+    PlayerEffect::Haste, PlayerEffect::Slow
+};
+
+std::set<PlayerEffect> appliedOnFirstStack = {
+    PlayerEffect::RightAngled, PlayerEffect::SwapControl
+};
+
+}
+
 PlayerThing::PlayerThing(const PlayerInfo& info, float radius, int vel, Timer::Ptr gapSwitchTimer):
     info_{info},
     shape_{radius},
     recShape_{{radius*2, radius*2}},
-    vel_{vel},
+    baseVel_{vel},
+    vel_{baseVel_},
     gapSwitchTimer_{gapSwitchTimer}
 {
     shape_.setOrigin(radius, radius);
@@ -21,7 +34,7 @@ PlayerThing::PlayerThing(const PlayerInfo& info, float radius, int vel, Timer::P
 }
 
 const sf::Shape& PlayerThing::getShape() const {
-    if (rightAngleMovement_) {
+    if (isRightAngled()) {
         return recShape_;
     } else {
         return shape_;
@@ -31,7 +44,7 @@ const sf::Shape& PlayerThing::getShape() const {
 void PlayerThing::step(double timeStep, std::deque<TrailThing>& trails) {
     endExpiredEffects();
 
-    if (!rightAngleMovement_) {
+    if (not isRightAngled()) {
         if (isKeyPressed(info_.right)) {
             direction_ += timeStep * turnDegrees_;
         } else if (isKeyPressed(info_.left)) {
@@ -68,7 +81,7 @@ void PlayerThing::move(double timeStep, std::deque<TrailThing>& trails) {
 }
 
 void PlayerThing::input(const sf::Event& e) {
-    if (rightAngleMovement_ && e.type == sf::Event::KeyPressed) {
+    if (isRightAngled() && e.type == sf::Event::KeyPressed) {
         if (e.key.code == info_.right) {
             direction_ += 90;
         } else if (e.key.code == info_.left) {
@@ -78,7 +91,7 @@ void PlayerThing::input(const sf::Event& e) {
 }
 
 void PlayerThing::newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailThing>& trails) {
-    effects_.clear();
+    clearAllEffects();
     dead_ = false;
     direction_ = xor_rand::next(0, 360);
     shape_.setPosition(xPos, yPos);
@@ -87,12 +100,7 @@ void PlayerThing::newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailTh
     gap_ = true;
     gapSwitch();
 
-    move(0.1, trails);
-}
-
-void PlayerThing::setRightAngleMovement(bool v) {
-    rightAngleMovement_ = v;
-    recShape_.setRotation(direction_);
+    move(0.125, trails);
 }
 
 void PlayerThing::swapControls() {
@@ -104,7 +112,6 @@ void PlayerThing::swapControls() {
         shape_.setFillColor(sf::Color::Blue);
         recShape_.setFillColor(sf::Color::Blue);
     }
-
 }
 
 void PlayerThing::gapSwitch() {
@@ -115,6 +122,7 @@ void PlayerThing::gapSwitch() {
 }
 
 bool PlayerThing::checkCollision(const sf::Shape &o) const {
+    if (gap_) return false;
     return shape_.getGlobalBounds().intersects(o.getGlobalBounds());
 }
 
@@ -129,12 +137,136 @@ void PlayerThing::kill() {
 }
 
 void PlayerThing::endExpiredEffects() {
-    effects_.erase(std::remove_if(effects_.begin(), effects_.end(), [] (const auto& effect) {
-        return effect.isExpired();
-    }), effects_.end());
+    for (auto&[e, stack] : effectStacks_) {
+        auto sizeBefore = stack.size();
+        stack.erase(std::remove_if(stack.begin(), stack.end(), [] (auto& t) {
+            return t->isExpired();
+        }), stack.end());
+        auto removedTotal = sizeBefore - stack.size();
+        if (removedTotal > 0) {
+            if (appliedOnEveryStack.find(e) != appliedOnEveryStack.end()) {
+                for (std::size_t i = 0 ; i < removedTotal ; ++i) {
+                    revertEffect(e);
+                }
+            }
+            if (appliedOnFirstStack.find(e) != appliedOnFirstStack.end() &&
+                stack.size() == 0) {
+                revertEffect(e);
+            }
+        }
+    }
 }
 
 void PlayerThing::setPosition(float x, float y) {
     recShape_.setPosition(x, y);
     shape_.setPosition(x, y);
+}
+
+void PlayerThing::addEffectStack(PlayerEffect e, Timer::Ptr t) {
+    auto it = effectStacks_.find(e);
+    if (it == effectStacks_.end()) {
+        effectStacks_.emplace(e, std::vector<Timer::Ptr>{t});
+    } else {
+        it->second.push_back(t);
+    }
+
+    if (appliedOnEveryStack.find(e) != appliedOnEveryStack.end()) {
+        applyEffect(e);
+    }
+
+    if (effectStacks_[e].size() == 1 &&
+        appliedOnFirstStack.find(e) != appliedOnFirstStack.end()) {
+            applyEffect(e);
+    }
+}
+
+int PlayerThing::getNumEffectStacks(PlayerEffect e) const {
+    auto it = effectStacks_.find(e);
+    if (it == effectStacks_.end()) return 0;
+    return it->second.size();
+}
+
+void PlayerThing::applyEffect(PlayerEffect e) {
+    print::info("{}: {} on {}", __func__, e, info_.name);
+    switch (e) {
+        case PlayerEffect::Haste:
+            vel_ = calculateCurrentVelocity();
+            break;
+        case PlayerEffect::Slow:
+            vel_ = calculateCurrentVelocity();
+            break;
+        case PlayerEffect::SwapControl:
+            swapControls();
+            break;
+        case PlayerEffect::RightAngled:
+            recShape_.setRotation(direction_);
+            break;
+        case PlayerEffect::Enlarge:
+            // todo
+            break;
+        case PlayerEffect::Reduce:
+            // todo
+            break;
+        case PlayerEffect::Wrap:
+            // todo
+            break;
+        case PlayerEffect::NoTrails:
+            // todo
+            break;
+    }
+}
+
+void PlayerThing::revertEffect(PlayerEffect e) {
+    print::info("{}: {} on {}", __func__, e, info_.name);
+    switch (e) {
+        case PlayerEffect::Haste:
+            vel_ = calculateCurrentVelocity();
+            break;
+        case PlayerEffect::Slow:
+            vel_ = calculateCurrentVelocity();
+            break;
+        case PlayerEffect::SwapControl:
+            swapControls();
+            break;
+        case PlayerEffect::RightAngled:
+            break;
+        case PlayerEffect::Enlarge:
+            // todo
+            break;
+        case PlayerEffect::Reduce:
+            // todo
+            break;
+        case PlayerEffect::Wrap:
+            // todo
+            break;
+        case PlayerEffect::NoTrails:
+            // todo
+            break;
+    }
+}
+
+void PlayerThing::clearAllEffects() {
+    // basically, expire them all and clear expired.
+    for (auto&[e, stack]: effectStacks_) {
+        for(auto& t: stack) {
+            t->reset(0);
+        }
+    }
+    endExpiredEffects();
+}
+
+int PlayerThing::calculateCurrentVelocity() const {
+    int velTier = 0;
+    if (auto it = effectStacks_.find(PlayerEffect::Haste); it != effectStacks_.end()) {
+        velTier += it->second.size();
+    }
+    if (auto it = effectStacks_.find(PlayerEffect::Slow); it != effectStacks_.end()) {
+        velTier -= it->second.size();
+    }
+
+    if (velTier >= 0) {
+        return baseVel_ * (velTier+1);
+    } else {
+        return baseVel_ / std::pow(2, -velTier);
+    }
 }

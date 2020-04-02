@@ -34,7 +34,7 @@ public:
 protected:
     void initializePlayers(const PlayerInfos&);
 
-    bool checkCollisions(PlayerThing&);  // returns true if they died
+    bool checkCollisions(ProfileId, PlayerThing&);  // returns true if they died
     void awardPoints();
     bool victoryGoalAchieved();
 
@@ -69,7 +69,7 @@ protected:
     Pickmeups pickmeups_;
     Timer::Ptr pickmeupSpawnTimer_;
 
-    std::optional<TimedEffect> massPowerups_;
+    Timer::Ptr massPowerups_;
 };
 
 struct RoundEndEvent : framework::IEvent {};

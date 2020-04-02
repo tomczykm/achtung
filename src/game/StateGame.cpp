@@ -23,7 +23,9 @@ IAssetManager::TextureSet gameTextures = {
         TextureType::ClearTrails,
         TextureType::ControlSwap,
         TextureType::MassPowerups,
-        TextureType::RandomPickMeUp
+        TextureType::RandomPickMeUp,
+        TextureType::Shrink,
+        TextureType::Enlarge
 };
 
 }  // namespace

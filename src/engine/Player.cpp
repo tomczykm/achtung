@@ -9,7 +9,8 @@
 namespace {
 
 std::set<PlayerEffect> appliedOnEveryStack = {
-    PlayerEffect::Haste, PlayerEffect::Slow
+    PlayerEffect::Haste, PlayerEffect::Slow,
+    PlayerEffect::Enlarge, PlayerEffect::Shrink
 };
 
 std::set<PlayerEffect> appliedOnFirstStack = {
@@ -23,6 +24,7 @@ PlayerThing::PlayerThing(const PlayerInfo& info, float radius, int vel, Timer::P
     shape_{radius},
     recShape_{{radius*2, radius*2}},
     baseVel_{vel},
+    baseRadius_{radius},
     vel_{baseVel_},
     gapSwitchTimer_{gapSwitchTimer}
 {
@@ -202,10 +204,10 @@ void PlayerThing::applyEffect(PlayerEffect e) {
             recShape_.setRotation(direction_);
             break;
         case PlayerEffect::Enlarge:
-            // todo
+            updateRadius();
             break;
-        case PlayerEffect::Reduce:
-            // todo
+        case PlayerEffect::Shrink:
+            updateRadius();
             break;
         case PlayerEffect::Wrap:
             // todo
@@ -231,10 +233,10 @@ void PlayerThing::revertEffect(PlayerEffect e) {
         case PlayerEffect::RightAngled:
             break;
         case PlayerEffect::Enlarge:
-            // todo
+            updateRadius();
             break;
-        case PlayerEffect::Reduce:
-            // todo
+        case PlayerEffect::Shrink:
+            updateRadius();
             break;
         case PlayerEffect::Wrap:
             // todo
@@ -264,9 +266,26 @@ int PlayerThing::calculateCurrentVelocity() const {
         velTier -= it->second.size();
     }
 
-    if (velTier >= 0) {
-        return baseVel_ * (velTier+1);
-    } else {
-        return baseVel_ / std::pow(2, -velTier);
+    return velTier >= 0 ?
+        baseVel_ * (velTier+1) :
+        baseVel_ / std::pow(2, -velTier);
+}
+
+void PlayerThing::updateRadius() {
+    int sizeTier = 0;
+    if (auto it = effectStacks_.find(PlayerEffect::Enlarge); it != effectStacks_.end()) {
+        sizeTier += it->second.size();
     }
+    if (auto it = effectStacks_.find(PlayerEffect::Shrink); it != effectStacks_.end()) {
+        sizeTier -= it->second.size();
+    }
+
+    const auto newRadius = sizeTier >= 0 ?
+        baseRadius_ * (sizeTier+1) :
+        baseRadius_ * std::pow(2/3.f, -sizeTier);
+
+    shape_.setRadius(newRadius);
+    shape_.setOrigin(newRadius, newRadius);
+    recShape_.setSize({newRadius*2, newRadius*2});
+    recShape_.setOrigin(newRadius, newRadius);
 }

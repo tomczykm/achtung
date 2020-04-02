@@ -95,5 +95,24 @@ const std::array<TestPreviewParam, totalTestcases> setupAndTicks = {{
         engine.createPickMeUp(PickUpType::SelfHaste, 400, 900);
         inputs.addKeyHold(sf::Keyboard::Q, 250, 350);
         inputs.addKeyHold(sf::Keyboard::Q, 400, 500);
-    }, 500)
+    }, 500),
+
+    // 7 - CheckEnlargeAndShrink
+    std::make_pair([] (auto& engine, auto& inputs) {
+        auto resetState = [] (auto& player, auto& pickups, auto& t) {
+            ::resetState(player, pickups, t);
+            player.setPosition(100, 200);
+        };
+        engine.enablePowerups(false);
+        engine.accessState(resetState);
+        auto& p2 = engine.addPlayer(PlayerInfo{"be", sf::Keyboard::A, sf::Keyboard::S, sf::Color::Green});
+        p2.setPosition(100, 50);
+        p2.setDirection(270);
+        engine.createPickMeUp(PickUpType::Shrink, 200, 200);
+        engine.createPickMeUp(PickUpType::Shrink, 250, 200);
+        engine.createPickMeUp(PickUpType::Enlarge, 300, 200);
+        engine.createPickMeUp(PickUpType::Enlarge, 350, 200);
+        inputs.addKeyHold(sf::Keyboard::W, 450, 550);
+        inputs.addKeyHold(sf::Keyboard::S, 550, 650);
+    }, 1200),
 }};

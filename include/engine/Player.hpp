@@ -26,7 +26,7 @@ enum class PlayerEffect {
     SwapControl,
     RightAngled,
     Enlarge,
-    Reduce,
+    Shrink,
     Wrap,
     NoTrails
 };
@@ -80,6 +80,7 @@ protected:
     bool isRightAngled() const { return getNumEffectStacks(PlayerEffect::RightAngled) > 0; }
 
     int calculateCurrentVelocity() const;
+    void updateRadius();
 
     PlayerInfo info_;
 
@@ -87,6 +88,7 @@ protected:
     sf::RectangleShape recShape_; // for right angle movement
 
     int baseVel_;
+    int baseRadius_;
     double baseTurn_ = 130;
 
     double direction_ = 0.0; // in degrees

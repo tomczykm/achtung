@@ -20,6 +20,8 @@ enum class PickUpType {
     ClearTrails,
     ControlSwap,
     MassPowerups,
+    Shrink,
+    Enlarge,
 
     Count
 };

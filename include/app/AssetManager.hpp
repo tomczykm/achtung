@@ -19,7 +19,9 @@ enum class TextureType {
     ClearTrails,
     ControlSwap,
     MassPowerups,
-    RandomPickMeUp
+    RandomPickMeUp,
+    Shrink,
+    Enlarge
 };
 
 class IAssetManager {

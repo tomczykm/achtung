@@ -19,6 +19,8 @@ const auto oppSlowDuration = sf::milliseconds(4000);
 const auto selfRightAngleMovementDuration = sf::milliseconds(8500);
 const auto oppRightAngleMovementDuration = sf::milliseconds(5500);
 
+const auto sizeChangeDuration = sf::milliseconds(8500);
+
 const auto controlSwapDuration = sf::milliseconds(6500);
 
 }  // namespace
@@ -237,6 +239,14 @@ std::pair<PickMeUp::OnPickUp, TextureType> Engine::makePickMeUpEffectAndTexture(
             addMassPowerups();
             resetPickmeupSpawnTimer();
         }), TextureType::MassPowerups);
+    case PickUpType::Shrink:
+        return std::make_pair(makeSelfEffect([this] (auto& player) {
+            player.addEffectStack(PlayerEffect::Shrink, timerService_.makeTimer(sizeChangeDuration));
+        }), TextureType::Shrink);
+    case PickUpType::Enlarge:
+        return std::make_pair(makeOpponentEffect([this] (auto& player) {
+            player.addEffectStack(PlayerEffect::Enlarge, timerService_.makeTimer(sizeChangeDuration));
+        }), TextureType::Enlarge);
     default:
         const auto msg = fmt::format("bad pickup type {}", type);
         print::error(msg);

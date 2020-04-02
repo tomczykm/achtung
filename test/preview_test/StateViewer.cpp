@@ -16,7 +16,9 @@ IAssetManager::TextureSet gameTextures = {
         TextureType::ClearTrails,
         TextureType::ControlSwap,
         TextureType::MassPowerups,
-        TextureType::RandomPickMeUp
+        TextureType::RandomPickMeUp,
+        TextureType::Shrink,
+        TextureType::Enlarge
 };
 
 auto resetState = [] (PlayerTestable& player, Engine::Pickmeups& pickups, Engine::Trails& t) {

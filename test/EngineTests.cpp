@@ -33,19 +33,18 @@ const auto assertPlayerInBoxBounds = [] (auto& player, auto&, auto&) {
 
 using namespace ::testing;
 
-struct EngineTests : TestWithParam<EngineTestParam> {
+struct EngineTests : Test {
 
     EngineTests():
         engine_{
             assetManager_,
             inputs_,
             tickrate,
-            0,
+            50,
             boxSize
         }
     {
         print::detail::logFile.reset(std::fopen(fmt::format("{}Test.log", UnitTest::GetInstance()->current_test_info()->name()).c_str(), "w"));
-        engine_.enablePowerups(false);
 
         ON_CALL(assetManager_, getTexture(_))
             .WillByDefault(ReturnRef(defaultTex_));
@@ -69,33 +68,92 @@ struct EngineTests : TestWithParam<EngineTestParam> {
     sf::Texture defaultTex_;
 };
 
-TEST_P(EngineTests, TestEngine) {
-    const auto [setup, asserts, ticks] = GetParam();
+TEST_F(EngineTests, ShouldDieOnCollisionWithTrail) {
+    const auto [setup, ticks] = setupAndTicks[0];
 
     setup(engine_, inputs_);
     stepEngine(ticks);
-    asserts(engine_);
+    engine_.accessState(assertIsPlayerDead(true));
 }
 
-INSTANTIATE_TEST_SUITE_P(Tests, EngineTests, Values(
-    // 0 - ShouldDieOnCollisionWithTrail
-    std::make_tuple(setupAndTicks[0].first, [] (auto& engine) {
-        engine.accessState(assertIsPlayerDead(true));
-    }, setupAndTicks[0].second),
+TEST_F(EngineTests, ShouldntDieOnEndOfHaste) {
+    const auto [setup, ticks] = setupAndTicks[1];
 
-    // 1 - ShouldntDieOnEndOfHaste
-    std::make_tuple(setupAndTicks[1].first, [] (auto& engine) {
-        engine.accessState(assertIsPlayerDead(false));
-        engine.accessState(assertPlayerInBoxBounds);
-    }, setupAndTicks[1].second),
+    setup(engine_, inputs_);
+    stepEngine(ticks);
+    engine_.accessState(assertIsPlayerDead(false));
+    engine_.accessState(assertPlayerInBoxBounds);
 
-    // 2 - PickupsShouldNotCancelEachOtherOut
-    std::make_tuple(setupAndTicks[2].first, [] (auto& engine) {
-        engine.accessState([] (auto& p, auto&, auto&) {
-            EXPECT_EQ(p.getEffects().size(), 2);
-        });
-        engine.accessState([] (auto& p, auto&, auto&) {
-            EXPECT_TRUE(p.isRightAngled());
-        });
-    }, setupAndTicks[2].second)
-));
+    // check if speed was changed; y>=600 says it was not (too close to starting pos)
+    engine_.accessState([] (auto& p, auto&, auto&) {
+        auto [x, y] = p.getPosition();
+        EXPECT_LT(y, 600);
+    });
+}
+
+TEST_F(EngineTests, PickupsShouldNotCancelEachOtherOut) {
+    const auto [setup, ticks] = setupAndTicks[2];
+
+    setup(engine_, inputs_);
+    stepEngine(ticks);
+    engine_.accessState([] (auto& p, auto&, auto&) {
+        EXPECT_EQ(p.getTotalEffects(), 2);
+        EXPECT_TRUE(p.isRightAngled());
+    });
+}
+
+TEST_F(EngineTests, CheckSwapControls) {
+    const auto [setup, ticks] = setupAndTicks[3];
+    setup(engine_, inputs_);
+    stepEngine(ticks);
+    engine_.accessState([] (auto& p, auto&, auto&) {
+        auto [x, y] = p.getPosition();
+        EXPECT_GT(y, 200);
+        EXPECT_EQ(p.getTotalEffects(), 0);
+    });
+}
+
+TEST_F(EngineTests, CheckHasteAndRightAngledInteraction) {
+    const auto [setup, ticks] = setupAndTicks[4];
+    setup(engine_, inputs_);
+    stepEngine(ticks);
+    engine_.accessState([] (auto& p, auto&, auto&) {
+        EXPECT_EQ(p.getTotalEffects(), 2);
+        EXPECT_TRUE(p.isRightAngled());
+        EXPECT_FALSE(p.isOnBaseVelocity());
+    });
+}
+
+TEST_F(EngineTests, CheckOpponentSlow) {
+    const auto [setup, ticks] = setupAndTicks[5];
+    setup(engine_, inputs_);
+    stepEngine(ticks);
+    engine_.accessState([] (auto& p, auto&, auto&) {
+        EXPECT_EQ(p.getTotalEffects(), 0);
+        EXPECT_TRUE(p.isOnBaseVelocity());
+    });
+}
+
+TEST_F(EngineTests, CheckMultipleHaste) {
+    const auto [setup, ticks] = setupAndTicks[6];
+    setup(engine_, inputs_);
+    stepEngine(ticks);
+    engine_.accessState([] (auto& p, auto&, auto&) {
+        EXPECT_EQ(p.getTotalEffects(), 2);
+        EXPECT_FALSE(p.isOnBaseVelocity());
+    });
+}
+
+TEST_F(EngineTests, CheckWarping) {
+    const auto [setup, ticks] = setupAndTicks[8];
+    setup(engine_, inputs_);
+    stepEngine(ticks);
+    engine_.accessState(assertIsPlayerDead(false));
+}
+
+TEST_F(EngineTests, CheckNoTrails) {
+    const auto [setup, ticks] = setupAndTicks[9];
+    setup(engine_, inputs_);
+    stepEngine(ticks);
+    engine_.accessState(assertIsPlayerDead(true));
+}

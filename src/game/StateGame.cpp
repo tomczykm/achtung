@@ -14,16 +14,21 @@ namespace {
 constexpr auto scoreListEntryHeight = 30u;
 
 IAssetManager::TextureSet gameTextures = {
-        TextureType::SelfHaste,
-        TextureType::OpponentHaste,
-        TextureType::SelfSlow,
-        TextureType::OpponentSlow,
-        TextureType::SelfRightAngle,
-        TextureType::OpponentRightAngle,
-        TextureType::ClearTrails,
-        TextureType::ControlSwap,
-        TextureType::MassPowerups,
-        TextureType::RandomPickMeUp
+    TextureType::SelfHaste,
+    TextureType::OpponentHaste,
+    TextureType::SelfSlow,
+    TextureType::OpponentSlow,
+    TextureType::SelfRightAngle,
+    TextureType::OpponentRightAngle,
+    TextureType::ClearTrails,
+    TextureType::ControlSwap,
+    TextureType::MassPowerups,
+    TextureType::RandomPickMeUp,
+    TextureType::Shrink,
+    TextureType::Enlarge,
+    TextureType::SelfWarp,
+    TextureType::MapWarp,
+    TextureType::NoTrails
 };
 
 }  // namespace

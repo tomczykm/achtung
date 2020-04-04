@@ -34,7 +34,7 @@ public:
 protected:
     void initializePlayers(const PlayerInfos&);
 
-    bool checkCollisions(PlayerThing&);  // returns true if they died
+    bool checkCollisions(ProfileId, PlayerThing&);  // returns true if they died
     void awardPoints();
     bool victoryGoalAchieved();
 
@@ -49,9 +49,12 @@ protected:
     void addRightAngleMovement(PlayerThing&, sf::Time);
     void addControlSwap(PlayerThing&, sf::Time);
     void addMassPowerups();
+    void addMapWarp();
 
     IAssetManager& assets_;
     TimerService timerService_;
+
+    int tickrate_;
 
     int playAreaCornerOffset_;
     int playAreaSideLength_;
@@ -69,7 +72,9 @@ protected:
     Pickmeups pickmeups_;
     Timer::Ptr pickmeupSpawnTimer_;
 
-    std::optional<TimedEffect> massPowerups_;
+    Timer::Ptr massPowerups_;
+    Timer::Ptr mapWarp_;
+    uint8_t warpAlphaCounter_ = 0u;
 };
 
 struct RoundEndEvent : framework::IEvent {};

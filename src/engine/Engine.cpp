@@ -1,34 +1,37 @@
 #include "engine/Engine.hpp"
 
+#include <cmath>
 #include <TGUI/TGUI.hpp>
 
 #include "app/Utils.hpp"
 
 namespace {
 
-constexpr auto playerToGameAreaSizeRatio = 253.334f;
 constexpr auto pickMeUpToGameAreaSizeRatio = 32.2f;
-constexpr auto playerSpeedToGameAreaSizeRatio = 7.6f;
 
-constexpr auto hasteTurnAngleChange = 9;
 const auto selfHasteDuration = sf::milliseconds(3500);
 const auto oppHasteDuration = sf::milliseconds(2500);
 
-constexpr auto selfSlowTurnAngleChange = 3;
-constexpr auto oppSlowTurnAngleChange = 0;
 const auto selfSlowDuration = sf::milliseconds(5000);
 const auto oppSlowDuration = sf::milliseconds(4000);
 
 const auto selfRightAngleMovementDuration = sf::milliseconds(8500);
 const auto oppRightAngleMovementDuration = sf::milliseconds(5500);
 
+const auto sizeChangeDuration = sf::milliseconds(8500);
+
 const auto controlSwapDuration = sf::milliseconds(6500);
+
+const auto selfWarpDuration = sf::milliseconds(9000);
+
+constexpr auto pi = 3.141592;
 
 }  // namespace
 
 Engine::Engine(IAssetManager& a, const PlayerInfos& infos, int tickrate, int playAreaCorner, int playAreaSide):
     assets_{a},
     timerService_{tickrate},
+    tickrate_{tickrate},
     playAreaCornerOffset_{playAreaCorner},
     playAreaSideLength_{playAreaSide},
     pickMeUpRadius_{playAreaSideLength_ / pickMeUpToGameAreaSizeRatio},
@@ -52,13 +55,20 @@ void Engine::input(const sf::Event& event) {
 void Engine::step(double deltaTime) {
     timerService_.advanceAll();
 
+    const auto warpAlpha = 127*(std::cos((warpAlphaCounter_++)*2*pi/tickrate_)+1);
+    if (warpAlphaCounter_ >= tickrate_) warpAlphaCounter_ = 0;
+
     bool playerDied = false;
     for (auto& [id, player]: players_) {
         if (player->isDead()) continue;
         player->step(deltaTime, trails_);
 
-        if (checkCollisions(*player)) {
+        if (checkCollisions(id, *player)) {
             playerDied = true;
+        }
+
+        if (player->isWarping()) {
+            player->setAlpha(warpAlpha);
         }
     }
 
@@ -74,12 +84,23 @@ void Engine::step(double deltaTime) {
     if (massPowerups_ && massPowerups_->isExpired()) {
         massPowerups_.reset();
     }
+
+    if (mapWarp_) {
+        if (mapWarp_->isExpired()) {
+            mapWarp_.reset();
+            border_.setAlpha(255u);
+        } else {
+            border_.setAlpha(warpAlpha);
+        }
+    }
 }
 
 void Engine::resetRound() {
     trails_.clear();
     pickmeups_.clear();
     massPowerups_.reset();
+    mapWarp_.reset();
+    resetPickmeupSpawnTimer();
     for (auto& [id, player] : players_) {
         player->newRoundSetup(
             xor_rand::next(playAreaCornerOffset_ + 0.15 * playAreaSideLength_,
@@ -101,29 +122,31 @@ std::vector<const sf::Drawable*> Engine::getDrawables() {
         drawables.push_back(&t.getShape());
     }
 
-    for (const auto& shape: border_.getShapes()) {
-        drawables.push_back(&shape);
-    }
-
     for (const auto& [id, player]: players_) {
         drawables.push_back(&player->getShape());
     }
+
+    for (const auto d: border_.getDrawables()) {
+        drawables.push_back(d);
+    }
+
     return drawables;
 }
 
 void Engine::initializePlayers(const PlayerInfos& infos) {
-    const auto radius = playAreaSideLength_ / playerToGameAreaSizeRatio;
-    const auto velocity = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
     for (const auto& [id, info] : infos) {
-        players_.emplace(id, std::make_unique<PlayerThing>(info, radius, velocity, timerService_.makeTimer(sf::milliseconds(400))));
+        players_.emplace(id, std::make_unique<PlayerThing>(info, playAreaCornerOffset_,
+            playAreaSideLength_, timerService_.makeTimer(sf::milliseconds(400))));
     }
 }
 
-bool Engine::checkCollisions(PlayerThing& player) {
-    for (const auto& shape: border_.getShapes()) {
-        if (!player.isGap() && player.checkCollision(shape)) {
-            player.kill();
-            return true;
+bool Engine::checkCollisions(ProfileId id, PlayerThing& player) {
+    if (not mapWarp_ && not player.isWarping()) {
+        for (const auto& shape: border_.getShapes()) {
+            if (player.checkCollision(shape)) {
+                player.kill();
+                return true;
+            }
         }
     }
 
@@ -132,22 +155,24 @@ bool Engine::checkCollisions(PlayerThing& player) {
     // we don't want to check if we collide with segments we just created
     // (we obviously do, they're right underneath and we don't want to die immediately)
 
-    auto toSkip = 45u;
-    for (const auto& t: trails_) {
-        if (t.getShape().getFillColor() == player.getColor() && toSkip > 0) {
-            --toSkip;
-            continue;
-        }
-        if (!player.isGap() && player.checkCollision(t.getShape())) {
-            player.kill();
-            return true;
+    if (not player.isGap()) {
+        auto toSkip = 45u;
+        for (const auto& t: trails_) {
+            if (t.getShape().getFillColor() == player.getColor() && toSkip > 0) {
+                --toSkip;
+                continue;
+            }
+            if (player.checkCollision(t.getShape())) {
+                player.kill();
+                return true;
+            }
         }
     }
 
     auto pickmeup = pickmeups_.begin();
     while (pickmeup != pickmeups_.end()) {
         if (player.checkCollision(pickmeup->getShape())) {
-            pickmeup->onPickUp(player);
+            pickmeup->onPickUp(id, player);
             pickmeup = pickmeups_.erase(pickmeup);
         } else {
             ++pickmeup;
@@ -188,7 +213,7 @@ bool Engine::victoryGoalAchieved() {
 }
 
 void Engine::createRandomPickMeUp() {
-    const auto type = static_cast<PickUpType>(xor_rand::next(5, static_cast<int>(PickUpType::Count)-1));
+    const auto type = static_cast<PickUpType>(xor_rand::next(1, static_cast<int>(PickUpType::Count)-1));
     auto [onPickMeUp, texture] = makePickMeUpEffectAndTexture(type);
     if (xor_rand::next(1, static_cast<int>(PickUpType::Count)) == 1) texture = TextureType::RandomPickMeUp;
     pickmeups_.emplace_back(
@@ -204,45 +229,61 @@ std::pair<PickMeUp::OnPickUp, TextureType> Engine::makePickMeUpEffectAndTexture(
     switch (type) {
     case PickUpType::SelfHaste:
         return std::make_pair(makeSelfEffect([this] (auto& player) {
-            const auto velChange = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
-            addVelocityChange(player, velChange, hasteTurnAngleChange, selfHasteDuration);
+            player.addEffectStack(PlayerEffect::Haste, timerService_.makeTimer(selfHasteDuration));
         }), TextureType::SelfHaste);
     case PickUpType::OpponentHaste:
         return std::make_pair(makeOpponentEffect([this] (auto& player) {
-            const auto velChange = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
-            addVelocityChange(player, velChange, hasteTurnAngleChange, oppHasteDuration);
+            player.addEffectStack(PlayerEffect::Haste, timerService_.makeTimer(oppHasteDuration));
         }), TextureType::OpponentHaste);
     case PickUpType::SelfSlow:
         return std::make_pair(makeSelfEffect([this] (auto& player) {
-            const auto velChange = -(player.getVelocity() / 2);
-            addVelocityChange(player, velChange, selfSlowTurnAngleChange, selfSlowDuration);
+            player.addEffectStack(PlayerEffect::Slow, timerService_.makeTimer(selfSlowDuration));
         }), TextureType::SelfSlow);
     case PickUpType::OpponentSlow:
         return std::make_pair(makeOpponentEffect([this] (auto& player) {
-            const auto velChange = -(player.getVelocity() / 2);
-            addVelocityChange(player, velChange, oppSlowTurnAngleChange, oppSlowDuration);
+            player.addEffectStack(PlayerEffect::Slow, timerService_.makeTimer(oppSlowDuration));
         }), TextureType::OpponentSlow);
     case PickUpType::ClearTrails:
-        return std::make_pair(makeSelfEffect([this] (auto&) {
+        return std::make_pair([this] (auto, auto&) {
             trails_.clear();
-        }), TextureType::ClearTrails);
+        }, TextureType::ClearTrails);
     case PickUpType::SelfRightAngle:
         return std::make_pair(makeSelfEffect([this] (auto& player) {
-            addRightAngleMovement(player, selfRightAngleMovementDuration);
+            player.addEffectStack(PlayerEffect::RightAngled, timerService_.makeTimer(selfRightAngleMovementDuration));
         }), TextureType::SelfRightAngle);
     case PickUpType::OpponentRightAngle:
         return std::make_pair(makeOpponentEffect([this] (auto& player) {
-            addRightAngleMovement(player, oppRightAngleMovementDuration);
+            player.addEffectStack(PlayerEffect::RightAngled, timerService_.makeTimer(oppRightAngleMovementDuration));
         }), TextureType::OpponentRightAngle);
     case PickUpType::ControlSwap:
         return std::make_pair(makeOpponentEffect([this] (auto& player) {
-            addControlSwap(player, controlSwapDuration);
+            player.addEffectStack(PlayerEffect::SwapControl, timerService_.makeTimer(controlSwapDuration));
         }), TextureType::ControlSwap);
     case PickUpType::MassPowerups:
-        return std::make_pair(makeSelfEffect([this] (auto&) {
+        return std::make_pair([this] (auto, auto&) {
             addMassPowerups();
             resetPickmeupSpawnTimer();
-        }), TextureType::MassPowerups);
+        }, TextureType::MassPowerups);
+    case PickUpType::Shrink:
+        return std::make_pair(makeSelfEffect([this] (auto& player) {
+            player.addEffectStack(PlayerEffect::Shrink, timerService_.makeTimer(sizeChangeDuration));
+        }), TextureType::Shrink);
+    case PickUpType::Enlarge:
+        return std::make_pair(makeOpponentEffect([this] (auto& player) {
+            player.addEffectStack(PlayerEffect::Enlarge, timerService_.makeTimer(sizeChangeDuration));
+        }), TextureType::Enlarge);
+    case PickUpType::SelfWarp:
+    return std::make_pair(makeSelfEffect([this] (auto& player) {
+            player.addEffectStack(PlayerEffect::Warp, timerService_.makeTimer(selfWarpDuration));
+        }), TextureType::SelfWarp);
+    case PickUpType::MapWarp:
+    return std::make_pair([this] (auto, auto&) {
+            addMapWarp();
+        }, TextureType::MapWarp);
+    case PickUpType::NoTrails:
+    return std::make_pair(makeSelfEffect([this] (auto& player) {
+            player.addEffectStack(PlayerEffect::NoTrails, timerService_.makeTimer(selfWarpDuration));
+        }), TextureType::NoTrails);
     default:
         const auto msg = fmt::format("bad pickup type {}", type);
         print::error(msg);
@@ -252,56 +293,41 @@ std::pair<PickMeUp::OnPickUp, TextureType> Engine::makePickMeUpEffectAndTexture(
 
 template <typename PlayerUnaryOp>
 PickMeUp::OnPickUp Engine::makeSelfEffect(PlayerUnaryOp effect) {
-    return [this, effect] (PlayerThing& pickedBy) {
+    return [this, effect] (ProfileId, PlayerThing& pickedBy) {
         effect(pickedBy);
     };
 }
 
 template <typename PlayerUnaryOp>
 PickMeUp::OnPickUp Engine::makeOpponentEffect(PlayerUnaryOp effect) {
-    return [this, effect] (PlayerThing& pickedBy) {
+    return [this, effect] (ProfileId pickedBy, PlayerThing&) {
         for (auto& [id, player]: players_) {
-            if (player->name() == pickedBy.name()) continue;
+            if (id == pickedBy) continue;
             effect(*player);
         }
     };
 }
 
-void Engine::addVelocityChange(PlayerThing& player, int velChange, int turnAngleChange, sf::Time duration) {
-    player.changeVelocity(velChange);
-    player.changeTurn(turnAngleChange);
-    player.addTimedEffect(timerService_.makeTimer(duration), [&] () {
-        player.changeVelocity(-velChange);
-        player.changeTurn(-turnAngleChange);
-    });
-}
-
-void Engine::addRightAngleMovement(PlayerThing& player, sf::Time duration) {
-    player.setRightAngleMovement(true);
-    player.addTimedEffect(timerService_.makeTimer(duration), [&] {
-        player.setRightAngleMovement(false);
-    });
-}
-
-void Engine::addControlSwap(PlayerThing& player, sf::Time duration) {
-    player.swapControls();
-    player.addTimedEffect(timerService_.makeTimer(duration), [&] {
-        player.swapControls();
-    });
-}
-
 void Engine::addMassPowerups() {
     if (massPowerups_) {
-        massPowerups_->extendBy(timerService_.timeToTicks(sf::milliseconds(8000)));
+        massPowerups_->extend(timerService_.timeToTicks(sf::milliseconds(7000)));
     } else {
-        massPowerups_.emplace(timerService_.makeTimer(sf::milliseconds(12000)), [] () {});
+        massPowerups_ = timerService_.makeTimer(sf::milliseconds(10000));
+    }
+}
+
+void Engine::addMapWarp() {
+    if (mapWarp_) {
+        mapWarp_->extend(timerService_.timeToTicks(sf::milliseconds(8000)));
+    } else {
+        mapWarp_ = timerService_.makeTimer(sf::milliseconds(12000));
     }
 }
 
 void Engine::resetPickmeupSpawnTimer() {
     const auto timeUntilNextPickmeupSpawn =
         massPowerups_ ?
-        sf::milliseconds(xor_rand::next(300, 1500)) :
-        sf::milliseconds(xor_rand::next(4500, 9000));
+        sf::milliseconds(xor_rand::next(800, 2200)) :
+        sf::milliseconds(xor_rand::next(4500, 8000));
     pickmeupSpawnTimer_->reset(timerService_.timeToTicks(timeUntilNextPickmeupSpawn));
 }

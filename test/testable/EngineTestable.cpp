@@ -7,7 +7,7 @@ constexpr auto playerSpeedToGameAreaSizeRatio = 7.6f;
 
 }
 
-EngineTestable::EngineTestable(IAssetManager& a, const InputSequence& in, int tickrate, int playAreaCorner, int playAreaSide):
+EngineTestable::EngineTestable(IAssetManager& a, const InputSequence& in, int tickrate, float playAreaCorner, float playAreaSide):
     Engine{a, {}, tickrate, playAreaCorner, playAreaSide},
     inputs_{in}
 {

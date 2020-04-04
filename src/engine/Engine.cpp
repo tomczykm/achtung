@@ -28,15 +28,15 @@ constexpr auto pi = 3.141592;
 
 }  // namespace
 
-Engine::Engine(IAssetManager& a, const PlayerInfos& infos, int tickrate, int playAreaCorner, int playAreaSide):
+Engine::Engine(IAssetManager& a, const PlayerInfos& infos, int tickrate, float playAreaCorner, float playAreaSide):
     assets_{a},
     timerService_{tickrate},
     tickrate_{tickrate},
-    playAreaCornerOffset_{playAreaCorner},
-    playAreaSideLength_{playAreaSide},
+    playAreaCornerOffset_{static_cast<uint32_t>(playAreaCorner)},
+    playAreaSideLength_{static_cast<uint32_t>(playAreaSide)},
     pickMeUpRadius_{playAreaSideLength_ / pickMeUpToGameAreaSizeRatio},
     scoreVictoryGoal_{static_cast<uint32_t>((infos.size()-1)*10)},
-    border_{playAreaCornerOffset_, playAreaSideLength_},
+    border_{playAreaCorner, playAreaSide},
     pickmeupSpawnTimer_{timerService_.makeTimer(sf::milliseconds(0))}
 {
     initializePlayers(infos);

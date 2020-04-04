@@ -39,8 +39,8 @@ StateGame::StateGame(const Application::Interface& ctx, const PlayerInfos& infos
         app_.assets,
         infos,
         app_.config.get<int>(Setting::TickRate),
-        0.05 * app_.config.get<uint32_t>(Setting::ResHeight),
-        0.9 * app_.config.get<uint32_t>(Setting::ResHeight)
+        0.05f * app_.config.get<uint32_t>(Setting::ResHeight),
+        0.9f * app_.config.get<uint32_t>(Setting::ResHeight)
     }
 {
     app_.window.setMouseCursorVisible(false);

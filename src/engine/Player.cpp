@@ -30,7 +30,7 @@ PlayerThing::PlayerThing(const PlayerInfo& info, int playAreaCorner, int playAre
     playAreaCorner_{playAreaCorner},
     playAreaSide_{playAreaSide},
     baseVel_{static_cast<int>(playAreaSide_ / playerSpeedToGameAreaSizeRatio)},
-    baseRadius_{static_cast<int>(playAreaSide_ / playerToGameAreaSizeRatio)},
+    baseRadius_{playAreaSide_ / playerToGameAreaSizeRatio},
     baseTurn_{tickrate_ * 1.1},
     shape_{baseRadius_},
     recShape_{{baseRadius_*2.f, baseRadius_*2.f}},
@@ -309,7 +309,7 @@ void PlayerThing::updateRadius() {
         sizeTier -= it->second.size();
     }
 
-    const auto newRadius = sizeTier >= 0 ?
+    const float newRadius = sizeTier >= 0 ?
         baseRadius_ * (sizeTier+1) :
         baseRadius_ * std::pow(2/3.f, -sizeTier);
 

@@ -122,13 +122,14 @@ std::vector<const sf::Drawable*> Engine::getDrawables() {
         drawables.push_back(&t.getShape());
     }
 
-    for (const auto& shape: border_.getShapes()) {
-        drawables.push_back(&shape);
-    }
-
     for (const auto& [id, player]: players_) {
         drawables.push_back(&player->getShape());
     }
+
+    for (const auto d: border_.getDrawables()) {
+        drawables.push_back(d);
+    }
+
     return drawables;
 }
 

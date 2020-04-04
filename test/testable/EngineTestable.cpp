@@ -11,7 +11,7 @@ EngineTestable::EngineTestable(IAssetManager& a, const InputSequence& in, int ti
     Engine{a, {}, tickrate, playAreaCorner, playAreaSide},
     inputs_{in}
 {
-    addPlayer(PlayerInfo{"test", sf::Keyboard::Q, sf::Keyboard::W, sf::Color::White});
+    addPlayer(PlayerInfo{"test", sf::Keyboard::Q, sf::Keyboard::W, sf::Color::Red});
 }
 
 PlayerTestable& EngineTestable::addPlayer(const PlayerInfo& info) {

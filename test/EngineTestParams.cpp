@@ -120,7 +120,7 @@ const std::array<TestPreviewParam, totalTestcases> setupAndTicks = {{
     std::make_pair([] (auto& engine, auto& inputs) {
         engine.enablePowerups(false);
         engine.accessState(resetState);
-        engine.createPickMeUp(PickUpType::SelfWarp, 350, 950);
+        engine.createPickMeUp(PickUpType::MapWarp, 350, 950);
         inputs.addKeyHold(sf::Keyboard::W, 230, 280);
     }, 600),
 

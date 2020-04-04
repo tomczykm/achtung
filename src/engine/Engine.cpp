@@ -295,7 +295,7 @@ std::pair<PickMeUp::OnPickUp, TextureType> Engine::makePickMeUpEffectAndTexture(
 
 template <typename PlayerUnaryOp>
 PickMeUp::OnPickUp Engine::makeSelfEffect(PlayerUnaryOp effect) {
-    return [this, effect] (ProfileId, PlayerThing& pickedBy) {
+    return [effect] (ProfileId, PlayerThing& pickedBy) {
         effect(pickedBy);
     };
 }

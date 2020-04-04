@@ -14,7 +14,7 @@ public:
     void render() override;
 
 private:
-    class RoundState;
+    struct RoundState;
 
     void loadGui(const PlayerInfos& infos);
     void prepareScoreLabels(const PlayerInfos&) ;
@@ -75,9 +75,8 @@ private:
     struct RoundEnd : RoundState {
         RoundEnd(StateGame& s, std::string_view winner): RoundState{s} {
             print::info(PRINT, __func__);
-            onEnterState(winner);
+            gs.setInfoText(fmt::format("{} won\nthe round", winner));
         }
-        void onEnterState(std::string_view winner);
         void onSpacebar() override;
         void onEscape() override;
     };
@@ -85,9 +84,8 @@ private:
     struct MatchEnd : RoundState {
         MatchEnd(StateGame& s, std::string_view winner): RoundState{s} {
             print::info(PRINT, __func__);
-            onEnterState(winner);
+            gs.setInfoText(fmt::format("{} won\nthe game!", winner));
         }
-        void onEnterState(std::string_view winner);
         void onSpacebar() override;
         void onEscape() override;
     };

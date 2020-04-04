@@ -203,10 +203,6 @@ void StateGame::Pause::onEscape() {
 }
 
 
-void StateGame::RoundEnd::onEnterState(std::string_view winner) {
-    gs.setInfoText(fmt::format("{} won\nthe round", winner));
-}
-
 void StateGame::RoundEnd::onSpacebar() {
     gs.changeState<RoundBegin>();
 }
@@ -215,11 +211,6 @@ void StateGame::RoundEnd::onEscape() {
     gs.app_.enterState<StateMenu>();
 }
 
-
-void StateGame::MatchEnd::onEnterState(std::string_view winner) {
-    // todo: show end of match splash screen
-    gs.setInfoText(fmt::format("{} won\nthe game!", winner));
-}
 
 void StateGame::MatchEnd::onSpacebar() {
     gs.app_.enterState<StateMenu>();

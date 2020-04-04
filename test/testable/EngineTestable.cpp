@@ -1,12 +1,5 @@
 #include "testable/EngineTestable.hpp"
 
-namespace {
-
-constexpr auto playerToGameAreaSizeRatio = 253.334f;
-constexpr auto playerSpeedToGameAreaSizeRatio = 7.6f;
-
-}
-
 EngineTestable::EngineTestable(IAssetManager& a, const InputSequence& in, int tickrate, float playAreaCorner, float playAreaSide):
     Engine{a, {}, tickrate, playAreaCorner, playAreaSide},
     inputs_{in}

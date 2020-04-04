@@ -93,7 +93,7 @@ void ProfilePanel::loadProfile(std::optional<ProfileId> id) {
 
 // example: converts "ffffff" to sf::Color::White
 sf::Color ProfilePanel::decodeColor(const std::string& str) {
-    int rgb[3];
+    std::uint8_t rgb[3];
     for (auto i = 0u; i < 6; i+=2) {
         std::stringstream ss;
         ss << str.substr(i, 2);

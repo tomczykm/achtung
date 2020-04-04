@@ -8,8 +8,9 @@
 #include <TGUI/TGUI.hpp>
 
 #include "app/ProfileManager.hpp"
+#include "app/Log.hpp"
 #include "engine/TrailThing.hpp"
-#include "engine/Effect.hpp"
+#include "engine/Timer.hpp"
 
 struct PlayerInfo {
     std::string name;
@@ -19,11 +20,22 @@ struct PlayerInfo {
 
 using PlayerInfos = std::map<ProfileId, PlayerInfo>;
 
+enum class PlayerEffect {
+    Haste,
+    Slow,
+    SwapControl,
+    RightAngled,
+    Enlarge,
+    Shrink,
+    Warp,
+    NoTrails
+};
+
 class PlayerThing {
 public:
     using Score = uint32_t;
 
-    PlayerThing(const PlayerInfo&, float radius, int vel, Timer::Ptr gapSwitchTimer);
+    PlayerThing(const PlayerInfo&, int playAreaCorner, int playAreaSide, int tickrate, Timer::Ptr gapSwitchTimer);
     virtual ~PlayerThing() = default;
 
     void step(double timeStep, std::deque<TrailThing>& trails);
@@ -31,9 +43,10 @@ public:
 
     void newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailThing>&);
 
+    void setAlpha(std::uint8_t alpha);
+
     const sf::Shape& getShape() const;
     sf::Color getColor() const { return info_.color; }
-    int getVelocity() const { return vel_; }
 
     bool checkCollision(const sf::Shape&) const;
 
@@ -42,40 +55,54 @@ public:
 
     void kill();
     bool isDead() const { return dead_; }
-    bool isGap() const { return gap_; }
 
     const std::string& name() const { return info_.name; }
 
-    void changeVelocity(int d) { vel_ += d; }
-    void changeTurn(int d) { turnDegrees_ += d; }
-    void setRightAngleMovement(bool);
-    void swapControls();
-
-    template <typename... Ts>
-    void addTimedEffect(Ts&&... args) {
-        effects_.emplace_back(std::forward<Ts>(args)...);
-    }
+    void addEffectStack(PlayerEffect, Timer::Ptr);
+    bool isWarping() const { return getNumEffectStacks(PlayerEffect::Warp) > 0; }
+    bool isGap() const { return gap_; }
 
 protected:
     void gapSwitch();
     void endExpiredEffects();
 
     void move(double timeStep, std::deque<TrailThing>& trails);
-    virtual bool isKeyPressed(sf::Keyboard::Key k) {
+    virtual bool isKeyPressed(sf::Keyboard::Key k) const {
         return sf::Keyboard::isKeyPressed(k);
     }
 
     void setPosition(float x, float y);
 
+    int getNumEffectStacks(PlayerEffect) const;
+
+    void applyEffect(PlayerEffect);
+    void revertEffect(PlayerEffect);
+
+    void clearAllEffects();
+
+    void swapControls();
+    bool isRightAngled() const { return getNumEffectStacks(PlayerEffect::RightAngled) > 0; }
+
+    int calculateCurrentVelocity() const;
+    void updateRadius();
+
     PlayerInfo info_;
+
+    int tickrate_;
+
+    int playAreaCorner_;
+    int playAreaSide_;
+
+    int baseVel_;
+    int baseRadius_;
+    double baseTurn_;
 
     sf::CircleShape shape_;
     sf::RectangleShape recShape_; // for right angle movement
 
     double direction_ = 0.0; // in degrees
     int vel_; // pixels per seconds
-    double turnDegrees_ = 130;
-    bool rightAngleMovement_ = false;
+    double turnDegrees_ = baseTurn_;
 
     Score score_ = 0;
 
@@ -84,5 +111,5 @@ protected:
     bool gap_ = false;
     Timer::Ptr gapSwitchTimer_;
 
-    std::vector<TimedEffect> effects_;
+    std::map<PlayerEffect, std::vector<Timer::Ptr>> effectStacks_;
 };

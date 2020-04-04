@@ -19,8 +19,8 @@ public:
 
     void createPickMeUp(PickUpType, int x, int y);
 
-private:
-    void prepareTestPlayer();
+    PlayerTestable& addPlayer(const PlayerInfo&);
 
+private:
     const InputSequence& inputs_;
 };

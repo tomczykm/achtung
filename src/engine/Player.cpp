@@ -6,25 +6,46 @@
 #include "app/Utils.hpp"
 
 namespace {
-constexpr auto pi = 355.f / 113.f;
+
+const std::set<PlayerEffect> appliedOnEveryStack = {
+    PlayerEffect::Haste, PlayerEffect::Slow,
+    PlayerEffect::Enlarge, PlayerEffect::Shrink
+};
+
+const std::set<PlayerEffect> appliedOnFirstStack = {
+    PlayerEffect::RightAngled, PlayerEffect::SwapControl,
+    PlayerEffect::Warp, PlayerEffect::NoTrails
+};
+
+constexpr auto pi = 3.141592;
+
+constexpr auto playerToGameAreaSizeRatio = 253.334f;
+constexpr auto playerSpeedToGameAreaSizeRatio = 7.6f;
+
 }
 
-PlayerThing::PlayerThing(const PlayerInfo& info, float radius, int vel, Timer::Ptr gapSwitchTimer):
+PlayerThing::PlayerThing(const PlayerInfo& info, int playAreaCorner, int playAreaSide, int tickrate, Timer::Ptr gapSwitchTimer):
     info_{info},
-    shape_{radius},
-    recShape_{{radius*2, radius*2}},
-    vel_{vel},
+    tickrate_{tickrate},
+    playAreaCorner_{playAreaCorner},
+    playAreaSide_{playAreaSide},
+    baseVel_{static_cast<int>(playAreaSide_ / playerSpeedToGameAreaSizeRatio)},
+    baseRadius_{static_cast<int>(playAreaSide_ / playerToGameAreaSizeRatio)},
+    baseTurn_{tickrate_ * 1.1},
+    shape_{baseRadius_},
+    recShape_{{baseRadius_*2.f, baseRadius_*2.f}},
+    vel_{baseVel_},
     gapSwitchTimer_{gapSwitchTimer}
 {
-    shape_.setOrigin(radius, radius);
+    shape_.setOrigin(baseRadius_, baseRadius_);
     shape_.setFillColor(sf::Color::Yellow);
 
-    recShape_.setOrigin(radius, radius);
+    recShape_.setOrigin(baseRadius_, baseRadius_);
     recShape_.setFillColor(sf::Color::Yellow);
 }
 
 const sf::Shape& PlayerThing::getShape() const {
-    if (rightAngleMovement_) {
+    if (isRightAngled()) {
         return recShape_;
     } else {
         return shape_;
@@ -34,7 +55,7 @@ const sf::Shape& PlayerThing::getShape() const {
 void PlayerThing::step(double timeStep, std::deque<TrailThing>& trails) {
     endExpiredEffects();
 
-    if (!rightAngleMovement_) {
+    if (!isRightAngled()) {
         if (isKeyPressed(info_.right)) {
             direction_ += timeStep * turnDegrees_;
         } else if (isKeyPressed(info_.left)) {
@@ -59,19 +80,33 @@ void PlayerThing::move(double timeStep, std::deque<TrailThing>& trails) {
         oldY + (timeStep * vel_ * cos(-(pi/180)*direction_))
     );
 
+    auto [newX, newY] = shape_.getPosition();
     if (!gap_) {
-        const auto newPos = shape_.getPosition();
-        const auto numSegments = distance(newPos, {oldX, oldY}) / (TrailThing::height-1);
+        const auto numSegments = distance({newX, newY}, {oldX, oldY}) / (TrailThing::height-1);
         for (auto i = 0u; i < numSegments; ++i) {
             trails.emplace_front(oldX, oldY, direction_, shape_.getRadius()*2, info_.color);
             oldX += ((TrailThing::height-1) * sin(-(pi/180)*direction_));
             oldY += ((TrailThing::height-1) * cos(-(pi/180)*direction_));
         }
     }
+
+    // warps
+    if (newX < playAreaCorner_) {
+        setPosition(newX + playAreaSide_, newY);
+    }
+    if (newY < playAreaCorner_) {
+        setPosition(newX, newY + playAreaSide_);
+    }
+    if (newX > playAreaSide_ + playAreaCorner_) {
+        setPosition(newX - playAreaSide_, newY);
+    }
+    if (newY > playAreaSide_+ playAreaCorner_) {
+        setPosition(newX, newY - playAreaSide_);
+    }
 }
 
 void PlayerThing::input(const sf::Event& e) {
-    if (rightAngleMovement_ && e.type == sf::Event::KeyPressed) {
+    if (isRightAngled() && e.type == sf::Event::KeyPressed) {
         if (e.key.code == info_.right) {
             direction_ += 90;
         } else if (e.key.code == info_.left) {
@@ -81,7 +116,7 @@ void PlayerThing::input(const sf::Event& e) {
 }
 
 void PlayerThing::newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailThing>& trails) {
-    effects_.clear();
+    clearAllEffects();
     dead_ = false;
     direction_ = xor_rand::next(0, 360);
     shape_.setPosition(xPos, yPos);
@@ -90,12 +125,13 @@ void PlayerThing::newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailTh
     gap_ = true;
     gapSwitch();
 
-    move(0.1, trails);
+    move(1.f/7, trails);
 }
 
-void PlayerThing::setRightAngleMovement(bool v) {
-    rightAngleMovement_ = v;
-    recShape_.setRotation(direction_);
+void PlayerThing::setAlpha(std::uint8_t alpha) {
+    const auto newColor = sf::Color{0xff, 0xff, 0x00, alpha};
+    shape_.setFillColor(newColor);
+    recShape_.setFillColor(newColor);
 }
 
 void PlayerThing::swapControls() {
@@ -107,14 +143,13 @@ void PlayerThing::swapControls() {
         shape_.setFillColor(sf::Color::Blue);
         recShape_.setFillColor(sf::Color::Blue);
     }
-
 }
 
 void PlayerThing::gapSwitch() {
     gap_ = !gap_;
     const auto gapTime = sf::seconds(6 * shape_.getRadius() / vel_);
     const auto gapSwitchDuration = gap_ ? gapTime : sf::milliseconds(xor_rand::next(1400, 7000));
-    gapSwitchTimer_->reset(gapSwitchDuration.asMilliseconds() / 1000.f * 140); // todo: hardcoded 140 tickrate
+    gapSwitchTimer_->reset(gapSwitchDuration.asMilliseconds() / 1000.f * tickrate_);
 }
 
 bool PlayerThing::checkCollision(const sf::Shape &o) const {
@@ -132,12 +167,154 @@ void PlayerThing::kill() {
 }
 
 void PlayerThing::endExpiredEffects() {
-    effects_.erase(std::remove_if(effects_.begin(), effects_.end(), [] (const auto& effect) {
-        return effect.isExpired();
-    }), effects_.end());
+    for (auto&[e, stack] : effectStacks_) {
+        auto sizeBefore = stack.size();
+        stack.erase(std::remove_if(stack.begin(), stack.end(), [] (auto& t) {
+            return t->isExpired();
+        }), stack.end());
+        auto removedTotal = sizeBefore - stack.size();
+        if (removedTotal > 0) {
+            if (appliedOnEveryStack.find(e) != appliedOnEveryStack.end()) {
+                for (std::size_t i = 0 ; i < removedTotal ; ++i) {
+                    revertEffect(e);
+                }
+            }
+            if (appliedOnFirstStack.find(e) != appliedOnFirstStack.end() &&
+                stack.size() == 0) {
+                revertEffect(e);
+            }
+        }
+    }
 }
 
 void PlayerThing::setPosition(float x, float y) {
     recShape_.setPosition(x, y);
     shape_.setPosition(x, y);
+}
+
+void PlayerThing::addEffectStack(PlayerEffect e, Timer::Ptr t) {
+    auto it = effectStacks_.find(e);
+    if (it == effectStacks_.end()) {
+        effectStacks_.emplace(e, std::vector<Timer::Ptr>{t});
+    } else {
+        it->second.push_back(t);
+    }
+
+    if (appliedOnEveryStack.find(e) != appliedOnEveryStack.end()) {
+        applyEffect(e);
+    }
+
+    if (effectStacks_[e].size() == 1 &&
+        appliedOnFirstStack.find(e) != appliedOnFirstStack.end()) {
+            applyEffect(e);
+    }
+}
+
+int PlayerThing::getNumEffectStacks(PlayerEffect e) const {
+    auto it = effectStacks_.find(e);
+    if (it == effectStacks_.end()) return 0;
+    return it->second.size();
+}
+
+void PlayerThing::applyEffect(PlayerEffect e) {
+    print::info("{}: {} on {}", __func__, e, info_.name);
+    switch (e) {
+        case PlayerEffect::Haste:
+            vel_ = calculateCurrentVelocity();
+            break;
+        case PlayerEffect::Slow:
+            vel_ = calculateCurrentVelocity();
+            break;
+        case PlayerEffect::SwapControl:
+            swapControls();
+            break;
+        case PlayerEffect::RightAngled:
+            recShape_.setRotation(direction_);
+            break;
+        case PlayerEffect::Enlarge:
+            updateRadius();
+            break;
+        case PlayerEffect::Shrink:
+            updateRadius();
+            break;
+        case PlayerEffect::Warp:
+            break;
+        case PlayerEffect::NoTrails:
+            gap_ = true;
+            gapSwitchTimer_->pause();
+            break;
+    }
+}
+
+void PlayerThing::revertEffect(PlayerEffect e) {
+    print::info("{}: {} on {}", __func__, e, info_.name);
+    switch (e) {
+        case PlayerEffect::Haste:
+            vel_ = calculateCurrentVelocity();
+            break;
+        case PlayerEffect::Slow:
+            vel_ = calculateCurrentVelocity();
+            break;
+        case PlayerEffect::SwapControl:
+            swapControls();
+            break;
+        case PlayerEffect::RightAngled:
+            break;
+        case PlayerEffect::Enlarge:
+            updateRadius();
+            break;
+        case PlayerEffect::Shrink:
+            updateRadius();
+            break;
+        case PlayerEffect::Warp:
+            setAlpha(255u);
+            break;
+        case PlayerEffect::NoTrails:
+            gapSwitch();
+            gapSwitchTimer_->pause(false);
+            break;
+    }
+}
+
+void PlayerThing::clearAllEffects() {
+    // basically, expire them all and clear expired.
+    for (auto&[e, stack]: effectStacks_) {
+        for(auto& t: stack) {
+            t->reset(0);
+        }
+    }
+    endExpiredEffects();
+}
+
+int PlayerThing::calculateCurrentVelocity() const {
+    int velTier = 0;
+    if (auto it = effectStacks_.find(PlayerEffect::Haste); it != effectStacks_.end()) {
+        velTier += it->second.size();
+    }
+    if (auto it = effectStacks_.find(PlayerEffect::Slow); it != effectStacks_.end()) {
+        velTier -= it->second.size();
+    }
+
+    return velTier >= 0 ?
+        baseVel_ * (velTier+1) :
+        baseVel_ / std::pow(2, -velTier);
+}
+
+void PlayerThing::updateRadius() {
+    int sizeTier = 0;
+    if (auto it = effectStacks_.find(PlayerEffect::Enlarge); it != effectStacks_.end()) {
+        sizeTier += it->second.size();
+    }
+    if (auto it = effectStacks_.find(PlayerEffect::Shrink); it != effectStacks_.end()) {
+        sizeTier -= it->second.size();
+    }
+
+    const auto newRadius = sizeTier >= 0 ?
+        baseRadius_ * (sizeTier+1) :
+        baseRadius_ * std::pow(2/3.f, -sizeTier);
+
+    shape_.setRadius(newRadius);
+    shape_.setOrigin(newRadius, newRadius);
+    recShape_.setSize({newRadius*2, newRadius*2});
+    recShape_.setOrigin(newRadius, newRadius);
 }

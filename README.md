@@ -19,10 +19,3 @@ The easiest way to build on Windows seems to be with vcpkg, CMake and MSBuild. T
 1. Install required libraries: `vcpkg install sfml tgui sqlite3`
 2. Generate Visual Studio solution: `cmake -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake -G "Visual Studio 16 2019"`
 3. Build the generated ALL_BUILD project `MSBuild ALL_BUILD.vcxproj -property:Configuration=Release`
-
-### Planned features
-
-1. Feature parity with [this version of the game](http://www.cda.pl/gry-online/6431c8/Uwaga-zakret-Achtung-Die-Kurve)
-2. Publishing Windows binaries
-3. Recording and viewing replay files
-4. Statistics for player profiles

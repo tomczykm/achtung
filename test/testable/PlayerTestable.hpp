@@ -5,11 +5,8 @@
 
 class PlayerTestable : public PlayerThing {
 public:
-    PlayerTestable(const InputSequence& inputs, float radius, int vel, Timer::Ptr gapSwitchTimer):
-        PlayerThing{
-            PlayerInfo{"test", sf::Keyboard::Q, sf::Keyboard::W, sf::Color::White},
-            radius, vel, gapSwitchTimer
-        },
+    PlayerTestable(const InputSequence& inputs, const PlayerInfo& info, Timer::Ptr gapSwitchTimer):
+        PlayerThing{info, 50, 0.9*1080, 140, gapSwitchTimer},
         inputs_{inputs}
     {}
 
@@ -17,7 +14,7 @@ public:
         PlayerThing::setPosition(x, y);
     }
 
-    bool isKeyPressed(sf::Keyboard::Key k) override {
+    bool isKeyPressed(sf::Keyboard::Key k) const override {
         return inputs_.isKeyPressed(k);
     }
 
@@ -26,9 +23,18 @@ public:
     float getRadius() { return shape_.getRadius(); }
     void setDead(bool dead) { dead_ = dead; }
 
-    std::vector<TimedEffect>& getEffects() { return effects_; }
+    bool isOnBaseVelocity() { return vel_ == baseVel_; }
 
-    bool isRightAngled() { return rightAngleMovement_; }
+    std::size_t getTotalEffects() {
+        std::size_t sum = 0;
+        for (const auto&[effect, stack]: effectStacks_) {
+            sum += stack.size();
+        }
+        return sum;
+    }
+
+
+    bool isRightAngled() const { return PlayerThing::isRightAngled(); }
 
 private:
     const InputSequence& inputs_;

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project("freeachtung" VERSION 0.1.0 LANGUAGES CXX)
+project("freeachtung" VERSION 0.2 LANGUAGES CXX)
 
 add_subdirectory(external)
 
@@ -11,20 +11,24 @@ if(MSVC)
 	find_package(sqlite3 CONFIG REQUIRED)
 endif(MSVC)
 
-enable_testing()
+if(MSVC)
+	set(COMPILE_OPTIONS /W0)
+else(MSVC)
+	set(COMPILE_OPTIONS -Wall -Wpedantic -Wextra -Werror -Wno-narrowing)
+endif(MSVC)
+
+if (NOT MSVC)
+	enable_testing()
+	add_executable(preview_test)
+	add_subdirectory(test)
+endif()
 
 add_executable(${PROJECT_NAME})
-add_executable(preview_test)
 
 add_subdirectory(src)
-add_subdirectory(test)
 add_subdirectory(include/app)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE freeachtung_app)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/generated_include include)
-if(MSVC)
-	target_compile_options(${PROJECT_NAME} PRIVATE /W4)
-else(MSVC)
-	target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wpedantic -Wextra -Werror -Wno-narrowing)
-endif(MSVC)
+target_compile_options(${PROJECT_NAME} PRIVATE ${COMPILE_OPTIONS})
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)

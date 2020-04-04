@@ -16,3 +16,13 @@ Label.ScoreGoal {
         textcolor = yellow;
     }
 }
+
+Label.Info {
+    Position = (&.height * 0.6, 80%);  // todo: set to 5% to right of game border
+    TextSize = 18;
+    Text = info;
+    Renderer {
+        backgroundcolor = transparent;
+        textcolor = yellow;
+    }
+}

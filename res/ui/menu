@@ -50,3 +50,13 @@ Panel.Navigation {
         renderer = &ButtonRenderer;
     }
 }
+
+Label.Version {
+    TextSize = 14;
+    Position = ((&.width - 3% - width), (&.height - height*2));
+    Renderer {
+        backgroundcolor = transparent;
+        textcolor = yellow;
+    }
+    Text = 0.0;
+}

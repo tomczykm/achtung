@@ -28,13 +28,12 @@ public:
     void step(double deltaTime);
     void resetRound();
 
-    bool checkVictoryGoal();
     std::vector<const sf::Drawable*> getDrawables();
 
 protected:
     void initializePlayers(const PlayerInfos&);
 
-    bool checkCollisions(PlayerThing&);  // returns true if they died
+    bool checkCollisions(ProfileId, PlayerThing&);  // returns true if they died
     void awardPoints();
     bool victoryGoalAchieved();
 
@@ -49,9 +48,15 @@ protected:
     void addRightAngleMovement(PlayerThing&, sf::Time);
     void addControlSwap(PlayerThing&, sf::Time);
     void addMassPowerups();
+    void addMapWarp();
+
+    const PlayerThing& getHighestScoring();
+    std::string getRoundWinnerName();
 
     IAssetManager& assets_;
     TimerService timerService_;
+
+    int tickrate_;
 
     int playAreaCornerOffset_;
     int playAreaSideLength_;
@@ -69,12 +74,20 @@ protected:
     Pickmeups pickmeups_;
     Timer::Ptr pickmeupSpawnTimer_;
 
-    std::optional<TimedEffect> massPowerups_;
+    Timer::Ptr massPowerups_;
+    Timer::Ptr mapWarp_;
+    uint8_t warpAlphaCounter_ = 0u;
 };
 
-struct RoundEndEvent : framework::IEvent {};
+struct RoundEndEvent : framework::IEvent {
+    RoundEndEvent(const std::string& w): winner{w} {}
+    std::string winner;
+};
 
-struct MatchEndEvent : framework::IEvent {};
+struct MatchEndEvent : framework::IEvent {
+    MatchEndEvent(const std::string& w): winner{w} {}
+    std::string winner;
+};
 
 struct PointsAwardedEvent : framework::IEvent {
     PointsAwardedEvent(const Engine::Players&p): players{p} {}

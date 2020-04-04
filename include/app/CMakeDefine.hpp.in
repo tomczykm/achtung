@@ -1,3 +1,7 @@
 #pragma once
 
 #cmakedefine PROJECT_NAME "@PROJECT_NAME@"
+#cmakedefine PROJECT_VERSION "@PROJECT_VERSION@"
+
+constexpr inline std::string_view projectName = PROJECT_NAME;
+constexpr inline std::string_view projectVersion = PROJECT_VERSION;

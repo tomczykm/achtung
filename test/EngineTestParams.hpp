@@ -8,11 +8,8 @@
 #include "testable/InputSequence.hpp"
 
 using SetupFunctor = std::function<void(EngineTestable&, InputSequence&)>;
-using AssertFunctor = std::function<void(EngineTestable&)>;
-
-using EngineTestParam = std::tuple<SetupFunctor, AssertFunctor, Ticks>;
 using TestPreviewParam = std::pair<SetupFunctor, Ticks>;
 
-constexpr std::size_t totalTestcases = 8;
+constexpr std::size_t totalTestcases = 9;
 
 extern const std::array<TestPreviewParam, totalTestcases> setupAndTicks;

@@ -40,7 +40,7 @@ struct EngineTests : Test {
             assetManager_,
             inputs_,
             tickrate,
-            0,
+            50,
             boxSize
         }
     {
@@ -142,4 +142,11 @@ TEST_F(EngineTests, CheckMultipleHaste) {
         EXPECT_EQ(p.getTotalEffects(), 2);
         EXPECT_FALSE(p.isOnBaseVelocity());
     });
+}
+
+TEST_F(EngineTests, CheckWarping) {
+    const auto [setup, ticks] = setupAndTicks[8];
+    setup(engine_, inputs_);
+    stepEngine(ticks);
+    engine_.accessState(assertIsPlayerDead(false));
 }

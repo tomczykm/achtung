@@ -23,7 +23,9 @@ const std::map<TextureType, std::string_view> texToFilename = {
     {TextureType::MassPowerups, "sprites/massPowerups.png"},
     {TextureType::RandomPickMeUp, "sprites/random.png"},
     {TextureType::Shrink, "sprites/shrink.png"},
-    {TextureType::Enlarge, "sprites/enlarge.png"}
+    {TextureType::Enlarge, "sprites/enlarge.png"},
+    {TextureType::SelfWarp, "sprites/selfWarp.png"},
+    {TextureType::MapWarp, "sprites/mapWarp.png"}
 };
 
 }  // namespace

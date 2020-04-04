@@ -49,9 +49,12 @@ protected:
     void addRightAngleMovement(PlayerThing&, sf::Time);
     void addControlSwap(PlayerThing&, sf::Time);
     void addMassPowerups();
+    void addMapWarp();
 
     IAssetManager& assets_;
     TimerService timerService_;
+
+    int tickrate_;
 
     int playAreaCornerOffset_;
     int playAreaSideLength_;
@@ -70,6 +73,8 @@ protected:
     Timer::Ptr pickmeupSpawnTimer_;
 
     Timer::Ptr massPowerups_;
+    Timer::Ptr mapWarp_;
+    uint8_t warpAlphaCounter_ = 0u;
 };
 
 struct RoundEndEvent : framework::IEvent {};

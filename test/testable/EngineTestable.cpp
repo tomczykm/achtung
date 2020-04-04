@@ -15,15 +15,12 @@ EngineTestable::EngineTestable(IAssetManager& a, const InputSequence& in, int ti
 }
 
 PlayerTestable& EngineTestable::addPlayer(const PlayerInfo& info) {
-    const auto radius = playAreaSideLength_ / playerToGameAreaSizeRatio;
-    const auto velocity = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
-
     auto timer = timerService_.makeTimer(sf::milliseconds(200));
     timer->pause();
 
     const auto newId = players_.size() == 0 ? 0 : (players_.rbegin()->first)+1;
 
-    const auto [it, emplaced] = players_.emplace(newId, std::make_unique<PlayerTestable>(inputs_, info, radius, velocity, timer));
+    const auto [it, emplaced] = players_.emplace(newId, std::make_unique<PlayerTestable>(inputs_, info, timer));
     return dynamic_cast<PlayerTestable&>(*(it->second));
 }
 

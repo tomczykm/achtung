@@ -4,7 +4,7 @@ namespace {
 
 const auto resetState = [] (PlayerTestable& player, Engine::Pickmeups& pickups, Engine::Trails& t) {
     player.setDead(false);
-    player.setPosition(100, 900);
+    player.setPosition(150, 950);
     player.setDirection(270);
     t.clear();
     pickups.clear();
@@ -17,8 +17,8 @@ const std::array<TestPreviewParam, totalTestcases> setupAndTicks = {{
     std::make_pair([] (auto& engine, auto&) {
         auto resetState = [] (PlayerTestable& player, Engine::Pickmeups& pickups, Engine::Trails& t) {
             ::resetState(player, pickups, t);
-            for (int y = 850; y < 950; y+=2)
-                t.emplace_back(150, y, 0, player.getRadius(), sf::Color::Red);
+            for (int y = 900; y < 1000; y+=2)
+                t.emplace_back(200, y, 0, player.getRadius(), sf::Color::Red);
         };
 
         engine.accessState(resetState);
@@ -33,7 +33,7 @@ const std::array<TestPreviewParam, totalTestcases> setupAndTicks = {{
     std::make_pair([] (auto& engine, auto& inputs) {
         engine.enablePowerups(false);
         engine.accessState(resetState);
-        engine.createPickMeUp(PickUpType::SelfHaste, 150, 900);
+        engine.createPickMeUp(PickUpType::SelfHaste, 200, 950);
         inputs.addKeyHold(sf::Keyboard::Q, 30, 120);
         inputs.addKeyHold(sf::Keyboard::W, 140, 280);
         inputs.addKeyHold(sf::Keyboard::Q, 310, 500);
@@ -43,22 +43,22 @@ const std::array<TestPreviewParam, totalTestcases> setupAndTicks = {{
     std::make_pair([] (auto& engine, auto&) {
         engine.enablePowerups(false);
         engine.accessState(resetState);
-        engine.createPickMeUp(PickUpType::SelfRightAngle, 200, 900);
-        engine.createPickMeUp(PickUpType::SelfRightAngle, 400, 900);
+        engine.createPickMeUp(PickUpType::SelfRightAngle, 250, 950);
+        engine.createPickMeUp(PickUpType::SelfRightAngle, 450, 950);
     }, 450),
 
     // 3 - CheckSwapControls
     std::make_pair([] (auto& engine, auto& inputs) {
         auto resetState = [] (auto& player, auto& pickups, auto& t) {
             ::resetState(player, pickups, t);
-            player.setPosition(100, 200);
+            player.setPosition(150, 250);
         };
         engine.enablePowerups(false);
         engine.accessState(resetState);
         auto& p2 = engine.addPlayer(PlayerInfo{"be", sf::Keyboard::A, sf::Keyboard::S, sf::Color::Green});
-        p2.setPosition(100, 50);
+        p2.setPosition(150, 100);
         p2.setDirection(270);
-        engine.createPickMeUp(PickUpType::ControlSwap, 200, 50);
+        engine.createPickMeUp(PickUpType::ControlSwap, 250, 100);
         inputs.addKeyHold(sf::Keyboard::Q, 450, 550);
     }, 1200),
 
@@ -68,22 +68,22 @@ const std::array<TestPreviewParam, totalTestcases> setupAndTicks = {{
     std::make_pair([] (auto& engine, auto&) {
         engine.enablePowerups(false);
         engine.accessState(resetState);
-        engine.createPickMeUp(PickUpType::SelfHaste, 200, 900);
-        engine.createPickMeUp(PickUpType::SelfRightAngle, 400, 900);
+        engine.createPickMeUp(PickUpType::SelfHaste, 250, 950);
+        engine.createPickMeUp(PickUpType::SelfRightAngle, 450, 950);
     }, 400),
 
     // 5 - CheckOpponentSlow
     std::make_pair([] (auto& engine, auto& inputs) {
         auto resetState = [] (auto& player, auto& pickups, auto& t) {
             ::resetState(player, pickups, t);
-            player.setPosition(100, 200);
+            player.setPosition(150, 250);
         };
         engine.enablePowerups(false);
         engine.accessState(resetState);
         auto& p2 = engine.addPlayer(PlayerInfo{"be", sf::Keyboard::A, sf::Keyboard::S, sf::Color::Green});
-        p2.setPosition(100, 50);
+        p2.setPosition(150, 100);
         p2.setDirection(270);
-        engine.createPickMeUp(PickUpType::OpponentSlow, 200, 50);
+        engine.createPickMeUp(PickUpType::OpponentSlow, 250, 100);
         inputs.addKeyHold(sf::Keyboard::W, 450, 550);
     }, 1200),
 
@@ -91,8 +91,8 @@ const std::array<TestPreviewParam, totalTestcases> setupAndTicks = {{
     std::make_pair([] (auto& engine, auto& inputs) {
         engine.enablePowerups(false);
         engine.accessState(resetState);
-        engine.createPickMeUp(PickUpType::SelfHaste, 200, 900);
-        engine.createPickMeUp(PickUpType::SelfHaste, 400, 900);
+        engine.createPickMeUp(PickUpType::SelfHaste, 250, 950);
+        engine.createPickMeUp(PickUpType::SelfHaste, 450, 950);
         inputs.addKeyHold(sf::Keyboard::Q, 250, 350);
         inputs.addKeyHold(sf::Keyboard::Q, 400, 500);
     }, 500),
@@ -101,18 +101,26 @@ const std::array<TestPreviewParam, totalTestcases> setupAndTicks = {{
     std::make_pair([] (auto& engine, auto& inputs) {
         auto resetState = [] (auto& player, auto& pickups, auto& t) {
             ::resetState(player, pickups, t);
-            player.setPosition(100, 200);
+            player.setPosition(150, 250);
         };
         engine.enablePowerups(false);
         engine.accessState(resetState);
         auto& p2 = engine.addPlayer(PlayerInfo{"be", sf::Keyboard::A, sf::Keyboard::S, sf::Color::Green});
-        p2.setPosition(100, 50);
+        p2.setPosition(150, 100);
         p2.setDirection(270);
-        engine.createPickMeUp(PickUpType::Shrink, 200, 200);
-        engine.createPickMeUp(PickUpType::Shrink, 250, 200);
-        engine.createPickMeUp(PickUpType::Enlarge, 300, 200);
-        engine.createPickMeUp(PickUpType::Enlarge, 350, 200);
+        engine.createPickMeUp(PickUpType::Shrink, 250, 250);
+        engine.createPickMeUp(PickUpType::Shrink, 300, 250);
+        engine.createPickMeUp(PickUpType::Enlarge, 350, 250);
+        engine.createPickMeUp(PickUpType::Enlarge, 400, 250);
         inputs.addKeyHold(sf::Keyboard::W, 450, 550);
         inputs.addKeyHold(sf::Keyboard::S, 550, 650);
     }, 1200),
+
+    // 8 - CheckWarping
+    std::make_pair([] (auto& engine, auto& inputs) {
+        engine.enablePowerups(false);
+        engine.accessState(resetState);
+        engine.createPickMeUp(PickUpType::SelfWarp, 350, 950);
+        inputs.addKeyHold(sf::Keyboard::W, 230, 280);
+    }, 600)
 }};

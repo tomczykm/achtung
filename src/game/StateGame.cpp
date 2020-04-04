@@ -25,7 +25,9 @@ IAssetManager::TextureSet gameTextures = {
         TextureType::MassPowerups,
         TextureType::RandomPickMeUp,
         TextureType::Shrink,
-        TextureType::Enlarge
+        TextureType::Enlarge,
+        TextureType::SelfWarp,
+        TextureType::MapWarp
 };
 
 }  // namespace

@@ -5,8 +5,8 @@
 
 class PlayerTestable : public PlayerThing {
 public:
-    PlayerTestable(const InputSequence& inputs, const PlayerInfo& info, float radius, int vel, Timer::Ptr gapSwitchTimer):
-        PlayerThing{info, radius, vel, gapSwitchTimer},
+    PlayerTestable(const InputSequence& inputs, const PlayerInfo& info, Timer::Ptr gapSwitchTimer):
+        PlayerThing{info, 50, 0.9*1080, gapSwitchTimer},
         inputs_{inputs}
     {}
 

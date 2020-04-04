@@ -8,30 +8,35 @@
 
 namespace {
 
-std::set<PlayerEffect> appliedOnEveryStack = {
+const std::set<PlayerEffect> appliedOnEveryStack = {
     PlayerEffect::Haste, PlayerEffect::Slow,
     PlayerEffect::Enlarge, PlayerEffect::Shrink
 };
 
-std::set<PlayerEffect> appliedOnFirstStack = {
-    PlayerEffect::RightAngled, PlayerEffect::SwapControl
+const std::set<PlayerEffect> appliedOnFirstStack = {
+    PlayerEffect::RightAngled, PlayerEffect::SwapControl, PlayerEffect::Warp
 };
+
+constexpr auto playerToGameAreaSizeRatio = 253.334f;
+constexpr auto playerSpeedToGameAreaSizeRatio = 7.6f;
 
 }
 
-PlayerThing::PlayerThing(const PlayerInfo& info, float radius, int vel, Timer::Ptr gapSwitchTimer):
+PlayerThing::PlayerThing(const PlayerInfo& info, int playAreaCorner, int playAreaSide, Timer::Ptr gapSwitchTimer):
     info_{info},
-    shape_{radius},
-    recShape_{{radius*2, radius*2}},
-    baseVel_{vel},
-    baseRadius_{radius},
+    playAreaCorner_{playAreaCorner},
+    playAreaSide_{playAreaSide},
+    baseVel_{playAreaSide_ / playerSpeedToGameAreaSizeRatio},
+    baseRadius_{playAreaSide_ / playerToGameAreaSizeRatio},
+    shape_{baseRadius_},
+    recShape_{{baseRadius_*2, baseRadius_*2}},
     vel_{baseVel_},
     gapSwitchTimer_{gapSwitchTimer}
 {
-    shape_.setOrigin(radius, radius);
+    shape_.setOrigin(baseRadius_, baseRadius_);
     shape_.setFillColor(sf::Color::Yellow);
 
-    recShape_.setOrigin(radius, radius);
+    recShape_.setOrigin(baseRadius_, baseRadius_);
     recShape_.setFillColor(sf::Color::Yellow);
 }
 
@@ -71,14 +76,28 @@ void PlayerThing::move(double timeStep, std::deque<TrailThing>& trails) {
         oldY + (timeStep * vel_ * cos(-(M_PI/180)*direction_))
     );
 
+    auto [newX, newY] = shape_.getPosition();
     if (!gap_) {
-        const auto newPos = shape_.getPosition();
-        const auto numSegments = distance(newPos, {oldX, oldY}) / (TrailThing::height-1);
+        const auto numSegments = distance({newX, newY}, {oldX, oldY}) / (TrailThing::height-1);
         for (auto i = 0u; i < numSegments; ++i) {
             trails.emplace_front(oldX, oldY, direction_, shape_.getRadius()*2, info_.color);
             oldX += ((TrailThing::height-1) * sin(-(M_PI/180)*direction_));
             oldY += ((TrailThing::height-1) * cos(-(M_PI/180)*direction_));
         }
+    }
+
+    // warps
+    if (newX < playAreaCorner_) {
+        setPosition(newX + playAreaSide_  - 4, newY);
+    }
+    if (newY < playAreaCorner_) {
+        setPosition(newX, newY + playAreaSide_ - 4);
+    }
+    if (newX > playAreaSide_ + playAreaCorner_) {
+        setPosition(newX - playAreaSide_ + 4, newY);
+    }
+    if (newY > playAreaSide_+ playAreaCorner_) {
+        setPosition(newX, newY - playAreaSide_ + 4);
     }
 }
 
@@ -103,6 +122,12 @@ void PlayerThing::newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailTh
     gapSwitch();
 
     move(0.125, trails);
+}
+
+void PlayerThing::setAlpha(std::uint8_t alpha) {
+    const auto newColor = sf::Color{0xff, 0xff, 0x00, alpha};
+    shape_.setFillColor(newColor);
+    recShape_.setFillColor(newColor);
 }
 
 void PlayerThing::swapControls() {
@@ -209,8 +234,7 @@ void PlayerThing::applyEffect(PlayerEffect e) {
         case PlayerEffect::Shrink:
             updateRadius();
             break;
-        case PlayerEffect::Wrap:
-            // todo
+        case PlayerEffect::Warp:
             break;
         case PlayerEffect::NoTrails:
             // todo
@@ -238,8 +262,8 @@ void PlayerThing::revertEffect(PlayerEffect e) {
         case PlayerEffect::Shrink:
             updateRadius();
             break;
-        case PlayerEffect::Wrap:
-            // todo
+        case PlayerEffect::Warp:
+            setAlpha(255u);
             break;
         case PlayerEffect::NoTrails:
             // todo

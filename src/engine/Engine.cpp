@@ -1,14 +1,13 @@
 #include "engine/Engine.hpp"
 
+#include <cmath>
 #include <TGUI/TGUI.hpp>
 
 #include "app/Utils.hpp"
 
 namespace {
 
-constexpr auto playerToGameAreaSizeRatio = 253.334f;
 constexpr auto pickMeUpToGameAreaSizeRatio = 32.2f;
-constexpr auto playerSpeedToGameAreaSizeRatio = 7.6f;
 
 const auto selfHasteDuration = sf::milliseconds(3500);
 const auto oppHasteDuration = sf::milliseconds(2500);
@@ -23,11 +22,16 @@ const auto sizeChangeDuration = sf::milliseconds(8500);
 
 const auto controlSwapDuration = sf::milliseconds(6500);
 
+const auto selfWarpDuration = sf::milliseconds(9000);
+
+constexpr auto pi = 3.141592;
+
 }  // namespace
 
 Engine::Engine(IAssetManager& a, const PlayerInfos& infos, int tickrate, int playAreaCorner, int playAreaSide):
     assets_{a},
     timerService_{tickrate},
+    tickrate_{tickrate},
     playAreaCornerOffset_{playAreaCorner},
     playAreaSideLength_{playAreaSide},
     pickMeUpRadius_{playAreaSideLength_ / pickMeUpToGameAreaSizeRatio},
@@ -51,6 +55,9 @@ void Engine::input(const sf::Event& event) {
 void Engine::step(double deltaTime) {
     timerService_.advanceAll();
 
+    const auto warpAlpha = 127*(std::cos((warpAlphaCounter_++)*2*pi/tickrate_)+1);
+    if (warpAlphaCounter_ >= tickrate_) warpAlphaCounter_ = 0;
+
     bool playerDied = false;
     for (auto& [id, player]: players_) {
         if (player->isDead()) continue;
@@ -58,6 +65,10 @@ void Engine::step(double deltaTime) {
 
         if (checkCollisions(id, *player)) {
             playerDied = true;
+        }
+
+        if (player->isWarping()) {
+            player->setAlpha(warpAlpha);
         }
     }
 
@@ -72,6 +83,15 @@ void Engine::step(double deltaTime) {
 
     if (massPowerups_ && massPowerups_->isExpired()) {
         massPowerups_.reset();
+    }
+
+    if (mapWarp_) {
+        if (mapWarp_->isExpired()) {
+            mapWarp_.reset();
+            border_.setAlpha(255u);
+        } else {
+            border_.setAlpha(warpAlpha);
+        }
     }
 }
 
@@ -112,18 +132,19 @@ std::vector<const sf::Drawable*> Engine::getDrawables() {
 }
 
 void Engine::initializePlayers(const PlayerInfos& infos) {
-    const auto radius = playAreaSideLength_ / playerToGameAreaSizeRatio;
-    const auto velocity = playAreaSideLength_ / playerSpeedToGameAreaSizeRatio;
     for (const auto& [id, info] : infos) {
-        players_.emplace(id, std::make_unique<PlayerThing>(info, radius, velocity, timerService_.makeTimer(sf::milliseconds(400))));
+        players_.emplace(id, std::make_unique<PlayerThing>(info, playAreaCornerOffset_,
+            playAreaSideLength_, timerService_.makeTimer(sf::milliseconds(400))));
     }
 }
 
 bool Engine::checkCollisions(ProfileId id, PlayerThing& player) {
-    for (const auto& shape: border_.getShapes()) {
-        if (player.checkCollision(shape)) {
-            player.kill();
-            return true;
+    if (not mapWarp_ && not player.isWarping()) {
+        for (const auto& shape: border_.getShapes()) {
+            if (player.checkCollision(shape)) {
+                player.kill();
+                return true;
+            }
         }
     }
 
@@ -219,9 +240,9 @@ std::pair<PickMeUp::OnPickUp, TextureType> Engine::makePickMeUpEffectAndTexture(
             player.addEffectStack(PlayerEffect::Slow, timerService_.makeTimer(oppSlowDuration));
         }), TextureType::OpponentSlow);
     case PickUpType::ClearTrails:
-        return std::make_pair(makeSelfEffect([this] (auto&) {
+        return std::make_pair([this] (auto, auto&) {
             trails_.clear();
-        }), TextureType::ClearTrails);
+        }, TextureType::ClearTrails);
     case PickUpType::SelfRightAngle:
         return std::make_pair(makeSelfEffect([this] (auto& player) {
             player.addEffectStack(PlayerEffect::RightAngled, timerService_.makeTimer(selfRightAngleMovementDuration));
@@ -235,10 +256,10 @@ std::pair<PickMeUp::OnPickUp, TextureType> Engine::makePickMeUpEffectAndTexture(
             player.addEffectStack(PlayerEffect::SwapControl, timerService_.makeTimer(controlSwapDuration));
         }), TextureType::ControlSwap);
     case PickUpType::MassPowerups:
-        return std::make_pair(makeSelfEffect([this] (auto&) {
+        return std::make_pair([this] (auto, auto&) {
             addMassPowerups();
             resetPickmeupSpawnTimer();
-        }), TextureType::MassPowerups);
+        }, TextureType::MassPowerups);
     case PickUpType::Shrink:
         return std::make_pair(makeSelfEffect([this] (auto& player) {
             player.addEffectStack(PlayerEffect::Shrink, timerService_.makeTimer(sizeChangeDuration));
@@ -247,6 +268,14 @@ std::pair<PickMeUp::OnPickUp, TextureType> Engine::makePickMeUpEffectAndTexture(
         return std::make_pair(makeOpponentEffect([this] (auto& player) {
             player.addEffectStack(PlayerEffect::Enlarge, timerService_.makeTimer(sizeChangeDuration));
         }), TextureType::Enlarge);
+    case PickUpType::SelfWarp:
+    return std::make_pair(makeSelfEffect([this] (auto& player) {
+            player.addEffectStack(PlayerEffect::Warp, timerService_.makeTimer(selfWarpDuration));
+        }), TextureType::SelfWarp);
+    case PickUpType::MapWarp:
+    return std::make_pair([this] (auto, auto&) {
+            addMapWarp();
+        }, TextureType::MapWarp);
     default:
         const auto msg = fmt::format("bad pickup type {}", type);
         print::error(msg);
@@ -263,9 +292,9 @@ PickMeUp::OnPickUp Engine::makeSelfEffect(PlayerUnaryOp effect) {
 
 template <typename PlayerUnaryOp>
 PickMeUp::OnPickUp Engine::makeOpponentEffect(PlayerUnaryOp effect) {
-    return [this, effect] (ProfileId pickedById, PlayerThing&) {
+    return [this, effect] (ProfileId pickedBy, PlayerThing&) {
         for (auto& [id, player]: players_) {
-            if (id == pickedById) continue;
+            if (id == pickedBy) continue;
             effect(*player);
         }
     };
@@ -276,6 +305,14 @@ void Engine::addMassPowerups() {
         massPowerups_->extend(timerService_.timeToTicks(sf::milliseconds(7000)));
     } else {
         massPowerups_ = timerService_.makeTimer(sf::milliseconds(10000));
+    }
+}
+
+void Engine::addMapWarp() {
+    if (mapWarp_) {
+        mapWarp_->extend(timerService_.timeToTicks(sf::milliseconds(12000)));
+    } else {
+        mapWarp_ = timerService_.makeTimer(sf::milliseconds(16000));
     }
 }
 

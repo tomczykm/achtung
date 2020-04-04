@@ -6,6 +6,8 @@ namespace {
 constexpr static auto tickrate = 140;
 const auto stepTime = sf::milliseconds(1000/tickrate).asMilliseconds() / 1000.f;
 
+constexpr auto playAreaCorner = 50;
+
 IAssetManager::TextureSet gameTextures = {
         TextureType::SelfHaste,
         TextureType::OpponentHaste,
@@ -18,7 +20,9 @@ IAssetManager::TextureSet gameTextures = {
         TextureType::MassPowerups,
         TextureType::RandomPickMeUp,
         TextureType::Shrink,
-        TextureType::Enlarge
+        TextureType::Enlarge,
+        TextureType::SelfWarp,
+        TextureType::MapWarp
 };
 
 auto resetState = [] (PlayerTestable& player, Engine::Pickmeups& pickups, Engine::Trails& t) {
@@ -42,7 +46,7 @@ StateViewer::StateViewer(const Application::Interface& a, int testcaseIndex):
         app_.assets,
         inputs_,
         tickrate,
-        0,
+        playAreaCorner,
         0.9 * app_.config.get<int>(Setting::ResHeight)
     }
 {

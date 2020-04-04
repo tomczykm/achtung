@@ -23,3 +23,10 @@ BorderThing::BorderThing(float offset, float sideLength) {
         shape.setFillColor(sf::Color::Yellow);
     }
 }
+
+void BorderThing::setAlpha(std::uint8_t alpha) {
+    const auto newColor = sf::Color{0xff, 0xff, 0x00, alpha};
+    for (auto& s: shapes_) {
+        s.setFillColor(newColor);
+    }
+}

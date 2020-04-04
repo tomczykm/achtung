@@ -22,6 +22,8 @@ enum class PickUpType {
     MassPowerups,
     Shrink,
     Enlarge,
+    SelfWarp,
+    MapWarp,
 
     Count
 };

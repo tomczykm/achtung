@@ -11,6 +11,8 @@ public:
 
     const WallShapes& getShapes() const { return shapes_; }
 
+    void setAlpha(std::uint8_t alpha);
+
 private:
     WallShapes shapes_;
 };

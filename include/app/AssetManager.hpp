@@ -21,7 +21,9 @@ enum class TextureType {
     MassPowerups,
     RandomPickMeUp,
     Shrink,
-    Enlarge
+    Enlarge,
+    SelfWarp,
+    MapWarp
 };
 
 class IAssetManager {

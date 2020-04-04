@@ -150,3 +150,10 @@ TEST_F(EngineTests, CheckWarping) {
     stepEngine(ticks);
     engine_.accessState(assertIsPlayerDead(false));
 }
+
+TEST_F(EngineTests, CheckNoTrails) {
+    const auto [setup, ticks] = setupAndTicks[9];
+    setup(engine_, inputs_);
+    stepEngine(ticks);
+    engine_.accessState(assertIsPlayerDead(true));
+}

@@ -24,6 +24,7 @@ enum class PickUpType {
     Enlarge,
     SelfWarp,
     MapWarp,
+    NoTrails,
 
     Count
 };

@@ -10,6 +10,6 @@
 using SetupFunctor = std::function<void(EngineTestable&, InputSequence&)>;
 using TestPreviewParam = std::pair<SetupFunctor, Ticks>;
 
-constexpr std::size_t totalTestcases = 9;
+constexpr std::size_t totalTestcases = 10;
 
 extern const std::array<TestPreviewParam, totalTestcases> setupAndTicks;

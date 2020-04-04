@@ -23,7 +23,8 @@ enum class TextureType {
     Shrink,
     Enlarge,
     SelfWarp,
-    MapWarp
+    MapWarp,
+    NoTrails
 };
 
 class IAssetManager {

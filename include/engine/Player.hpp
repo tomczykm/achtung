@@ -60,6 +60,7 @@ public:
 
     void addEffectStack(PlayerEffect, Timer::Ptr);
     bool isWarping() const { return getNumEffectStacks(PlayerEffect::Warp) > 0; }
+    bool isGap() const { return gap_; }
 
 protected:
     void gapSwitch();

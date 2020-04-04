@@ -99,6 +99,7 @@ void Engine::resetRound() {
     trails_.clear();
     pickmeups_.clear();
     massPowerups_.reset();
+    mapWarp_.reset();
     resetPickmeupSpawnTimer();
     for (auto& [id, player] : players_) {
         player->newRoundSetup(
@@ -153,15 +154,17 @@ bool Engine::checkCollisions(ProfileId id, PlayerThing& player) {
     // we don't want to check if we collide with segments we just created
     // (we obviously do, they're right underneath and we don't want to die immediately)
 
-    auto toSkip = 45u;
-    for (const auto& t: trails_) {
-        if (t.getShape().getFillColor() == player.getColor() && toSkip > 0) {
-            --toSkip;
-            continue;
-        }
-        if (player.checkCollision(t.getShape())) {
-            player.kill();
-            return true;
+    if (not player.isGap()) {
+        auto toSkip = 45u;
+        for (const auto& t: trails_) {
+            if (t.getShape().getFillColor() == player.getColor() && toSkip > 0) {
+                --toSkip;
+                continue;
+            }
+            if (player.checkCollision(t.getShape())) {
+                player.kill();
+                return true;
+            }
         }
     }
 
@@ -276,6 +279,10 @@ std::pair<PickMeUp::OnPickUp, TextureType> Engine::makePickMeUpEffectAndTexture(
     return std::make_pair([this] (auto, auto&) {
             addMapWarp();
         }, TextureType::MapWarp);
+    case PickUpType::NoTrails:
+    return std::make_pair(makeSelfEffect([this] (auto& player) {
+            player.addEffectStack(PlayerEffect::NoTrails, timerService_.makeTimer(selfWarpDuration));
+        }), TextureType::NoTrails);
     default:
         const auto msg = fmt::format("bad pickup type {}", type);
         print::error(msg);
@@ -310,9 +317,9 @@ void Engine::addMassPowerups() {
 
 void Engine::addMapWarp() {
     if (mapWarp_) {
-        mapWarp_->extend(timerService_.timeToTicks(sf::milliseconds(12000)));
+        mapWarp_->extend(timerService_.timeToTicks(sf::milliseconds(8000)));
     } else {
-        mapWarp_ = timerService_.makeTimer(sf::milliseconds(16000));
+        mapWarp_ = timerService_.makeTimer(sf::milliseconds(12000));
     }
 }
 

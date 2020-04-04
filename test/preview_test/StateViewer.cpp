@@ -9,20 +9,21 @@ const auto stepTime = sf::milliseconds(1000/tickrate).asMilliseconds() / 1000.f;
 constexpr auto playAreaCorner = 50;
 
 IAssetManager::TextureSet gameTextures = {
-        TextureType::SelfHaste,
-        TextureType::OpponentHaste,
-        TextureType::SelfSlow,
-        TextureType::OpponentSlow,
-        TextureType::SelfRightAngle,
-        TextureType::OpponentRightAngle,
-        TextureType::ClearTrails,
-        TextureType::ControlSwap,
-        TextureType::MassPowerups,
-        TextureType::RandomPickMeUp,
-        TextureType::Shrink,
-        TextureType::Enlarge,
-        TextureType::SelfWarp,
-        TextureType::MapWarp
+    TextureType::SelfHaste,
+    TextureType::OpponentHaste,
+    TextureType::SelfSlow,
+    TextureType::OpponentSlow,
+    TextureType::SelfRightAngle,
+    TextureType::OpponentRightAngle,
+    TextureType::ClearTrails,
+    TextureType::ControlSwap,
+    TextureType::MassPowerups,
+    TextureType::RandomPickMeUp,
+    TextureType::Shrink,
+    TextureType::Enlarge,
+    TextureType::SelfWarp,
+    TextureType::MapWarp,
+    TextureType::NoTrails
 };
 
 auto resetState = [] (PlayerTestable& player, Engine::Pickmeups& pickups, Engine::Trails& t) {

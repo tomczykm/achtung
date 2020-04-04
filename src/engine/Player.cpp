@@ -14,7 +14,8 @@ const std::set<PlayerEffect> appliedOnEveryStack = {
 };
 
 const std::set<PlayerEffect> appliedOnFirstStack = {
-    PlayerEffect::RightAngled, PlayerEffect::SwapControl, PlayerEffect::Warp
+    PlayerEffect::RightAngled, PlayerEffect::SwapControl,
+    PlayerEffect::Warp, PlayerEffect::NoTrails
 };
 
 constexpr auto playerToGameAreaSizeRatio = 253.334f;
@@ -88,16 +89,16 @@ void PlayerThing::move(double timeStep, std::deque<TrailThing>& trails) {
 
     // warps
     if (newX < playAreaCorner_) {
-        setPosition(newX + playAreaSide_  - 4, newY);
+        setPosition(newX + playAreaSide_, newY);
     }
     if (newY < playAreaCorner_) {
-        setPosition(newX, newY + playAreaSide_ - 4);
+        setPosition(newX, newY + playAreaSide_);
     }
     if (newX > playAreaSide_ + playAreaCorner_) {
-        setPosition(newX - playAreaSide_ + 4, newY);
+        setPosition(newX - playAreaSide_, newY);
     }
     if (newY > playAreaSide_+ playAreaCorner_) {
-        setPosition(newX, newY - playAreaSide_ + 4);
+        setPosition(newX, newY - playAreaSide_);
     }
 }
 
@@ -121,7 +122,7 @@ void PlayerThing::newRoundSetup(uint32_t xPos, uint32_t yPos, std::deque<TrailTh
     gap_ = true;
     gapSwitch();
 
-    move(0.125, trails);
+    move(1.f/7, trails);
 }
 
 void PlayerThing::setAlpha(std::uint8_t alpha) {
@@ -149,7 +150,6 @@ void PlayerThing::gapSwitch() {
 }
 
 bool PlayerThing::checkCollision(const sf::Shape &o) const {
-    if (gap_) return false;
     return shape_.getGlobalBounds().intersects(o.getGlobalBounds());
 }
 
@@ -237,7 +237,8 @@ void PlayerThing::applyEffect(PlayerEffect e) {
         case PlayerEffect::Warp:
             break;
         case PlayerEffect::NoTrails:
-            // todo
+            gap_ = true;
+            gapSwitchTimer_->pause();
             break;
     }
 }
@@ -266,7 +267,8 @@ void PlayerThing::revertEffect(PlayerEffect e) {
             setAlpha(255u);
             break;
         case PlayerEffect::NoTrails:
-            // todo
+            gapSwitch();
+            gapSwitchTimer_->pause(false);
             break;
     }
 }

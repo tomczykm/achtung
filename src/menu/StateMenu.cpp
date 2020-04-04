@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iterator>
 
+#include "CMakeDefine.hpp"
 #include "app/AssetManager.hpp"
 #include "app/Utils.hpp"
 
@@ -62,6 +63,8 @@ void StateMenu::loadGui() {
     app_.gui.get("QuitGame")->connect("pressed", [this] () {
         app_.quit();
     });
+
+    app_.getWidget<tgui::Label>("Version")->setText(projectVersion.data());
 }
 
 template <typename T>

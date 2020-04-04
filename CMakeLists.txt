@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project("freeachtung" VERSION 0.1.0 LANGUAGES CXX)
+project("freeachtung" VERSION 0.2 LANGUAGES CXX)
 
 add_subdirectory(external)
 

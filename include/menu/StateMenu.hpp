@@ -39,5 +39,4 @@ private:
 
     Panels panels_;
     Panels::iterator activePanel_;
-
 };

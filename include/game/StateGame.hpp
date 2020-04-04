@@ -22,20 +22,28 @@ private:
 
     void updateScoreLabels(const Engine::Players&);
 
-    template <typename State>
-    void changeState() { state_ = std::make_unique<State>(*this); }
+    template <typename State, typename... Args>
+    void changeState(Args&&... args) {
+        state_ = std::make_unique<State>(*this, std::forward<Args>(args)...);
+        state_->onEnterState();
+    }
+
+    void setInfoText(std::string_view);
 
     Application::Interface app_;
 
     std::unique_ptr<RoundState> state_;
 
+    tgui::Label::Ptr infoLabel_;
+
     Engine engine_;
 
     struct RoundState {
-        virtual void onEnterState() = 0;
-        virtual void onSpacebar() = 0;
-        virtual void onEscape() = 0;
-        virtual void onTick(double deltaTime) = 0;
+        virtual void onEnterState() {};
+        virtual void onSpacebar() {};
+        virtual void onEscape() {};
+        virtual void onTick(double) {};
+        virtual ~RoundState() = default;
     protected:
         explicit RoundState(StateGame& s) : gs{s} {}
         StateGame& gs;
@@ -44,42 +52,43 @@ private:
     static constexpr auto PRINT = "RoundState::{} ctor";
 
     struct RoundBegin : RoundState {
-        RoundBegin(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
+        RoundBegin(StateGame& s): RoundState{s} { print::info(PRINT, __func__); }
         void onEnterState() override;
         void onSpacebar() override;
         void onEscape() override;
-        void onTick(double) override {}
     };
 
     struct Running : RoundState {
-        Running(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
-        void onEnterState() override {}
+        Running(StateGame& s): RoundState{s} { print::info(PRINT, __func__); }
+        void onEnterState() override;
         void onSpacebar() override;
-        void onEscape() override {}
         void onTick(double deltaTime) override;
     };
 
     struct Pause : RoundState {
-        Pause(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
-        void onEnterState() override {}
-        void onSpacebar() override;
-        void onEscape() override;
-        void onTick(double) override {};
-    };
-
-    struct RoundEnd : RoundState {
-        RoundEnd(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
-        void onEnterState() override {}
-        void onSpacebar() override;
-        void onEscape() override;
-        void onTick(double) override {};
-    };
-
-    struct MatchEnd : RoundState {
-        MatchEnd(StateGame& s): RoundState{s} { print::info(PRINT, __func__); onEnterState(); }
+        Pause(StateGame& s): RoundState{s} { print::info(PRINT, __func__); }
         void onEnterState() override;
         void onSpacebar() override;
         void onEscape() override;
-        void onTick(double) override {};
+    };
+
+    struct RoundEnd : RoundState {
+        RoundEnd(StateGame& s, std::string_view winner): RoundState{s} {
+            print::info(PRINT, __func__);
+            onEnterState(winner);
+        }
+        void onEnterState(std::string_view winner);
+        void onSpacebar() override;
+        void onEscape() override;
+    };
+
+    struct MatchEnd : RoundState {
+        MatchEnd(StateGame& s, std::string_view winner): RoundState{s} {
+            print::info(PRINT, __func__);
+            onEnterState(winner);
+        }
+        void onEnterState(std::string_view winner);
+        void onSpacebar() override;
+        void onEscape() override;
     };
 };

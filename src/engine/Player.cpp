@@ -23,12 +23,14 @@ constexpr auto playerSpeedToGameAreaSizeRatio = 7.6f;
 
 }
 
-PlayerThing::PlayerThing(const PlayerInfo& info, int playAreaCorner, int playAreaSide, Timer::Ptr gapSwitchTimer):
+PlayerThing::PlayerThing(const PlayerInfo& info, int playAreaCorner, int playAreaSide, int tickrate, Timer::Ptr gapSwitchTimer):
     info_{info},
+    tickrate_{tickrate},
     playAreaCorner_{playAreaCorner},
     playAreaSide_{playAreaSide},
     baseVel_{playAreaSide_ / playerSpeedToGameAreaSizeRatio},
     baseRadius_{playAreaSide_ / playerToGameAreaSizeRatio},
+    baseTurn_{tickrate_ * 1.1},
     shape_{baseRadius_},
     recShape_{{baseRadius_*2, baseRadius_*2}},
     vel_{baseVel_},
@@ -146,7 +148,7 @@ void PlayerThing::gapSwitch() {
     gap_ = !gap_;
     const auto gapTime = sf::seconds(6 * shape_.getRadius() / vel_);
     const auto gapSwitchDuration = gap_ ? gapTime : sf::milliseconds(xor_rand::next(1400, 7000));
-    gapSwitchTimer_->reset(gapSwitchDuration.asMilliseconds() / 1000.f * 140); // todo: hardcoded 140 tickrate
+    gapSwitchTimer_->reset(gapSwitchDuration.asMilliseconds() / 1000.f * tickrate_);
 }
 
 bool PlayerThing::checkCollision(const sf::Shape &o) const {

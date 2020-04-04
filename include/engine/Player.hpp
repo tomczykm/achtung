@@ -35,7 +35,7 @@ class PlayerThing {
 public:
     using Score = uint32_t;
 
-    PlayerThing(const PlayerInfo&, int playAreaCorner, int playAreaSide, Timer::Ptr gapSwitchTimer);
+    PlayerThing(const PlayerInfo&, int playAreaCorner, int playAreaSide, int tickrate, Timer::Ptr gapSwitchTimer);
     virtual ~PlayerThing() = default;
 
     void step(double timeStep, std::deque<TrailThing>& trails);
@@ -88,12 +88,14 @@ protected:
 
     PlayerInfo info_;
 
+    int tickrate_;
+
     int playAreaCorner_;
     int playAreaSide_;
 
     int baseVel_;
     int baseRadius_;
-    double baseTurn_ = 130;
+    double baseTurn_;
 
     sf::CircleShape shape_;
     sf::RectangleShape recShape_; // for right angle movement

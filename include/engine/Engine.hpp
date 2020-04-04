@@ -28,7 +28,6 @@ public:
     void step(double deltaTime);
     void resetRound();
 
-    bool checkVictoryGoal();
     std::vector<const sf::Drawable*> getDrawables();
 
 protected:
@@ -50,6 +49,9 @@ protected:
     void addControlSwap(PlayerThing&, sf::Time);
     void addMassPowerups();
     void addMapWarp();
+
+    const PlayerThing& getHighestScoring();
+    std::string getRoundWinnerName();
 
     IAssetManager& assets_;
     TimerService timerService_;
@@ -77,9 +79,15 @@ protected:
     uint8_t warpAlphaCounter_ = 0u;
 };
 
-struct RoundEndEvent : framework::IEvent {};
+struct RoundEndEvent : framework::IEvent {
+    RoundEndEvent(const std::string& w): winner{w} {}
+    std::string winner;
+};
 
-struct MatchEndEvent : framework::IEvent {};
+struct MatchEndEvent : framework::IEvent {
+    MatchEndEvent(const std::string& w): winner{w} {}
+    std::string winner;
+};
 
 struct PointsAwardedEvent : framework::IEvent {
     PointsAwardedEvent(const Engine::Players&p): players{p} {}

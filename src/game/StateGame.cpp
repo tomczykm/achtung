@@ -50,7 +50,7 @@ StateGame::StateGame(const Application::Interface& ctx, const PlayerInfos& infos
 
     app_.assets.loadTextures(gameTextures);
 
-    state_ = std::make_unique<RoundBegin>(*this);
+    changeState<RoundBegin>();
 
     print::info("StateGame ready");
 }
@@ -69,13 +69,13 @@ void StateGame::attachObservers() {
 
     engine_.attach([this] (const auto& e) {
         if (auto event = dynamic_cast<const RoundEndEvent*>(&e); event) {
-            changeState<RoundEnd>();
+            changeState<RoundEnd>(event->winner);
         }
     });
 
     engine_.attach([this] (const auto& e) {
         if (auto event = dynamic_cast<const MatchEndEvent*>(&e); event) {
-            changeState<MatchEnd>();
+            changeState<MatchEnd>(event->winner);
         }
     });
 }
@@ -119,6 +119,8 @@ void StateGame::loadGui(const PlayerInfos& infos) {
     auto goalLabel = app_.getWidget<tgui::Label>("ScoreGoal");
     goalLabel->setText(fmt::format("Goal: {}", (infos.size()-1)*10));
 
+    infoLabel_ = app_.getWidget<tgui::Label>("Info");
+
     prepareScoreLabels(infos);
 }
 
@@ -157,7 +159,12 @@ void StateGame::updateScoreLabels(const Engine::Players& players) {
     }
 }
 
+void StateGame::setInfoText(std::string_view t) {
+    infoLabel_->setText(t.data());
+}
+
 void StateGame::RoundBegin::onEnterState() {
+    gs.setInfoText("Get ready!");
     gs.engine_.resetRound();
 }
 
@@ -169,6 +176,11 @@ void StateGame::RoundBegin::onEscape() {
     gs.app_.enterState<StateMenu>();
 }
 
+
+void StateGame::Running::onEnterState() {
+    gs.setInfoText("");
+}
+
 void StateGame::Running::onSpacebar() {
     gs.changeState<Pause>();
 }
@@ -177,6 +189,10 @@ void StateGame::Running::onTick(double deltaTime) {
     gs.engine_.step(deltaTime);
 }
 
+
+void StateGame::Pause::onEnterState() {
+    gs.setInfoText("Paused");
+}
 
 void StateGame::Pause::onSpacebar() {
     gs.changeState<Running>();
@@ -187,6 +203,10 @@ void StateGame::Pause::onEscape() {
 }
 
 
+void StateGame::RoundEnd::onEnterState(std::string_view winner) {
+    gs.setInfoText(fmt::format("{} won\nthe round", winner));
+}
+
 void StateGame::RoundEnd::onSpacebar() {
     gs.changeState<RoundBegin>();
 }
@@ -196,8 +216,9 @@ void StateGame::RoundEnd::onEscape() {
 }
 
 
-void StateGame::MatchEnd::onEnterState() {
+void StateGame::MatchEnd::onEnterState(std::string_view winner) {
     // todo: show end of match splash screen
+    gs.setInfoText(fmt::format("{} won\nthe game!", winner));
 }
 
 void StateGame::MatchEnd::onSpacebar() {

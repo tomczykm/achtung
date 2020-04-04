@@ -136,7 +136,7 @@ std::vector<const sf::Drawable*> Engine::getDrawables() {
 void Engine::initializePlayers(const PlayerInfos& infos) {
     for (const auto& [id, info] : infos) {
         players_.emplace(id, std::make_unique<PlayerThing>(info, playAreaCornerOffset_,
-            playAreaSideLength_, timerService_.makeTimer(sf::milliseconds(400))));
+            playAreaSideLength_, tickrate_, timerService_.makeTimer(sf::milliseconds(400))));
     }
 }
 
@@ -194,14 +194,16 @@ void Engine::awardPoints() {
         });
     if (aliveCount <= 1) {
         if (victoryGoalAchieved()) {
-            notifyAll(MatchEndEvent{});
+            notifyAll(MatchEndEvent{getHighestScoring().name()});
         } else {
-            notifyAll(RoundEndEvent{});
+            notifyAll(RoundEndEvent{getRoundWinnerName()});
         }
     }
 }
 
 bool Engine::victoryGoalAchieved() {
+    if (players_.size() <= 1) return false;
+
     std::vector<PlayerThing::Score> scores;
     for (const auto&[id, player]: players_) {
         scores.push_back(player->getScore());
@@ -330,4 +332,21 @@ void Engine::resetPickmeupSpawnTimer() {
         sf::milliseconds(xor_rand::next(800, 2200)) :
         sf::milliseconds(xor_rand::next(4500, 8000));
     pickmeupSpawnTimer_->reset(timerService_.timeToTicks(timeUntilNextPickmeupSpawn));
+}
+
+const PlayerThing& Engine::getHighestScoring() {
+    auto ret = players_.begin();
+    for (auto it = players_.begin(); it != players_.end(); ++it) {
+        if (it->second->getScore() > ret->second->getScore()) {
+            ret = it;
+        }
+    }
+    return *(ret->second);
+}
+
+std::string Engine::getRoundWinnerName() {
+    for (const auto&[id, player]: players_) {
+        if (not player->isDead()) return player->name();
+    }
+    return {};
 }

@@ -30,7 +30,7 @@ jobs:
     - name: Install dependencies
       uses: lukka/run-vcpkg@v1.4
       with:
-        vcpkgArguments: @$(Build.SourcesDirectory)/vcpkg-deps.txt
+        vcpkgArguments: '${{ env.vcpkgResponseFile  }}'
         vcpkgDirectory: '${{ github.workspace }}/external/vcpkg'
       
     - name: Generate build files

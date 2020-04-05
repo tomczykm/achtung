@@ -3,8 +3,8 @@ project("freeachtung" VERSION 0.2 LANGUAGES CXX)
 
 add_subdirectory(external)
 
-find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
-find_package(TGUI 0.8 REQUIRED)
+find_package(SFML 2.5 CONFIG COMPONENTS graphics REQUIRED)
+find_package(TGUI 0.8 CONFIG REQUIRED)
 
 enable_testing()
 

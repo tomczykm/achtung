@@ -32,6 +32,7 @@ jobs:
       with:
         vcpkgArguments: '@${{ env.vcpkgResponseFile  }}'
         vcpkgDirectory: '${{ github.workspace }}\external\vcpkg'
+        vcpkgTriplet: vcpkgTriplet
       
     - name: Generate build files
       uses: lukka/run-cmake@v1.4
@@ -40,5 +41,5 @@ jobs:
         cmakeBuildType: Release
         useVcpkgToolchainFile: true
     
-    - name: Build
-      run: msbuild ALL_BUILD.vcxproj -property:Configuration=Release
+    # - name: Build
+    #   run: msbuild ALL_BUILD.vcxproj -property:Configuration=Release

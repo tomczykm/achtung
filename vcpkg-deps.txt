@@ -1,3 +1,5 @@
 sqlite3
 sfml
 tgui
+--triplet
+x64-windows

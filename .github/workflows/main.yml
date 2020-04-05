@@ -21,13 +21,13 @@ jobs:
     - name: Cache vcpkg's artifacts
       uses: actions/cache@v1
       with:
-        path: '${{ github.workspace }}\external/\vcpkg'
-        key:  ${{ hashFiles( env.vcpkgResponseFile ) }}-${{ hashFiles('.git/modules/vcpkg/HEAD') }}-${{ runner.os }}
+        path: '${{ github.workspace }}\external\vcpkg'
+        key:  ${{ hashFiles( env.vcpkgResponseFile ) }}-${{ runner.os }}
 
     - name: Install dependencies
       uses: lukka/run-vcpkg@v1.4
       with:
-        vcpkgArguments: '@${{ env.vcpkgResponseFile  }}'
+        vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
         vcpkgDirectory: '${{ github.workspace }}\external\vcpkg'
         vcpkgTriplet: vcpkgTriplet
 

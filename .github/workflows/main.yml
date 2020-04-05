@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master, windows ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, windows ]
+    branches: [ master ]
 
 jobs:
   windows-build:

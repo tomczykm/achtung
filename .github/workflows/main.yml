@@ -11,15 +11,22 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0
+
+    - name: Cache vcpkg's artifacts
+      uses: actions/cache@v1
+      with:
+        path: ${env.VCPKG_INSTALLATION_ROOT}
+        key: windows-vcpkg-cache
 
     - name: Install dependencies
       run: vcpkg install sfml tgui sqlite3
     
     - name: Build
       run: |
-        cmake -DCMAKE_TOOLCHAIN_FILE=$VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake -G "Visual Studio 16 2019"
+        cmake -DCMAKE_TOOLCHAIN_FILE=${env.VCPKG_INSTALLATION_ROOT}\scripts\buildsystems\vcpkg.cmake -G "Visual Studio 16 2019"
         msbuild ALL_BUILD.vcxproj -property:Configuration=Release

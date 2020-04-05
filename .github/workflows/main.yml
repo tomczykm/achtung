@@ -9,10 +9,14 @@ on:
 jobs:
   windows-build:
     runs-on: windows-latest
+    env:
+      vcpkgResponseFile: '${{ github.workspace }}/vcpkg-deps.txt'
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        submodules: 'true'
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0
@@ -20,18 +24,21 @@ jobs:
     - name: Cache vcpkg's artifacts
       uses: actions/cache@v1
       with:
-        path: ${env.VCPKG_INSTALLATION_ROOT}
-        key: windows-vcpkg-cache
+        path: '${{ github.workspace }}/external/vcpkg'
+        key:  ${{ hashFiles( env.vcpkgResponseFile ) }}-${{ hashFiles('.git/modules/vcpkg/HEAD') }}-${{ runner.os }}
 
     - name: Install dependencies
-      run: vcpkg install sfml tgui sqlite3
+      uses: lukka/run-vcpkg@v1.4
+      with:
+        vcpkgArguments: @$(Build.SourcesDirectory)/vcpkg-deps.txt
+        vcpkgDirectory: '${{ github.workspace }}/external/vcpkg'
       
     - name: Generate build files
-      uses: lukka/run-cmake@v1
+      uses: lukka/run-cmake@v1.4
       with:
-        cmakeAppendedArgs: '-DCMAKE_TOOLCHAIN_FILE=${env.VCPKG_INSTALLATION_ROOT}\scripts\buildsystems\vcpkg.cmake'
         cmakeGenerator: VS16Win64
         cmakeBuildType: Release
+        useVcpkgToolchainFile: true
     
     - name: Build
       run: msbuild ALL_BUILD.vcxproj -property:Configuration=Release

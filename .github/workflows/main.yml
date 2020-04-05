@@ -25,8 +25,13 @@ jobs:
 
     - name: Install dependencies
       run: vcpkg install sfml tgui sqlite3
+      
+    - name: Generate build files
+      uses: lukka/run-cmake@v1
+      with:
+        cmakeAppendedArgs: '-DCMAKE_TOOLCHAIN_FILE=${env.VCPKG_INSTALLATION_ROOT}\scripts\buildsystems\vcpkg.cmake'
+        cmakeGenerator: VS16Win64
+        cmakeBuildType: Release
     
     - name: Build
-      run: |
-        cmake -DCMAKE_TOOLCHAIN_FILE=${env.VCPKG_INSTALLATION_ROOT}\scripts\buildsystems\vcpkg.cmake -G "Visual Studio 16 2019" ${env.GITHUB_WORKSPACE}\freeachtung
-        msbuild ALL_BUILD.vcxproj -property:Configuration=Release
+      run: msbuild ALL_BUILD.vcxproj -property:Configuration=Release

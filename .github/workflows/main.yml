@@ -18,9 +18,6 @@ jobs:
       with:
         submodules: 'true'
 
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.0
-
     - name: Cache vcpkg's artifacts
       uses: actions/cache@v1
       with:
@@ -33,13 +30,10 @@ jobs:
         vcpkgArguments: '@${{ env.vcpkgResponseFile  }}'
         vcpkgDirectory: '${{ github.workspace }}\external\vcpkg'
         vcpkgTriplet: vcpkgTriplet
-      
-    - name: Generate build files
+
+    - name: Build
       uses: lukka/run-cmake@v1.4
       with:
         cmakeGenerator: VS16Win64
         cmakeBuildType: Release
         useVcpkgToolchainFile: true
-    
-    # - name: Build
-    #   run: msbuild ALL_BUILD.vcxproj -property:Configuration=Release

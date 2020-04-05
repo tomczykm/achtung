@@ -5,17 +5,21 @@
 
 Application::Application():
     gui_{window_},
-    profiles_{database_},
-    stepTime_{sf::milliseconds(1000/config_.get<int>(Setting::TickRate))}
+    profiles_{database_}
 {
+    const auto tickrate = config_.get<int>(Setting::TickRate);
+    print::info("hehe {}", tickrate);
+    stepTime_ = sf::milliseconds(1000/tickrate);
     sf::ContextSettings windowSettings;
     windowSettings.antialiasingLevel = 8;
 
     const auto fullscreenFlag = config_.get<bool>(Setting::Fullscreen) ? sf::Style::Fullscreen : 0;
 
-    window_.create(sf::VideoMode{config_.get<int>(Setting::ResWidth), config_.get<int>(Setting::ResHeight)},
+    print::info("before create");
+    window_.create(sf::VideoMode{config_.get<uint32_t>(Setting::ResWidth), config_.get<uint32_t>(Setting::ResHeight)},
         projectName.data(), sf::Style::Titlebar | sf::Style::Close | fullscreenFlag, windowSettings);
     window_.setVerticalSyncEnabled(true);
+    print::info("after create");
 
     print::info("Initialization complete");
 }

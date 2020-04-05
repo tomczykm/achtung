@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdio>
+#include <ctime>
 #include <memory>
 #include <string_view>
 #include <fmt/format.h>
@@ -18,7 +19,7 @@ extern std::unique_ptr<std::FILE, FCloseDeleter> logFile;
 
 template <typename... Ts>
 void printInternal(std::string_view prefix, std::string_view formatString, Ts&&... params) {
-    const auto completePrint = fmt::format("{} {} {}\n", time(nullptr),
+    const auto completePrint = fmt::format("{} {} {}\n", std::time(nullptr),
         prefix, fmt::format(formatString, std::forward<Ts>(params)...));
     fmt::print(completePrint);
     fmt::print(logFile.get(), completePrint);

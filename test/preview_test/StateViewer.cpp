@@ -48,7 +48,7 @@ StateViewer::StateViewer(const Application::Interface& a, int testcaseIndex):
         inputs_,
         tickrate,
         playAreaCorner,
-        0.9 * app_.config.get<int>(Setting::ResHeight)
+        0.9f * app_.config.get<uint32_t>(Setting::ResHeight)
     }
 {
     app_.assets.loadTextures(gameTextures);

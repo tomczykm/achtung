@@ -94,7 +94,7 @@ protected:
     int playAreaSide_;
 
     int baseVel_;
-    int baseRadius_;
+    float baseRadius_;
     double baseTurn_;
 
     sf::CircleShape shape_;

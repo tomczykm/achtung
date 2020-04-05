@@ -28,15 +28,15 @@ constexpr auto pi = 3.141592;
 
 }  // namespace
 
-Engine::Engine(IAssetManager& a, const PlayerInfos& infos, int tickrate, int playAreaCorner, int playAreaSide):
+Engine::Engine(IAssetManager& a, const PlayerInfos& infos, int tickrate, float playAreaCorner, float playAreaSide):
     assets_{a},
     timerService_{tickrate},
     tickrate_{tickrate},
-    playAreaCornerOffset_{playAreaCorner},
-    playAreaSideLength_{playAreaSide},
+    playAreaCornerOffset_{static_cast<uint32_t>(playAreaCorner)},
+    playAreaSideLength_{static_cast<uint32_t>(playAreaSide)},
     pickMeUpRadius_{playAreaSideLength_ / pickMeUpToGameAreaSizeRatio},
-    scoreVictoryGoal_{(infos.size()-1)*10},
-    border_{playAreaCornerOffset_, playAreaSideLength_},
+    scoreVictoryGoal_{static_cast<uint32_t>((infos.size()-1)*10)},
+    border_{playAreaCorner, playAreaSide},
     pickmeupSpawnTimer_{timerService_.makeTimer(sf::milliseconds(0))}
 {
     initializePlayers(infos);
@@ -141,7 +141,7 @@ void Engine::initializePlayers(const PlayerInfos& infos) {
 }
 
 bool Engine::checkCollisions(ProfileId id, PlayerThing& player) {
-    if (not mapWarp_ && not player.isWarping()) {
+    if (!mapWarp_ && !player.isWarping()) {
         for (const auto& shape: border_.getShapes()) {
             if (player.checkCollision(shape)) {
                 player.kill();
@@ -155,7 +155,7 @@ bool Engine::checkCollisions(ProfileId id, PlayerThing& player) {
     // we don't want to check if we collide with segments we just created
     // (we obviously do, they're right underneath and we don't want to die immediately)
 
-    if (not player.isGap()) {
+    if (!player.isGap()) {
         auto toSkip = 45u;
         for (const auto& t: trails_) {
             if (t.getShape().getFillColor() == player.getColor() && toSkip > 0) {
@@ -190,7 +190,7 @@ void Engine::awardPoints() {
     notifyAll(PointsAwardedEvent{players_});
 
     const auto aliveCount = std::count_if(players_.begin(), players_.end(), [] (const auto& kv) {
-            return not kv.second->isDead();
+            return !kv.second->isDead();
         });
     if (aliveCount <= 1) {
         if (victoryGoalAchieved()) {
@@ -295,7 +295,7 @@ std::pair<PickMeUp::OnPickUp, TextureType> Engine::makePickMeUpEffectAndTexture(
 
 template <typename PlayerUnaryOp>
 PickMeUp::OnPickUp Engine::makeSelfEffect(PlayerUnaryOp effect) {
-    return [this, effect] (ProfileId, PlayerThing& pickedBy) {
+    return [effect] (ProfileId, PlayerThing& pickedBy) {
         effect(pickedBy);
     };
 }
@@ -346,7 +346,7 @@ const PlayerThing& Engine::getHighestScoring() {
 
 std::string Engine::getRoundWinnerName() {
     for (const auto&[id, player]: players_) {
-        if (not player->isDead()) return player->name();
+        if (!player->isDead()) return player->name();
     }
     return {};
 }

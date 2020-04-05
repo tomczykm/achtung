@@ -14,4 +14,8 @@ You may also run `make all test` to run automated tests.
 
 ### Building on Windows
 
-Building the game on Windows is likely possible as-is, but you're going to have to figure this out yourself (for now).
+The easiest way to build on Windows seems to be with vcpkg, CMake and MSBuild. Tested with MSBuild included with Visual Studio 2019.
+
+1. Install required libraries: `vcpkg install sfml tgui sqlite3`
+2. Generate Visual Studio solution: `cmake -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake -G "Visual Studio 16 2019"`
+3. Build the generated ALL_BUILD project `MSBuild ALL_BUILD.vcxproj -property:Configuration=Release`

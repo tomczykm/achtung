@@ -22,7 +22,7 @@ public:
     using Pickmeups = std::vector<PickMeUp>;
     using Trails = std::deque<TrailThing>;
 
-    Engine(IAssetManager&, const PlayerInfos&, int tickrate, int playAreaCorner, int playAreaSide);
+    Engine(IAssetManager&, const PlayerInfos&, int tickrate, float playAreaCorner, float playAreaSide);
 
     void input(const sf::Event&);
     void step(double deltaTime);
@@ -58,8 +58,8 @@ protected:
 
     int tickrate_;
 
-    int playAreaCornerOffset_;
-    int playAreaSideLength_;
+    uint32_t playAreaCornerOffset_;
+    uint32_t playAreaSideLength_;
 
     float pickMeUpRadius_;
 

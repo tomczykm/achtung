@@ -1,5 +1,6 @@
 #include "app/ConfigManager.hpp"
 
+#include <cstdint>
 #include <toml.hpp>
 
 #include "app/AssetManager.hpp"
@@ -19,8 +20,11 @@ void ConfigManager::loadFromFile() {
 
     const auto video = toml::find(parsed, "video");
 
-    values_.emplace(Setting::ResWidth, toml::find_or<int>(video, "res_width", 1280));
-    values_.emplace(Setting::ResHeight, toml::find_or<int>(video, "res_height", 720));
+    const auto resW = toml::find_or<int>(video, "res_width", 1280);
+    const auto resH = toml::find_or<std::uint32_t>(video, "res_height", 720);
+
+    values_.emplace(Setting::ResWidth, static_cast<uint32_t>(resW));
+    values_.emplace(Setting::ResHeight, static_cast<uint32_t>(resH));
     values_.emplace(Setting::Fullscreen, toml::find_or<bool>(video, "fullscreen", false));
 }
 

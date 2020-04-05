@@ -45,7 +45,8 @@ void discard(std::size_t n) {
 std::string_view stripLeadingDigits(std::string_view s) {
     auto it = s.begin();
     while (std::isdigit(*it)) it++;
-    return std::string_view{it, static_cast<size_t>(s.end()-it)};
+    s.remove_prefix(it - s.begin());
+    return s;
 }
 
 std::string_view keycodeToStr(sf::Keyboard::Key key) {

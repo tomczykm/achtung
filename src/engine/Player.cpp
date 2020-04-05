@@ -1,6 +1,5 @@
 #include "engine/Player.hpp"
 
-#include <cmath>
 #include <algorithm>
 
 #include "app/Log.hpp"
@@ -18,6 +17,8 @@ const std::set<PlayerEffect> appliedOnFirstStack = {
     PlayerEffect::Warp, PlayerEffect::NoTrails
 };
 
+constexpr auto pi = 3.141592;
+
 constexpr auto playerToGameAreaSizeRatio = 253.334f;
 constexpr auto playerSpeedToGameAreaSizeRatio = 7.6f;
 
@@ -28,11 +29,11 @@ PlayerThing::PlayerThing(const PlayerInfo& info, int playAreaCorner, int playAre
     tickrate_{tickrate},
     playAreaCorner_{playAreaCorner},
     playAreaSide_{playAreaSide},
-    baseVel_{playAreaSide_ / playerSpeedToGameAreaSizeRatio},
+    baseVel_{static_cast<int>(playAreaSide_ / playerSpeedToGameAreaSizeRatio)},
     baseRadius_{playAreaSide_ / playerToGameAreaSizeRatio},
     baseTurn_{tickrate_ * 1.1},
     shape_{baseRadius_},
-    recShape_{{baseRadius_*2, baseRadius_*2}},
+    recShape_{{baseRadius_*2.f, baseRadius_*2.f}},
     vel_{baseVel_},
     gapSwitchTimer_{gapSwitchTimer}
 {
@@ -54,7 +55,7 @@ const sf::Shape& PlayerThing::getShape() const {
 void PlayerThing::step(double timeStep, std::deque<TrailThing>& trails) {
     endExpiredEffects();
 
-    if (not isRightAngled()) {
+    if (!isRightAngled()) {
         if (isKeyPressed(info_.right)) {
             direction_ += timeStep * turnDegrees_;
         } else if (isKeyPressed(info_.left)) {
@@ -75,8 +76,8 @@ void PlayerThing::step(double timeStep, std::deque<TrailThing>& trails) {
 void PlayerThing::move(double timeStep, std::deque<TrailThing>& trails) {
     auto [oldX, oldY] = shape_.getPosition();
     setPosition(
-        oldX + (timeStep * vel_ * sin(-(M_PI/180)*direction_)),
-        oldY + (timeStep * vel_ * cos(-(M_PI/180)*direction_))
+        oldX + (timeStep * vel_ * sin(-(pi/180)*direction_)),
+        oldY + (timeStep * vel_ * cos(-(pi/180)*direction_))
     );
 
     auto [newX, newY] = shape_.getPosition();
@@ -84,8 +85,8 @@ void PlayerThing::move(double timeStep, std::deque<TrailThing>& trails) {
         const auto numSegments = distance({newX, newY}, {oldX, oldY}) / (TrailThing::height-1);
         for (auto i = 0u; i < numSegments; ++i) {
             trails.emplace_front(oldX, oldY, direction_, shape_.getRadius()*2, info_.color);
-            oldX += ((TrailThing::height-1) * sin(-(M_PI/180)*direction_));
-            oldY += ((TrailThing::height-1) * cos(-(M_PI/180)*direction_));
+            oldX += ((TrailThing::height-1) * sin(-(pi/180)*direction_));
+            oldY += ((TrailThing::height-1) * cos(-(pi/180)*direction_));
         }
     }
 
@@ -308,7 +309,7 @@ void PlayerThing::updateRadius() {
         sizeTier -= it->second.size();
     }
 
-    const auto newRadius = sizeTier >= 0 ?
+    const float newRadius = sizeTier >= 0 ?
         baseRadius_ * (sizeTier+1) :
         baseRadius_ * std::pow(2/3.f, -sizeTier);
 

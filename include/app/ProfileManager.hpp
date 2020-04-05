@@ -39,7 +39,7 @@ private:
     ProfileId makeNewId();
     std::string_view makeUpdateQuery(bool isNewProfile);
 
-    sf::Color decodeColor(int);
+    sf::Color decodeColor(std::uint32_t);
 
     sql::Connection& db_;
 

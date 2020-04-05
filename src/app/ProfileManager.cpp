@@ -58,6 +58,6 @@ ProfileId ProfileManager::makeNewId() {
     return profiles_.size() == 0 ? 0 : profiles_.rbegin()->first + 1;
 }
 
-sf::Color ProfileManager::decodeColor(int color) {
+sf::Color ProfileManager::decodeColor(std::uint32_t color) {
     return sf::Color{(color << 8) | 0xff};
 }

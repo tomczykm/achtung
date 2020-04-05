@@ -10,7 +10,7 @@ jobs:
   windows-build:
     runs-on: windows-latest
     env:
-      vcpkgResponseFile: '${{ github.workspace }}/vcpkg-deps.txt'
+      vcpkgResponseFile: '${{ github.workspace }}\vcpkg-deps.txt'
 
     steps:
     - name: Checkout
@@ -24,14 +24,14 @@ jobs:
     - name: Cache vcpkg's artifacts
       uses: actions/cache@v1
       with:
-        path: '${{ github.workspace }}/external/vcpkg'
+        path: '${{ github.workspace }}\external/\vcpkg'
         key:  ${{ hashFiles( env.vcpkgResponseFile ) }}-${{ hashFiles('.git/modules/vcpkg/HEAD') }}-${{ runner.os }}
 
     - name: Install dependencies
       uses: lukka/run-vcpkg@v1.4
       with:
-        vcpkgArguments: '${{ env.vcpkgResponseFile  }}'
-        vcpkgDirectory: '${{ github.workspace }}/external/vcpkg'
+        vcpkgArguments: '@${{ env.vcpkgResponseFile  }}'
+        vcpkgDirectory: '${{ github.workspace }}\external\vcpkg'
       
     - name: Generate build files
       uses: lukka/run-cmake@v1.4

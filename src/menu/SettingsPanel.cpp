@@ -1,5 +1,7 @@
 #include "menu/SettingsPanel.hpp"
 
+using namespace std::literals;
+
 SettingsPanel::SettingsPanel(Application::Interface& i, StateMenu& gs, tgui::Panel::Ptr p):
     Panel{i, gs, p}
 {
@@ -11,7 +13,7 @@ void SettingsPanel::input(const sf::Event&) {
 }
 
 void SettingsPanel::loadGui() {
-    constexpr auto resName = "ui/settingsPanel";
+    constexpr auto resName = "ui/settingsPanel"sv;
     try {
         panel_->loadWidgetsFromStream(AssetManager::openResource(resName));
     }

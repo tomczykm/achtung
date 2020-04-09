@@ -2,6 +2,8 @@
 
 #include "menu/StateMenu.hpp"
 
+using namespace std::literals;
+
 ProfilePanel::ProfilePanel(Application::Interface& i, StateMenu& gs, tgui::Panel::Ptr p):
     Panel{i, gs, p}
 {
@@ -13,7 +15,7 @@ void ProfilePanel::input(const sf::Event&) {
 }
 
 void ProfilePanel::loadGui() {
-    constexpr auto resName = "ui/profilePanel";
+    constexpr auto resName = "ui/profilePanel"sv;
     try {
         panel_->loadWidgetsFromStream(AssetManager::openResource(resName));
     }
@@ -93,13 +95,11 @@ void ProfilePanel::loadProfile(std::optional<ProfileId> id) {
 
 // example: converts "ffffff" to sf::Color::White
 sf::Color ProfilePanel::decodeColor(const std::string& str) {
-    std::uint8_t rgb[3];
-    for (auto i = 0u; i < 6; i+=2) {
-        std::stringstream ss;
-        ss << str.substr(i, 2);
-        ss >> std::hex >> rgb[i/2];
-    }
-    return {rgb[0], rgb[1], rgb[2]};
+    return {
+        static_cast<uint8_t>(std::stoi(str.substr(0, 2), 0, 16)),
+        static_cast<uint8_t>(std::stoi(str.substr(2, 2), 0, 16)),
+        static_cast<uint8_t>(std::stoi(str.substr(4, 2), 0, 16))
+    };
 }
 
 std::string ProfilePanel::encodeColor(sf::Color c) {

@@ -8,7 +8,6 @@ Application::Application():
     profiles_{database_}
 {
     const auto tickrate = config_.get<int>(Setting::TickRate);
-    print::info("hehe {}", tickrate);
     stepTime_ = sf::milliseconds(1000/tickrate);
     sf::ContextSettings windowSettings;
     windowSettings.antialiasingLevel = 8;

@@ -3,10 +3,12 @@
 #include "app/AssetManager.hpp"
 #include "app/Log.hpp"
 
+using namespace std::literals;
+
 namespace sql {
 namespace {
 
-constexpr auto dbFilename = "freeachtung.db";
+constexpr auto dbFilename = "freeachtung.db"sv;
 
 }
 

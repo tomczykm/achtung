@@ -2,6 +2,8 @@
 
 #include "menu/StateMenu.hpp"
 
+using namespace std::literals;
+
 ProfilePanel::ProfilePanel(Application::Interface& i, StateMenu& gs, tgui::Panel::Ptr p):
     Panel{i, gs, p}
 {
@@ -13,7 +15,7 @@ void ProfilePanel::input(const sf::Event&) {
 }
 
 void ProfilePanel::loadGui() {
-    constexpr auto resName = "ui/profilePanel";
+    constexpr auto resName = "ui/profilePanel"sv;
     try {
         panel_->loadWidgetsFromStream(AssetManager::openResource(resName));
     }

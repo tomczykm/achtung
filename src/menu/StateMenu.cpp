@@ -11,6 +11,8 @@
 #include "menu/ProfilePanel.hpp"
 #include "menu/SettingsPanel.hpp"
 
+using namespace std::literals;
+
 StateMenu::StateMenu(const Application::Interface& app):
     app_{app}
 {
@@ -35,7 +37,7 @@ void StateMenu::setActivePanel(PanelType t) {
 }
 
 void StateMenu::loadGui() {
-    constexpr auto resName = "ui/menu";
+    constexpr auto resName = "ui/menu"sv;
     try {
         app_.gui.loadWidgetsFromStream(AssetManager::openResource(resName));
     }

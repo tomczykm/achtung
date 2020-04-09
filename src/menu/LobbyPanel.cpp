@@ -6,6 +6,8 @@
 #include "menu/StateMenu.hpp"
 #include "menu/ProfilePanel.hpp"
 
+using namespace std::literals;
+
 namespace {
 constexpr auto PLAYER_LIST_ENTRY_HEIGHT = 60u;
 }
@@ -29,7 +31,7 @@ void LobbyPanel::onActivate() {
 }
 
 void LobbyPanel::loadGui() {
-    constexpr auto resName = "ui/lobby";
+    constexpr auto resName = "ui/lobby"sv;
     try {
         panel_->loadWidgetsFromStream(AssetManager::openResource(resName));
     }
@@ -154,7 +156,7 @@ void LobbyPanel::addPlayerEntry(ProfileId id) {
 bool LobbyPanel::canStartGame() {
     auto playersHaveSetValues = std::all_of(playerInfos_.cbegin(), playerInfos_.cend(), [] (const auto& pair) {
         const auto& p = pair.second;
-        return p.left != sf::Keyboard::Unknown && p.right != sf::Keyboard::Unknown && p.name != "";
+        return p.left != sf::Keyboard::Unknown && p.right != sf::Keyboard::Unknown;
     });
 
     std::set<std::string> names;

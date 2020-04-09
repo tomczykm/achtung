@@ -9,6 +9,8 @@
 #include "app/Log.hpp"
 #include "framework/Observer.hpp"
 
+using namespace std::literals;
+
 namespace {
 
 constexpr auto scoreListEntryHeight = 30u;
@@ -106,7 +108,7 @@ void StateGame::render() {
 }
 
 void StateGame::loadGui(const PlayerInfos& infos) {
-    constexpr auto resName = "ui/game";
+    constexpr auto resName = "ui/game"sv;
     try {
         app_.gui.loadWidgetsFromStream(AssetManager::openResource(resName));
     }

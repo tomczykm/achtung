@@ -4,6 +4,8 @@
 #include "app/IGameState.hpp"
 #include "engine/Engine.hpp"
 
+using namespace std::literals;
+
 class StateGame: public IGameState {
 public:
     StateGame(const Application::Interface&, const PlayerInfos&);
@@ -49,7 +51,7 @@ private:
         StateGame& gs;
     };
 
-    static constexpr auto PRINT = "RoundState::{} ctor";
+    static constexpr auto PRINT = "RoundState::{} ctor"sv;
 
     struct RoundBegin : RoundState {
         RoundBegin(StateGame& s): RoundState{s} { print::info(PRINT, __func__); }
